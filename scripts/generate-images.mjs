@@ -3,7 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 // API Key
-const API_KEY = "AIzaSyCccyfS2aUkkdrXSJnzO7hk-z3CaeZaKmI";
+const API_KEY = "API_KEY_HERE";
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 // Models

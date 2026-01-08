@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "WebSearch",
+      "WebFetch(domain:codesandbox.io)",
+      "WebFetch(domain:motion.dev)",
+      "WebFetch(domain:raghavvelan.medium.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:www.frontend.fyi)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

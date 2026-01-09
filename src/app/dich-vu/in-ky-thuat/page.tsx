@@ -68,7 +68,7 @@ export default function TechnicalPrintingServicePage() {
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
-                <Image src="/assets/generated/services/service-fdm-detail.png" alt="Technical Detail" fill className="object-cover" />
+                <Image src="/assets/generated/services/service-fdm-samples.png" alt="Technical Detail" fill className="object-cover" />
               </div>
               <div className="flex flex-col justify-center space-y-6">
                 {[

@@ -675,6 +675,8 @@ function ServicesSection() {
   ];
 
   useEffect(() => {
+    let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
+
     // Dynamic import GSAP to avoid SSR issues
     const initGSAP = async () => {
       const gsapModule = await import("gsap");
@@ -690,63 +692,67 @@ function ServicesSection() {
 
       if (!track || !section) return;
 
-      // Calculate how far to scroll horizontally
-      const scrollAmount = track.scrollWidth - window.innerWidth;
+      // Use GSAP context for proper cleanup
+      ctx = gsap.context(() => {
+        // Calculate how far to scroll horizontally
+        const scrollAmount = track.scrollWidth - window.innerWidth;
 
-      // Create the horizontal scroll animation
-      const tween = gsap.to(track, {
-        x: -scrollAmount,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          pin: true,
-          scrub: 0.5,
-          end: () => `+=${scrollAmount}`,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      // Animate header content as user scrolls
-      const headerContent = section.querySelector('.header-content');
-      const headerBg = section.querySelector('.header-bg-elements');
-
-      if (headerContent) {
-        gsap.to(headerContent, {
-          opacity: 0,
-          x: -100,
-          scale: 0.9,
-          ease: "power2.inOut",
+        // Create the horizontal scroll animation
+        gsap.to(track, {
+          x: -scrollAmount,
+          ease: "none",
           scrollTrigger: {
             trigger: section,
-            start: "top top",
-            end: () => `+=${window.innerWidth * 0.5}`,
+            pin: true,
             scrub: 0.5,
+            end: () => `+=${scrollAmount}`,
+            invalidateOnRefresh: true,
           },
         });
-      }
 
-      if (headerBg) {
-        gsap.to(headerBg, {
-          opacity: 0,
-          scale: 1.2,
-          ease: "power2.inOut",
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${window.innerWidth * 0.4}`,
-            scrub: 0.5,
-          },
-        });
-      }
+        // Animate header content as user scrolls
+        const headerContent = section.querySelector('.header-content');
+        const headerBg = section.querySelector('.header-bg-elements');
 
-      // Cleanup on unmount
-      return () => {
-        tween.kill();
-        ScrollTrigger.getAll().forEach((t) => t.kill());
-      };
+        if (headerContent) {
+          gsap.to(headerContent, {
+            opacity: 0,
+            x: -100,
+            scale: 0.9,
+            ease: "power2.inOut",
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: () => `+=${window.innerWidth * 0.5}`,
+              scrub: 0.5,
+            },
+          });
+        }
+
+        if (headerBg) {
+          gsap.to(headerBg, {
+            opacity: 0,
+            scale: 1.2,
+            ease: "power2.inOut",
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: () => `+=${window.innerWidth * 0.4}`,
+              scrub: 0.5,
+            },
+          });
+        }
+      }, sectionRef);
     };
 
     initGSAP();
+
+    // Cleanup on unmount
+    return () => {
+      if (ctx) {
+        ctx.revert();
+      }
+    };
   }, []);
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 interface LenisProviderProps {
@@ -9,6 +10,7 @@ interface LenisProviderProps {
 
 export function LenisProvider({ children }: LenisProviderProps) {
   const lenisRef = useRef<Lenis | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -34,6 +36,15 @@ export function LenisProvider({ children }: LenisProviderProps) {
       lenis.destroy();
     };
   }, []);
+
+  // Reset scroll position on route change
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+    // Also reset native scroll as fallback
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return <>{children}</>;
 }

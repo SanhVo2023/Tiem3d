@@ -27,7 +27,7 @@ export function LandingCTA({
   subtitle = "Liên hệ ngay",
   description = "Nhận báo giá miễn phí trong vòng 30 phút",
   primaryCTA = { label: "GỬI YÊU CẦU BÁO GIÁ", href: "/bao-gia", icon: "upload" },
-  secondaryCTA = { label: "CHAT ZALO", href: "https://zalo.me/0123456789" },
+  secondaryCTA = { label: "CHAT ZALO", href: "https://zalo.me/0777863808" },
   accentColor = "orange",
 }: LandingCTAProps) {
   const ref = useRef(null);

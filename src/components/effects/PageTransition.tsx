@@ -71,7 +71,7 @@ export function PageTransition({ children }: PageTransitionProps) {
             }}
             transition={{ duration: 0.3 }}
           >
-            CÁI TIỆM IN 3D
+            TIỆM 3D
           </motion.span>
         </motion.div>
       </motion.div>

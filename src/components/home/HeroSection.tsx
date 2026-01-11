@@ -60,7 +60,7 @@ export function HeroSection() {
           transition={{ delay: 0.2 }}
         >
           <h2 className="text-display text-xl md:text-2xl text-signal">
-            Cái tiệm in 3d
+            Tiệm 3D
           </h2>
           <p className="text-mono text-xs text-noise tracking-widest mt-1">
             TỪ Ý TƯỞNG ĐẾN SẢN PHẨM
@@ -135,7 +135,7 @@ export function HeroSection() {
             </MagneticButton>
             <MagneticButton
               variant="outline"
-              href="https://zalo.me/0123456789"
+              href="https://zalo.me/0777863808"
               cursorText="CHAT"
             >
               CHAT ZALO

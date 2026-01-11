@@ -80,7 +80,7 @@ export function CTAFooter() {
 
           {/* Zalo Button */}
           <motion.a
-            href="https://zalo.me/0123456789"
+            href="https://zalo.me/0777863808"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative flex-1 max-w-xs"
@@ -117,30 +117,30 @@ export function CTAFooter() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             {/* Logo / Brand */}
             <div className="text-left">
-              <h3 className="text-display text-2xl text-signal">Cái tiệm in 3d</h3>
+              <h3 className="text-display text-2xl text-signal">Tiệm 3D</h3>
               <p className="text-mono text-xs text-noise mt-1">TỪ Ý TƯỞNG ĐẾN SẢN PHẨM</p>
             </div>
 
             {/* Contact Info */}
             <div className="flex flex-col md:flex-row gap-8 text-mono text-xs text-noise">
               <div>
-                <p className="text-zinc-600 mb-1">EMAIL</p>
-                <p className="text-signal">contact@caitiemoin3d.vn</p>
-              </div>
-              <div>
-                <p className="text-zinc-600 mb-1">ZALO</p>
-                <p className="text-signal">0123 456 789</p>
+                <p className="text-zinc-600 mb-1">ZALO / ĐIỆN THOẠI</p>
+                <p className="text-signal">0777 863 808</p>
               </div>
               <div>
                 <p className="text-zinc-600 mb-1">ĐỊA CHỈ</p>
-                <p className="text-signal">TP. Hồ Chí Minh, Việt Nam</p>
+                <p className="text-signal">Thủ Đức, TP.HCM</p>
+              </div>
+              <div>
+                <p className="text-zinc-600 mb-1">GIỜ LÀM VIỆC</p>
+                <p className="text-signal">8:00 - 22:00</p>
               </div>
             </div>
           </div>
 
           {/* Copyright */}
           <p className="text-mono text-xs text-zinc-600 mt-8">
-            © 2024 CÁI TIỆM IN 3D. ALL RIGHTS RESERVED.
+            © 2024 TIỆM 3D. ALL RIGHTS RESERVED.
           </p>
         </motion.div>
       </motion.div>

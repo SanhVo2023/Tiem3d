@@ -539,6 +539,12 @@ html.lenis body {
   to { transform: rotate(360deg); }
 }
 
+/* Shimmer effect for skeleton loaders */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Draw line */
 .animate-draw {
   stroke-dasharray: 1000;

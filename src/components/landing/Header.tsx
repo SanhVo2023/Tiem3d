@@ -52,7 +52,7 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <span className="text-display text-xl text-zinc-900 group-hover:text-orange-500 transition-colors">
-              Cái Tiệm In <span className="text-orange-500">3D</span>
+              Tiệm <span className="text-orange-500">3D</span>
             </span>
           </Link>
 

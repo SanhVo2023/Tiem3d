@@ -85,10 +85,9 @@ export function Logo({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <span className={`text-display tracking-tight ${textColor}`}>
-        CÁI TIỆM
+        TIỆM
       </span>
       <span className="flex items-center gap-1">
-        <span className={`text-display tracking-tight ${textColor}`}>IN</span>
         <span className="text-display tracking-tight text-orange-500">3D</span>
       </span>
     </motion.div>
@@ -102,7 +101,7 @@ export function Logo({
       animate={animate ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: 0.5 }}
     >
-      Cái Tiệm In <span className="text-orange-500">3D</span>
+      Tiệm <span className="text-orange-500">3D</span>
     </motion.span>
   );
 
@@ -137,9 +136,8 @@ export function HeroLogo({ animate = true }: { animate?: boolean }) {
         animate={animate ? { opacity: 1, y: 0 } : undefined}
         transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
       >
-        <span className="block text-zinc-900">CÁI TIỆM</span>
+        <span className="block text-zinc-900">TIỆM</span>
         <span className="block">
-          <span className="text-zinc-900">IN </span>
           <span className="text-gradient-animated">3D</span>
         </span>
       </motion.div>

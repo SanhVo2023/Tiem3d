@@ -17,6 +17,7 @@ import { ZaloWidget } from "@/components/ui";
 import { Marquee } from "@/components/animations/Marquee";
 import { MagneticElement } from "@/components/animations/MagneticElement";
 import { CountUp } from "@/components/animations/CountUp";
+import { TestimonialsSection, FAQSection } from "@/components/home";
 import { Menu, X, ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
 
 // ============================================
@@ -60,6 +61,8 @@ export default function Home() {
         <ProcessTimeline />
         <PortfolioBento />
         <StatsReveal />
+        <TestimonialsSection />
+        <FAQSection />
         <MagneticCTA />
       </main>
       <Footer />
@@ -94,7 +97,7 @@ function IntroLoader() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.76, 0, 0.24, 1] }}
           >
             <span className="text-display text-4xl md:text-6xl text-white block">
-              CÁI TIỆM IN
+              TIỆM
             </span>
           </motion.div>
           <motion.span
@@ -161,7 +164,7 @@ function FloatingHeader({ scrollProgress }: { scrollProgress: number }) {
           <Link href="/" className="flex items-center group">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <span className="text-display text-lg md:text-xl text-zinc-900">
-                CÁI TIỆM IN{" "}
+                TIỆM{" "}
                 <span className="text-gradient-animated">3D</span>
               </span>
             </motion.div>
@@ -521,7 +524,7 @@ function CinematicHero({
             </MagneticElement>
             <MagneticElement strength={0.15}>
               <Link
-                href="https://zalo.me/0123456789"
+                href="https://zalo.me/0777863808"
                 className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 bg-transparent border-2 border-white/30 text-white font-bold text-base md:text-lg rounded-full hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300"
               >
                 <span>CHAT ZALO</span>
@@ -1070,7 +1073,7 @@ function ManifestoSection() {
           >
             <div className="w-12 h-[2px] bg-gradient-to-r from-orange-500 to-cyan-500" />
             <p className="text-sm text-zinc-500 font-mono uppercase tracking-widest">
-              Cái Tiệm In 3D, 2024
+              Tiệm 3D, 2024
             </p>
           </motion.div>
         </motion.div>
@@ -1205,27 +1208,27 @@ function PortfolioBento() {
 
   const items = [
     {
-      title: "Figure & Miniature",
-      description: "Resin 8K, layer 0.025mm",
-      image: "/assets/generated/products/product-figure-01.png",
+      title: "Tượng Phật A Di Đà",
+      description: "FDM 60cm, sơn vàng đồng",
+      image: "/assets/generated/projects/tuong-phat/phat-08-finished.png",
       span: "col-span-2 row-span-2",
     },
     {
-      title: "Mechanical Parts",
-      description: "FDM PETG, tolerance ±0.1mm",
-      image: "/assets/generated/products/product-gear.png",
+      title: "Rồng Trang Trí",
+      description: "FDM 80cm, sơn đỏ vàng",
+      image: "/assets/generated/projects/rong-trang-tri/rong-07-finished.png",
       span: "col-span-1 row-span-1",
     },
     {
-      title: "Cosplay Props",
-      description: "FDM + Finish",
-      image: "/assets/generated/projects/project4-06-finished.png",
+      title: "Tượng Goku 50cm",
+      description: "FDM + LED effects",
+      image: "/assets/generated/projects/tuong-anime-lon/goku-08-finished.png",
       span: "col-span-1 row-span-1",
     },
     {
-      title: "Custom Lamp",
-      description: "FDM PLA, 200mm",
-      image: "/assets/generated/products/product-lamp.png",
+      title: "Mascot Cửa Hàng 1m",
+      description: "FDM khổ lớn, 15kg filament",
+      image: "/assets/generated/projects/mascot-cua-hang/mascot-08-finished.png",
       span: "col-span-2 row-span-1",
     },
   ];
@@ -1477,7 +1480,7 @@ function MagneticCTA() {
 
           <MagneticElement strength={0.15}>
             <Link
-              href="https://zalo.me/0123456789"
+              href="https://zalo.me/0777863808"
               className="inline-flex items-center justify-center px-10 md:px-14 py-5 md:py-6 bg-white border-2 border-zinc-300 text-zinc-700 text-lg md:text-xl font-bold rounded-full hover:border-cyan-500 hover:text-cyan-500 transition-all duration-300 shadow-lg"
             >
               CHAT ZALO

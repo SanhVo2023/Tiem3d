@@ -12,6 +12,8 @@ interface MagneticButtonProps {
   onClick?: () => void;
   cursorText?: string;
   magneticStrength?: number;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 }
 
 export function MagneticButton({
@@ -22,6 +24,8 @@ export function MagneticButton({
   onClick,
   cursorText = "XEM",
   magneticStrength = 0.3,
+  disabled = false,
+  type = "button",
 }: MagneticButtonProps) {
   const buttonRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -47,7 +51,8 @@ export function MagneticButton({
     "relative inline-flex items-center justify-center px-8 py-4",
     "font-mono text-sm uppercase tracking-widest",
     "transition-colors duration-300",
-    "overflow-hidden group"
+    "overflow-hidden group",
+    disabled && "opacity-50 cursor-not-allowed"
   );
 
   const variantStyles = {
@@ -105,7 +110,7 @@ export function MagneticButton({
   }
 
   return (
-    <button onClick={onClick} type="button">
+    <button onClick={disabled ? undefined : onClick} type={type} disabled={disabled}>
       {ButtonContent}
     </button>
   );

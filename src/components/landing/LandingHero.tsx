@@ -33,7 +33,7 @@ export function LandingHero({
   titleAccent,
   description,
   primaryCTA = { label: "BÁO GIÁ NGAY", href: "/bao-gia" },
-  secondaryCTA = { label: "CHAT ZALO", href: "https://zalo.me/0123456789" },
+  secondaryCTA = { label: "CHAT ZALO", href: "https://zalo.me/0777863808" },
   stats,
   accentColor = "orange",
 }: LandingHeroProps) {

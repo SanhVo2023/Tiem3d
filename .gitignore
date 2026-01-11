@@ -42,3 +42,4 @@ next-env.d.ts
 
 # scripts with API keys
 generate-images.mjs
+scripts/upload-to-r2.mjs

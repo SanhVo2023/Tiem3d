@@ -106,7 +106,7 @@ export function HeroSection() {
           </MagneticButton>
           <MagneticButton
             variant="outline"
-            href="https://zalo.me/0777863808"
+            href="https://zalo.me/0384844730"
             cursorText="CHAT"
           >
             CHAT ZALO

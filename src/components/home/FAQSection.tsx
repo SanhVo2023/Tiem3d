@@ -115,7 +115,7 @@ export function FAQSection() {
           >
             Còn thắc mắc?{" "}
             <a
-              href="https://zalo.me/0777863808"
+              href="https://zalo.me/0384844730"
               target="_blank"
               rel="noopener noreferrer"
               className="text-orange-500 hover:text-orange-600 font-medium"

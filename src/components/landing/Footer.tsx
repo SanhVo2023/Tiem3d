@@ -1,33 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, Mail, MapPin, Phone } from "lucide-react";
-
-const services = [
-  { name: "Thiết kế 3D theo yêu cầu", href: "/dich-vu/thiet-ke-3d" },
-  { name: "In 3D FDM (PLA, PETG)", href: "/dich-vu/in-fdm" },
-  { name: "In 3D Resin 8K/14K/16K", href: "/dich-vu/in-resin" },
-  { name: "In 3D màu (Multicolor)", href: "/dich-vu/in-hang-loat" },
-  { name: "Sơn hoàn thiện mô hình", href: "/dich-vu/hoan-thien" },
-  { name: "Dự án trọn gói", href: "/dich-vu/du-an-tron-goi" },
-];
-
-const serviceAreas = [
-  "Thủ Đức",
-  "Quận 9",
-  "Quận 2",
-  "Bình Thạnh",
-  "TP. Hồ Chí Minh",
-];
-
-const quickLinks = [
-  { name: "Trang chủ", href: "/" },
-  { name: "Portfolio", href: "/portfolio" },
-  { name: "Blog", href: "/blog" },
-  { name: "Báo giá", href: "/bao-gia" },
-];
+import { MessageCircle, Mail, MapPin, Phone, Clock } from "lucide-react";
+import { BUSINESS, formatAddressShort, mapsUrl } from "@/lib/business";
+import { SERVICES, QUICK_LINKS } from "@/lib/navigation";
 
 export function Footer() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="bg-zinc-900 text-zinc-400">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -35,18 +15,18 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="inline-block mb-4">
-              <span className="text-display text-2xl text-white">Tiệm 3D</span>
+              <span className="text-display text-2xl text-white">{BUSINESS.name}</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4">
-              Dịch vụ in 3D và thiết kế chuyên nghiệp tại Thủ Đức, TP.HCM.
-              FDM, Resin 8K/14K/16K, sơn hoàn thiện mô hình.
+              Dịch vụ in 3D và thiết kế chuyên nghiệp tại TP.HCM. FDM, Resin
+              8K/14K/16K, sơn hoàn thiện mô hình.
             </p>
             <p className="text-xs text-zinc-500 mb-6">
-              Phục vụ: {serviceAreas.join(" • ")}
+              Phục vụ: {BUSINESS.serviceAreas.join(" • ")}
             </p>
             <div className="flex gap-4">
               <a
-                href="https://zalo.me/0777863808"
+                href={BUSINESS.zalo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center hover:bg-[#0068ff] transition-colors"
@@ -55,20 +35,29 @@ export function Footer() {
                 <MessageCircle className="w-5 h-5 text-white" />
               </a>
               <a
-                href="tel:0777863808"
+                href={BUSINESS.tel}
                 className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center hover:bg-orange-500 transition-colors"
-                aria-label="Gọi điện"
+                aria-label={`Gọi ${BUSINESS.phoneDisplay}`}
               >
                 <Phone className="w-5 h-5 text-white" />
+              </a>
+              <a
+                href={`mailto:${BUSINESS.email}`}
+                className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center hover:bg-orange-500 transition-colors"
+                aria-label={`Email ${BUSINESS.email}`}
+              >
+                <Mail className="w-5 h-5 text-white" />
               </a>
             </div>
           </div>
 
           {/* Services */}
           <div>
-            <h4 className="text-white text-sm font-mono uppercase tracking-wider mb-4">Dịch vụ</h4>
+            <h4 className="text-white text-sm font-mono uppercase tracking-wider mb-4">
+              Dịch vụ
+            </h4>
             <ul className="space-y-3">
-              {services.map((service) => (
+              {SERVICES.map((service) => (
                 <li key={service.href}>
                   <Link
                     href={service.href}
@@ -83,9 +72,11 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white text-sm font-mono uppercase tracking-wider mb-4">Liên kết</h4>
+            <h4 className="text-white text-sm font-mono uppercase tracking-wider mb-4">
+              Liên kết
+            </h4>
             <ul className="space-y-3">
-              {quickLinks.map((link) => (
+              {QUICK_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -96,26 +87,23 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-
-            <h4 className="text-white text-sm font-mono uppercase tracking-wider mb-4 mt-8">Khu vực phục vụ</h4>
-            <ul className="space-y-2">
-              {serviceAreas.map((area) => (
-                <li key={area} className="text-sm text-zinc-500">
-                  {area}
-                </li>
-              ))}
-            </ul>
           </div>
 
-          {/* Contact */}
+          {/* Contact — one block per branch */}
           <div>
-            <h4 className="text-white text-sm font-mono uppercase tracking-wider mb-4">Liên hệ</h4>
+            <h4 className="text-white text-sm font-mono uppercase tracking-wider mb-4">
+              Liên hệ
+            </h4>
+
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <Phone className="w-4 h-4 mt-0.5 text-orange-500 flex-shrink-0" />
                 <div>
-                  <a href="tel:0777863808" className="text-sm text-white hover:text-orange-500 transition-colors">
-                    0777 863 808
+                  <a
+                    href={BUSINESS.tel}
+                    className="text-sm text-white hover:text-orange-500 transition-colors font-mono"
+                  >
+                    {BUSINESS.phoneDisplay}
                   </a>
                   <p className="text-xs text-zinc-500">Zalo / Điện thoại</p>
                 </div>
@@ -124,7 +112,7 @@ export function Footer() {
                 <MessageCircle className="w-4 h-4 mt-0.5 text-orange-500 flex-shrink-0" />
                 <div>
                   <a
-                    href="https://zalo.me/0777863808"
+                    href={BUSINESS.zalo}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-white hover:text-orange-500 transition-colors"
@@ -134,20 +122,36 @@ export function Footer() {
                   <p className="text-xs text-zinc-500">Báo giá nhanh trong 30 phút</p>
                 </div>
               </li>
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 text-orange-500 flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-white">Thủ Đức, TP. Hồ Chí Minh</p>
-                  <p className="text-xs text-zinc-500">61 Đường Số 1, P. Linh Tây</p>
-                </div>
-              </li>
+
+              {BUSINESS.branches.map((branch) => (
+                <li key={branch.id} className="flex items-start gap-3">
+                  <MapPin className="w-4 h-4 mt-0.5 text-orange-500 flex-shrink-0" />
+                  <div>
+                    <a
+                      href={mapsUrl(branch)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-white hover:text-orange-500 transition-colors"
+                    >
+                      {branch.name}
+                    </a>
+                    <p className="text-xs text-zinc-500">{formatAddressShort(branch)}</p>
+                    {branch.landmark && (
+                      <p className="text-xs text-zinc-600">{branch.landmark}</p>
+                    )}
+                  </div>
+                </li>
+              ))}
             </ul>
 
             {/* Opening Hours */}
             <div className="mt-6 p-4 bg-zinc-800/50 rounded-lg">
-              <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Giờ làm việc</p>
-              <p className="text-sm text-white">8:00 - 22:00</p>
-              <p className="text-xs text-zinc-500">Thứ 2 - Chủ nhật</p>
+              <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Clock className="w-3 h-3" />
+                Giờ làm việc
+              </p>
+              <p className="text-sm text-white font-mono">{BUSINESS.hours.display}</p>
+              <p className="text-xs text-zinc-500">{BUSINESS.hours.days}</p>
             </div>
           </div>
         </div>
@@ -156,21 +160,24 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <p className="text-xs text-zinc-500">
-              © 2025 Tiệm 3D - Dịch Vụ In 3D & Thiết Kế Thủ Đức. All rights reserved.
+              © {year} {BUSINESS.legalName}. All rights reserved.
             </p>
             <p className="text-xs text-zinc-600 mt-1">
               In 3D FDM • In 3D Resin 8K/14K/16K • Thiết kế 3D • Sơn mô hình
             </p>
           </div>
           <div className="flex gap-6">
-            <Link href="/bao-gia" className="text-xs text-zinc-500 hover:text-orange-500 transition-colors">
+            <Link
+              href="/bao-gia/"
+              className="text-xs text-zinc-500 hover:text-orange-500 transition-colors"
+            >
               Báo giá ngay
             </Link>
             <a
-              href="tel:0777863808"
-              className="text-xs text-zinc-500 hover:text-orange-500 transition-colors"
+              href={BUSINESS.tel}
+              className="text-xs text-zinc-500 hover:text-orange-500 transition-colors font-mono"
             >
-              0777 863 808
+              {BUSINESS.phoneDisplay}
             </a>
           </div>
         </div>

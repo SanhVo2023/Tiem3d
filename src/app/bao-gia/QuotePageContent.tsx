@@ -205,7 +205,7 @@ export default function QuotePageContent() {
 
     // Open Zalo chat after a short delay
     setTimeout(() => {
-      window.open("https://zalo.me/0777863808", "_blank");
+      window.open("https://zalo.me/0384844730", "_blank");
     }, 500);
   };
 
@@ -353,7 +353,7 @@ export default function QuotePageContent() {
 
                   {/* Open Zalo again */}
                   <a
-                    href="https://zalo.me/0777863808"
+                    href="https://zalo.me/0384844730"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 py-3 mt-3 rounded-lg border border-zinc-700 text-signal hover:bg-zinc-800 transition-colors"

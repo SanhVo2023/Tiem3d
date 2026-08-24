@@ -3,20 +3,26 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Phone } from "lucide-react";
+import { BUSINESS } from "@/lib/business";
 
 interface ContactWidgetProps {
   zaloLink?: string;
   phoneNumber?: string;
+  phoneDisplay?: string;
   contactName?: string;
   responseTime?: string;
 }
 
 export function ZaloWidget({
-  zaloLink = "https://zalo.me/0777863808",
-  phoneNumber = "0777863808",
+  zaloLink = BUSINESS.zalo,
+  phoneNumber = BUSINESS.phone,
+  phoneDisplay = BUSINESS.phoneDisplay,
   contactName = "Mr Sanh",
   responseTime = "5 phút",
 }: ContactWidgetProps) {
+  // Derive the avatar initial rather than hardcoding a letter, so changing the
+  // contact person doesn't leave a stale one behind.
+  const initial = contactName.trim().split(/\s+/).pop()?.charAt(0).toUpperCase() ?? "T";
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -36,7 +42,7 @@ export function ZaloWidget({
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">S</span>
+                    <span className="text-white font-bold text-lg">{initial}</span>
                   </div>
                   <motion.div
                     className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-zinc-900"
@@ -46,7 +52,7 @@ export function ZaloWidget({
                 </div>
                 <div>
                   <p className="text-white text-sm font-semibold">{contactName}</p>
-                  <p className="text-zinc-400 text-xs">Tiệm 3D • Đang online</p>
+                  <p className="text-zinc-400 text-xs">{BUSINESS.name} • Đang online</p>
                 </div>
               </div>
               <button
@@ -100,7 +106,7 @@ export function ZaloWidget({
                 </div>
                 <div className="flex-1 text-left">
                   <p className="text-white font-semibold text-sm">Gọi điện</p>
-                  <p className="text-white/70 text-xs">{phoneNumber.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3")}</p>
+                  <p className="text-white/70 text-xs">{phoneDisplay}</p>
                 </div>
                 <motion.div
                   className="text-white/50 group-hover:text-white"
@@ -115,7 +121,8 @@ export function ZaloWidget({
             {/* Opening Hours */}
             <div className="mt-4 pt-3 border-t border-zinc-800">
               <p className="text-[10px] text-zinc-500 text-center">
-                Mở cửa 8:00 - 22:00 • Thủ Đức, TP.HCM
+                Mở cửa {BUSINESS.hours.display} •{" "}
+                {BUSINESS.branches.map((b) => b.shortName).join(" · ")}
               </p>
             </div>
           </motion.div>

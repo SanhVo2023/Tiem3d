@@ -201,7 +201,7 @@ export function BlogContent({ posts, tags }: BlogContentProps) {
             Lien he Tiem 3D de duoc tu van mien phi va bao gia nhanh
           </p>
           <a
-            href="https://zalo.me/0777863808"
+            href="https://zalo.me/0384844730"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-zinc-900 px-6 py-3 rounded-full font-medium hover:bg-zinc-100 transition-colors"

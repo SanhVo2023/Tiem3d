@@ -80,7 +80,7 @@ export function CTAFooter() {
 
           {/* Zalo Button */}
           <motion.a
-            href="https://zalo.me/0777863808"
+            href="https://zalo.me/0384844730"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative flex-1 max-w-xs"
@@ -125,7 +125,7 @@ export function CTAFooter() {
             <div className="flex flex-col md:flex-row gap-8 text-mono text-xs text-noise">
               <div>
                 <p className="text-zinc-600 mb-1">ZALO / ĐIỆN THOẠI</p>
-                <p className="text-signal">0777 863 808</p>
+                <p className="text-signal">0384 844 730</p>
               </div>
               <div>
                 <p className="text-zinc-600 mb-1">ĐỊA CHỈ</p>

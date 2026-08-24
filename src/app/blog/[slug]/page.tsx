@@ -261,7 +261,7 @@ export default async function BlogPostPage({ params }: Props) {
                   8K/14K/16K. Thiet ke va son hoan thien mo hinh.
                 </p>
                 <a
-                  href="https://zalo.me/0777863808"
+                  href="https://zalo.me/0384844730"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-zinc-800 transition-colors"

@@ -598,7 +598,7 @@ function CinematicHero({
             </MagneticElement>
             <MagneticElement strength={0.15}>
               <Link
-                href="https://zalo.me/0777863808"
+                href="https://zalo.me/0384844730"
                 className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 bg-transparent border-2 border-white/30 text-white font-bold text-base md:text-lg rounded-full hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300"
               >
                 <span>CHAT ZALO</span>
@@ -1624,7 +1624,7 @@ function MagneticCTA() {
 
           <MagneticElement strength={0.15}>
             <Link
-              href="https://zalo.me/0777863808"
+              href="https://zalo.me/0384844730"
               className="inline-flex items-center justify-center px-10 md:px-14 py-5 md:py-6 bg-white border-2 border-zinc-300 text-zinc-700 text-lg md:text-xl font-bold rounded-full hover:border-cyan-500 hover:text-cyan-500 transition-all duration-300 shadow-lg"
             >
               CHAT ZALO

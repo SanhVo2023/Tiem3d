@@ -1,72 +1,77 @@
 import { MetadataRoute } from "next";
-import fs from "fs";
-import path from "path";
+import { BUSINESS } from "@/lib/business";
+import { SERVICES } from "@/lib/navigation";
+import { getAllPosts, getAllTagSlugs } from "@/lib/blog";
+import { getAllCaseStudies } from "@/lib/portfolio";
 
 export const dynamic = "force-static";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://tiem3d.com";
-  const lastModified = "2025-01-11";
+const BASE = BUSINESS.url;
 
-  const services = [
-    "in-fdm",
-    "in-resin",
-    "in-kho-lon",
-    "in-ky-thuat",
-    "thiet-ke-3d",
-    "hoan-thien",
-    "in-hang-loat",
-    "du-an-tron-goi",
+/**
+ * next.config.ts sets `trailingSlash: true`, so every page canonicalises to a
+ * URL ending in "/". The sitemap has to match exactly — it previously emitted
+ * bare paths, so every non-root entry disagreed with its own page's canonical.
+ */
+function url(path: string): string {
+  if (path === "/") return `${BASE}/`;
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  return `${BASE}${clean.endsWith("/") ? clean : `${clean}/`}`;
+}
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const posts = getAllPosts();
+
+  // Freshest post date drives the blog index; falls back to today.
+  const newestPost = posts[0]?.date ? new Date(posts[0].date) : new Date();
+
+  const staticPages: MetadataRoute.Sitemap = [
+    { url: url("/"), changeFrequency: "weekly", priority: 1 },
+    { url: url("/dich-vu"), changeFrequency: "monthly", priority: 0.9 },
+    { url: url("/bang-gia"), changeFrequency: "monthly", priority: 0.9 },
+    { url: url("/bao-gia"), changeFrequency: "monthly", priority: 0.9 },
+    { url: url("/lien-he"), changeFrequency: "monthly", priority: 0.8 },
+    { url: url("/portfolio"), changeFrequency: "weekly", priority: 0.8 },
+    {
+      url: url("/blog"),
+      lastModified: newestPost,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
   ];
 
-  // Get blog post slugs
-  const blogDir = path.join(process.cwd(), "content", "blog");
-  let blogSlugs: string[] = [];
-  try {
-    blogSlugs = fs
-      .readdirSync(blogDir)
-      .filter((file) => file.endsWith(".mdx"))
-      .map((file) => file.replace(".mdx", ""));
-  } catch {
-    // Blog directory may not exist
-  }
+  const servicePages: MetadataRoute.Sitemap = SERVICES.map((service) => ({
+    url: url(service.href),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  const caseStudyPages: MetadataRoute.Sitemap = getAllCaseStudies().map((study) => ({
+    url: url(`/portfolio/${study.slug}`),
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+  }));
+
+  // lastModified comes from each post's own frontmatter (updated ?? date)
+  // instead of the single frozen "2025-01-11" this file used to ship.
+  const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: url(`/blog/${post.slug}`),
+    lastModified: new Date(post.updated || post.date),
+    changeFrequency: "monthly" as const,
+    priority: post.featured ? 0.7 : 0.6,
+  }));
+
+  const tagPages: MetadataRoute.Sitemap = getAllTagSlugs().map((slug) => ({
+    url: url(`/blog/tag/${slug}`),
+    changeFrequency: "weekly" as const,
+    priority: 0.4,
+  }));
 
   return [
-    {
-      url: baseUrl,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/bao-gia`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/portfolio`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    ...blogSlugs.map((slug) => ({
-      url: `${baseUrl}/blog/${slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    })),
-    ...services.map((service) => ({
-      url: `${baseUrl}/dich-vu/${service}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    })),
+    ...staticPages,
+    ...servicePages,
+    ...caseStudyPages,
+    ...blogPages,
+    ...tagPages,
   ];
 }

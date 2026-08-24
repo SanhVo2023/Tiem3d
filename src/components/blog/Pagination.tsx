@@ -1,101 +1,69 @@
-"use client";
-
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  basePath?: string;
-}
-
+/**
+ * Link-based pagination. The previous version was a client component driving
+ * `useState`, so page 2 had no URL — it was unreachable to a crawler and
+ * impossible to share.
+ */
 export function Pagination({
   currentPage,
   totalPages,
-  basePath = "/blog",
-}: PaginationProps) {
+}: {
+  currentPage: number;
+  totalPages: number;
+}) {
   if (totalPages <= 1) return null;
 
-  const getPageUrl = (page: number) => {
-    if (page === 1) return basePath;
-    return `${basePath}?page=${page}`;
-  };
+  const href = (page: number) => (page === 1 ? "/blog/" : `/blog/trang/${page}/`);
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  // Generate page numbers to show
-  const getPageNumbers = () => {
-    const pages: (number | "...")[] = [];
-    const delta = 2; // Pages to show on each side of current
-
-    for (let i = 1; i <= totalPages; i++) {
-      if (
-        i === 1 ||
-        i === totalPages ||
-        (i >= currentPage - delta && i <= currentPage + delta)
-      ) {
-        pages.push(i);
-      } else if (pages[pages.length - 1] !== "...") {
-        pages.push("...");
-      }
-    }
-
-    return pages;
-  };
+  const cell =
+    "inline-flex h-10 min-w-10 items-center justify-center rounded-lg px-3 font-mono text-sm transition-colors";
 
   return (
-    <nav className="flex items-center justify-center gap-2 mt-12">
-      {/* Previous Button */}
+    <nav aria-label="Phân trang" className="mt-16 flex items-center justify-center gap-2">
       {currentPage > 1 ? (
         <Link
-          href={getPageUrl(currentPage - 1)}
-          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+          href={href(currentPage - 1)}
+          rel="prev"
+          className={`${cell} border border-zinc-200 text-zinc-700 hover:bg-zinc-100`}
         >
-          <ChevronLeft className="w-4 h-4" />
-          Truoc
+          ← Trước
         </Link>
       ) : (
-        <span className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-zinc-300 cursor-not-allowed">
-          <ChevronLeft className="w-4 h-4" />
-          Truoc
-        </span>
+        <span className={`${cell} border border-zinc-100 text-zinc-300`}>← Trước</span>
       )}
 
-      {/* Page Numbers */}
-      <div className="flex items-center gap-1">
-        {getPageNumbers().map((page, idx) =>
-          page === "..." ? (
-            <span key={`ellipsis-${idx}`} className="px-3 py-2 text-zinc-400">
-              ...
-            </span>
-          ) : (
-            <Link
-              key={page}
-              href={getPageUrl(page)}
-              className={`min-w-[40px] h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-colors ${
-                currentPage === page
-                  ? "bg-zinc-900 text-white"
-                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
-              }`}
-            >
-              {page}
-            </Link>
-          )
-        )}
-      </div>
+      {pages.map((page) =>
+        page === currentPage ? (
+          <span
+            key={page}
+            aria-current="page"
+            className={`${cell} bg-zinc-900 text-white`}
+          >
+            {page}
+          </span>
+        ) : (
+          <Link
+            key={page}
+            href={href(page)}
+            className={`${cell} border border-zinc-200 text-zinc-700 hover:bg-zinc-100`}
+          >
+            {page}
+          </Link>
+        )
+      )}
 
-      {/* Next Button */}
       {currentPage < totalPages ? (
         <Link
-          href={getPageUrl(currentPage + 1)}
-          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+          href={href(currentPage + 1)}
+          rel="next"
+          className={`${cell} border border-zinc-200 text-zinc-700 hover:bg-zinc-100`}
         >
-          Sau
-          <ChevronRight className="w-4 h-4" />
+          Sau →
         </Link>
       ) : (
-        <span className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-zinc-300 cursor-not-allowed">
-          Sau
-          <ChevronRight className="w-4 h-4" />
-        </span>
+        <span className={`${cell} border border-zinc-100 text-zinc-300`}>Sau →</span>
       )}
     </nav>
   );

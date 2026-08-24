@@ -12,7 +12,7 @@ export function RelatedPosts({ posts }: RelatedPostsProps) {
   return (
     <section className="mt-16 pt-8 border-t border-zinc-200">
       <h2 className="text-2xl font-bold text-zinc-900 mb-6">
-        Bai Viet Lien Quan
+        Bài viết liên quan
       </h2>
       <div className="grid gap-6 md:grid-cols-3">
         {posts.map((post) => (

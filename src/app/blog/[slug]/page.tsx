@@ -1,19 +1,43 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllSlugs, getPostBySlug, formatDate, getRelatedPosts } from "@/lib/blog";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import {
+  getAllSlugs,
+  getPostBySlug,
+  formatDate,
+  getRelatedPosts,
+  slugifyTag,
+} from "@/lib/blog";
+import { BUSINESS } from "@/lib/business";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import { RelatedPosts } from "@/components/blog/RelatedPosts";
+import { ZaloWidget } from "@/components/ui";
+import {
+  ArticleJsonLd,
+  BreadcrumbJsonLd,
+  FAQJsonLd,
+} from "@/components/seo/JsonLd";
+import {
+  TomTatNhanh,
+  Callout,
+  BangGia,
+  ZaloCTA,
+  ThongTinLienHe,
+  DocThem,
+  Anh,
+} from "@/components/blog/MdxComponents";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  const slugs = getAllSlugs();
-  return slugs.map((slug) => ({ slug }));
+  return getAllSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -21,63 +45,77 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(slug);
 
   if (!post) {
-    return { title: "Khong tim thay bai viet" };
+    return { title: "Không tìm thấy bài viết" };
   }
 
+  const url = `${BUSINESS.url}/blog/${slug}/`;
+  const image = post.image || "/og-image.jpg";
+
   return {
-    title: `${post.title} | Tiem 3D`,
+    title: post.title,
     description: post.description,
     authors: [{ name: post.author }],
+    keywords: post.tags,
+    // Without this every post inherited the root layout's canonical and told
+    // Google the entire blog was a duplicate of the homepage.
+    alternates: { canonical: url },
     openGraph: {
+      type: "article",
       title: post.title,
       description: post.description,
-      type: "article",
+      url,
+      siteName: BUSINESS.name,
+      locale: "vi_VN",
       publishedTime: post.date,
+      modifiedTime: post.updated || post.date,
       authors: [post.author],
-      images: post.image ? [post.image] : [],
+      tags: post.tags,
+      images: [{ url: image, width: 1200, height: 630, alt: post.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description,
+      images: [image],
     },
   };
 }
 
-// Custom MDX components
 const mdxComponents = {
-  h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1
-      className="text-3xl md:text-4xl font-bold text-zinc-900 mt-12 mb-6"
-      {...props}
-    />
-  ),
+  // Custom blocks
+  TomTatNhanh,
+  Callout,
+  BangGia,
+  ZaloCTA,
+  ThongTinLienHe,
+  DocThem,
+  Anh,
+
+  // Base elements. Headings get scroll-margin so the anchor links that
+  // rehype-slug now generates don't land under the fixed header.
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
-      className="text-2xl md:text-3xl font-semibold text-zinc-900 mt-10 mb-4"
+      className="mt-12 scroll-mt-24 text-2xl font-bold text-zinc-900 md:text-3xl"
       {...props}
     />
   ),
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
-      className="text-xl md:text-2xl font-semibold text-zinc-900 mt-8 mb-3"
+      className="mt-8 scroll-mt-24 text-xl font-semibold text-zinc-900 md:text-2xl"
       {...props}
     />
+  ),
+  h4: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h4 className="mt-6 scroll-mt-24 text-lg font-semibold text-zinc-900" {...props} />
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className="text-zinc-700 leading-relaxed mb-4" {...props} />
+    <p className="mb-4 leading-relaxed text-zinc-700" {...props} />
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
-    <ul
-      className="list-disc list-inside space-y-2 mb-6 text-zinc-700"
-      {...props}
-    />
+    <ul className="mb-6 list-disc space-y-2 pl-5 text-zinc-700" {...props} />
   ),
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
-    <ol
-      className="list-decimal list-inside space-y-2 mb-6 text-zinc-700"
-      {...props}
-    />
+    <ol className="mb-6 list-decimal space-y-2 pl-5 text-zinc-700" {...props} />
   ),
   li: (props: React.HTMLAttributes<HTMLLIElement>) => (
     <li className="leading-relaxed" {...props} />
@@ -86,17 +124,11 @@ const mdxComponents = {
     <strong className="font-semibold text-zinc-900" {...props} />
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <a
-      className="text-orange-600 hover:text-orange-700 underline"
-      {...props}
-    />
+    <a className="text-orange-600 underline hover:text-orange-700" {...props} />
   ),
   table: (props: React.HTMLAttributes<HTMLTableElement>) => (
-    <div className="overflow-x-auto mb-6">
-      <table
-        className="min-w-full border border-zinc-200 rounded-lg"
-        {...props}
-      />
+    <div className="mb-6 overflow-x-auto rounded-lg border border-zinc-200">
+      <table className="min-w-full border-collapse text-sm" {...props} />
     </div>
   ),
   thead: (props: React.HTMLAttributes<HTMLTableSectionElement>) => (
@@ -104,34 +136,46 @@ const mdxComponents = {
   ),
   th: (props: React.HTMLAttributes<HTMLTableCellElement>) => (
     <th
-      className="px-4 py-3 text-left text-sm font-semibold text-zinc-900 border-b border-zinc-200"
+      className="border-b border-zinc-200 px-4 py-3 text-left text-sm font-semibold text-zinc-900"
       {...props}
     />
   ),
   td: (props: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td
-      className="px-4 py-3 text-sm text-zinc-700 border-b border-zinc-100"
+      className="border-b border-zinc-100 px-4 py-3 text-sm text-zinc-700"
       {...props}
     />
   ),
   blockquote: (props: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
-      className="border-l-4 border-orange-500 pl-4 italic text-zinc-600 my-6"
+      className="my-6 border-l-4 border-orange-500 pl-4 italic text-zinc-600"
       {...props}
     />
   ),
   code: (props: React.HTMLAttributes<HTMLElement>) => (
     <code
-      className="bg-zinc-100 px-1.5 py-0.5 rounded text-sm font-mono"
+      className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-sm"
       {...props}
     />
   ),
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
-      className="bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto mb-6"
+      className="mb-6 overflow-x-auto rounded-lg bg-zinc-900 p-4 text-zinc-100"
       {...props}
     />
   ),
+  hr: () => <hr className="my-10 border-zinc-200" />,
+};
+
+// rehype-slug and rehype-autolink-headings are installed but were only wired
+// into the dormant contentlayer config, so no post had heading IDs.
+const mdxOptions = {
+  mdxOptions: {
+    rehypePlugins: [
+      rehypeSlug,
+      [rehypeAutolinkHeadings, { behavior: "wrap" }],
+    ] as never,
+  },
 };
 
 export default async function BlogPostPage({ params }: Props) {
@@ -143,150 +187,152 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   const relatedPosts = getRelatedPosts(slug, 3);
-
-  // JSON-LD for SEO
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.description,
-    author: {
-      "@type": "Organization",
-      name: post.author,
-    },
-    datePublished: post.date,
-    dateModified: post.date,
-    publisher: {
-      "@type": "Organization",
-      name: "Tiem 3D",
-      url: "https://in3dplus.com",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://in3dplus.com/logo.png",
-      },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `https://in3dplus.com${post.url}`,
-    },
-    image: post.image || "https://in3dplus.com/og-image.jpg",
-  };
+  const url = `${BUSINESS.url}/blog/${slug}/`;
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-white pt-24">
-        {/* JSON-LD */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+      <ArticleJsonLd
+        headline={post.title}
+        description={post.description}
+        url={url}
+        image={post.image}
+        datePublished={post.date}
+        dateModified={post.updated}
+        authorName={post.author}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Trang chủ", url: `${BUSINESS.url}/` },
+          { name: "Blog", url: `${BUSINESS.url}/blog/` },
+          { name: post.title, url },
+        ]}
+      />
+      {post.faqs.length > 0 && <FAQJsonLd faqs={post.faqs} />}
 
-        {/* Article Header */}
-        <article className="container mx-auto px-6 max-w-3xl py-12">
+      <Header />
+
+      <main className="min-h-screen bg-white pt-24">
+        <article className="container mx-auto max-w-3xl px-6 py-12">
           {/* Breadcrumb */}
-          <nav className="mb-8">
+          <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex items-center gap-2 text-sm text-zinc-500">
               <li>
                 <Link href="/" className="hover:text-zinc-900">
-                  Trang chu
+                  Trang chủ
                 </Link>
               </li>
-              <li>/</li>
+              <li aria-hidden>/</li>
               <li>
-                <Link href="/blog" className="hover:text-zinc-900">
+                <Link href="/blog/" className="hover:text-zinc-900">
                   Blog
                 </Link>
               </li>
-              <li>/</li>
-              <li className="text-zinc-900 truncate max-w-[200px]">
-                {post.title}
-              </li>
+              <li aria-hidden>/</li>
+              <li className="max-w-[220px] truncate text-zinc-900">{post.title}</li>
             </ol>
           </nav>
 
-          {/* Draft Badge */}
           {post.draft && (
-            <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-              <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-              Ban nhap - Chua xuat ban
-            </div>
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-100 px-3 py-1.5 text-sm font-medium text-yellow-800">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-500" />
+              Bản nháp — chưa xuất bản
+            </p>
           )}
 
-          {/* Meta */}
-          <div className="flex items-center gap-4 text-sm text-zinc-500 mb-4">
+          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-sm text-zinc-500">
             <time dateTime={post.date}>{formatDate(post.date)}</time>
-            <span>&#8226;</span>
+            <span aria-hidden>·</span>
             <span>{post.readingTime}</span>
-            <span>&#8226;</span>
+            <span aria-hidden>·</span>
             <span>{post.author}</span>
+            {post.updated && (
+              <>
+                <span aria-hidden>·</span>
+                <span>Cập nhật {formatDate(post.updated)}</span>
+              </>
+            )}
           </div>
 
-          {/* Title */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-900 mb-6">
+          <h1 className="mb-6 text-3xl font-bold leading-tight text-zinc-900 md:text-4xl lg:text-5xl">
             {post.title}
           </h1>
 
-          {/* Description */}
-          <p className="text-xl text-zinc-600 mb-8">{post.description}</p>
+          <p className="mb-8 text-xl leading-relaxed text-zinc-600">
+            {post.description}
+          </p>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-12">
+          <div className="mb-10 flex flex-wrap gap-2">
             {post.tags.map((tag) => (
               <Link
                 key={tag}
-                href={`/blog?tag=${encodeURIComponent(tag)}`}
-                className="px-3 py-1 bg-zinc-100 text-zinc-600 text-sm rounded-full hover:bg-zinc-200 transition-colors"
+                href={`/blog/tag/${slugifyTag(tag)}/`}
+                className="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-600 transition-colors hover:bg-zinc-200"
               >
                 {tag}
               </Link>
             ))}
           </div>
 
-          {/* Content */}
-          <div className="prose prose-zinc max-w-none">
-            <MDXRemote source={post.content} components={mdxComponents} />
-          </div>
-
-          {/* Author & CTA */}
-          <div className="mt-16 p-8 bg-zinc-50 rounded-2xl">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                3D
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-zinc-900 mb-1">Tiem 3D</h3>
-                <p className="text-zinc-600 text-sm mb-4">
-                  Dich vu in 3D chuyen nghiep tai Thu Duc, TP.HCM. In FDM, Resin
-                  8K/14K/16K. Thiet ke va son hoan thien mo hinh.
-                </p>
-                <a
-                  href="https://zalo.me/0384844730"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-zinc-800 transition-colors"
-                >
-                  Lien he qua Zalo
-                </a>
-              </div>
+          {post.image && (
+            <div className="relative mb-12 aspect-[16/9] overflow-hidden rounded-2xl bg-zinc-100">
+              <Image
+                src={post.image}
+                alt={post.title}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
             </div>
+          )}
+
+          <div className="prose prose-zinc max-w-none">
+            <MDXRemote
+              source={post.content}
+              components={mdxComponents}
+              options={mdxOptions}
+            />
           </div>
 
-          {/* Related Posts */}
+          {/* FAQ, rendered from frontmatter so the markup and the schema
+              can never drift apart. */}
+          {post.faqs.length > 0 && (
+            <section className="mt-16">
+              <h2 className="mb-6 text-2xl font-bold text-zinc-900">
+                Câu hỏi thường gặp
+              </h2>
+              <div className="divide-y divide-zinc-200 border-y border-zinc-200">
+                {post.faqs.map((faq) => (
+                  <details key={faq.question} className="group py-4">
+                    <summary className="cursor-pointer list-none font-medium text-zinc-900 marker:content-none">
+                      <span className="flex items-start justify-between gap-4">
+                        {faq.question}
+                        <span className="mt-1 text-orange-500 transition-transform group-open:rotate-45">
+                          +
+                        </span>
+                      </span>
+                    </summary>
+                    <p className="mt-3 leading-relaxed text-zinc-600">{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <ThongTinLienHe />
+
           <RelatedPosts posts={relatedPosts} />
 
-          {/* Back to Blog */}
-          <div className="mt-12 pt-8 border-t border-zinc-100">
-            <Link
-              href="/blog"
-              className="text-zinc-600 hover:text-zinc-900 transition-colors"
-            >
-              &#8592; Xem tat ca bai viet
+          <div className="mt-12 border-t border-zinc-100 pt-8">
+            <Link href="/blog/" className="text-zinc-600 transition-colors hover:text-zinc-900">
+              ← Xem tất cả bài viết
             </Link>
           </div>
         </article>
       </main>
+
       <Footer />
+      <ZaloWidget />
     </>
   );
 }

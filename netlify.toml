@@ -5,11 +5,12 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Redirects for SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# NOTE: no catch-all redirect.
+# This is a static export (next.config.ts sets output: "export"), so Netlify
+# serves out/<route>/index.html directly. A `/* -> /index.html 200` rule --
+# SPA boilerplate that used to live here -- matched every request, which meant
+# unknown URLs returned 200 with the homepage instead of a 404, and out/404.html
+# was never reachable.
 
 # Cache static assets
 [[headers]]
@@ -31,6 +32,11 @@
   for = "/*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/feed.xml"
+  [headers.values]
+    Content-Type = "application/rss+xml; charset=utf-8"
 
 # Sitemap headers
 [[headers]]

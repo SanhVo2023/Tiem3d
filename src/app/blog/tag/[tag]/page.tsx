@@ -32,6 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: `${BUSINESS.url}/blog/tag/${tagSlug}/` },
+    // One post behind a tag makes the tag page a thin duplicate of it.
+    ...(tag.count < 2 ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       type: "website",
       title,

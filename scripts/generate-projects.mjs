@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { generateImage, pause } from "./lib/gemini.mjs";
+import { VN_PROJECTS, MISSING_SINGLES } from "./data/projects-vn.mjs";
 
 // ============================================
 // CONFIG
@@ -328,6 +329,7 @@ const PROJECTS = {
       },
     ],
   },
+  ...VN_PROJECTS,
 };
 
 // ============================================
@@ -437,6 +439,16 @@ switch (command) {
       console.log("Usage: node generate-projects.mjs project <name>");
       console.log("Projects:", Object.keys(PROJECTS).join(", "));
     }
+    break;
+  case "singles":
+    (async () => {
+      for (const item of MISSING_SINGLES) {
+        const out = path.join(OUTPUT_DIR, "projects", item.dir, `${item.name}.png`);
+        await generateImage(item.prompt, out);
+        await pause(8000);
+      }
+      console.log("Singles complete.");
+    })();
     break;
   case "list":
     console.log("\n📋 Available Projects:\n");

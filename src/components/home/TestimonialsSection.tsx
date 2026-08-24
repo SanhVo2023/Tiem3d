@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
+import {motion, useInView, AnimatePresence} from "framer-motion";
 import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 
 const testimonials = [
@@ -297,7 +297,7 @@ function TestimonialCard({ testimonial, isActive }: TestimonialCardProps) {
 
       {/* Content */}
       <p className="text-zinc-300 text-base md:text-lg leading-relaxed mb-6">
-        "{testimonial.content}"
+        &ldquo;{testimonial.content}&rdquo;
       </p>
 
       {/* Project Tag */}

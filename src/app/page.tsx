@@ -15,16 +15,18 @@ import { MagneticElement } from "@/components/animations/MagneticElement";
 import { CountUp } from "@/components/animations/CountUp";
 import { TestimonialsSection, FAQSection } from "@/components/home";
 import { Menu, X, ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
+import { SERVICES } from "@/lib/navigation";
 
 // ============================================
 // MAIN PAGE - SUPER PREMIUM
 // ============================================
 export default function Home() {
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Use GSAP for smooth scroll tracking instead of Framer Motion
+  // Tracks whether the hero has scrolled far enough to switch the header to its
+  // solid state. The dependency array previously listed the same state this
+  // effect sets, so the ScrollTrigger was torn down and rebuilt on every flip.
   useEffect(() => {
     let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
 
@@ -41,13 +43,8 @@ export default function Home() {
           start: "top top",
           end: "bottom top",
           onUpdate: (self) => {
-            // Only update state at key thresholds to avoid excessive re-renders
-            const progress = self.progress;
-            if (progress > 0.2 && scrollProgress <= 0.2) {
-              setScrollProgress(0.3);
-            } else if (progress <= 0.2 && scrollProgress > 0.2) {
-              setScrollProgress(0);
-            }
+            // Functional update, so this never needs to read current state.
+            setScrolledPastHero(self.progress > 0.2);
           },
         });
       });
@@ -58,25 +55,20 @@ export default function Home() {
     return () => {
       if (ctx) ctx.revert();
     };
-  }, [scrollProgress]);
-
-  // Intro loading animation
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2000);
-    return () => clearTimeout(timer);
   }, []);
 
   return (
     <>
-      {/* Premium Intro Loader */}
-      <AnimatePresence>
-        {isLoading && <IntroLoader />}
-      </AnimatePresence>
+      {/* The intro loader used to hold a 2s splash before a 2.2-3.4s hero
+          stagger, so the primary CTA was invisible for ~3.9 seconds and LCP
+          could not fire until then. Both are gone. */}
+      <a href="#noi-dung" className="skip-link">
+        Tới nội dung chính
+      </a>
 
-      {/* Floating Header */}
-      <FloatingHeader scrollProgress={scrollProgress} />
+      <FloatingHeader scrolledPastHero={scrolledPastHero} />
 
-      <main className="overflow-x-hidden">
+      <main id="noi-dung" className="overflow-x-hidden">
         <CinematicHero heroRef={heroRef} />
         <TypographyMarquee />
         <ServicesSection />
@@ -95,100 +87,37 @@ export default function Home() {
 }
 
 // ============================================
-// INTRO LOADER - Cinematic Brand Reveal
-// ============================================
-function IntroLoader() {
-  return (
-    <motion.div
-      className="fixed inset-0 z-[100] bg-zinc-950 flex items-center justify-center"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-    >
-      <div className="relative">
-        {/* Logo reveal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
-          className="text-center"
-        >
-          <motion.div
-            className="overflow-hidden"
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.76, 0, 0.24, 1] }}
-          >
-            <span className="text-display text-4xl md:text-6xl text-white block">
-              TIỆM
-            </span>
-          </motion.div>
-          <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="text-display text-5xl md:text-8xl text-gradient-animated"
-          >
-            3D
-          </motion.span>
-        </motion.div>
-
-        {/* Loading bar */}
-        <motion.div
-          className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-32 h-[2px] bg-zinc-800 overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          <motion.div
-            className="h-full bg-gradient-to-r from-orange-500 to-cyan-500"
-            initial={{ x: "-100%" }}
-            animate={{ x: "100%" }}
-            transition={{ duration: 1, ease: "linear", repeat: 1 }}
-          />
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ============================================
 // FLOATING HEADER - Glass Morphism
 // ============================================
-function FloatingHeader({ scrollProgress }: { scrollProgress: number }) {
+function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
-  const showHeader = scrollProgress > 0.2;
 
-  const services = [
-    { name: "In FDM", href: "/dich-vu/in-fdm", tag: "Bền" },
-    { name: "In Resin 8K", href: "/dich-vu/in-resin", tag: "Chi tiết" },
-    { name: "In khổ lớn", href: "/dich-vu/in-kho-lon", tag: "500mm+" },
-    { name: "In kỹ thuật", href: "/dich-vu/in-ky-thuat", tag: "±0.1mm" },
-    { name: "Thiết kế 3D", href: "/dich-vu/thiet-ke-3d", tag: "CAD" },
-    { name: "Hoàn thiện", href: "/dich-vu/hoan-thien", tag: "Sơn · Mạ" },
-    { name: "In hàng loạt", href: "/dich-vu/in-hang-loat", tag: "-40%" },
-    { name: "Trọn gói", href: "/dich-vu/du-an-tron-goi", tag: "E2E" },
-  ];
+  // The header is always present. It used to be hidden until 20% scroll, which
+  // left the homepage with no navigation at all in the first viewport.
+  // scrolledPastHero now only controls how solid it looks.
+  const services = SERVICES;
 
   return (
     <motion.header
       className="fixed top-4 left-4 right-4 z-50"
-      initial={{ y: -100, opacity: 0 }}
-      animate={{
-        y: showHeader ? 0 : -100,
-        opacity: showHeader ? 1 : 0,
-      }}
-      transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.1, ease: [0.76, 0, 0.24, 1] }}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 bg-white/70 backdrop-blur-xl rounded-2xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+      <div
+        className={`max-w-7xl mx-auto px-4 md:px-6 py-3 rounded-2xl border transition-colors duration-300 ${
+          scrolledPastHero
+            ? "bg-white/95 backdrop-blur-xl border-zinc-200 shadow-[0_8px_32px_rgba(0,0,0,0.08)]"
+            : "bg-white/70 backdrop-blur-xl border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)]"
+        }`}
+      >
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <span className="text-display text-lg md:text-xl text-zinc-900">
-                TIỆM{" "}
-                <span className="text-gradient-animated">3D</span>
+                TIỆM <span className="text-orange-500">3D</span>
               </span>
             </motion.div>
           </Link>
@@ -500,7 +429,7 @@ function CinematicHero({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 2.2 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
             className="mb-6 md:mb-8"
           >
             <span className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
@@ -513,25 +442,14 @@ function CinematicHero({
 
           {/* Giant Brand Typography */}
           <div className="space-y-0">
-            <div className="overflow-hidden">
+            <div className="overflow-hidden pb-[0.08em]">
               <motion.h1
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
-                transition={{ duration: 1, delay: 2.4, ease: [0.76, 0, 0.24, 1] }}
-                className="text-display text-[15vw] md:text-[11vw] lg:text-[9vw] leading-[0.85] tracking-tighter text-white"
+                transition={{ duration: 0.8, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
+                className="text-display text-[18vw] md:text-[13vw] lg:text-[11vw] leading-[1] tracking-tighter text-white"
               >
-                CÁI TIỆM
-              </motion.h1>
-            </div>
-            <div className="overflow-hidden">
-              <motion.h1
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 1, delay: 2.5, ease: [0.76, 0, 0.24, 1] }}
-                className="text-display text-[15vw] md:text-[11vw] lg:text-[9vw] leading-[0.85] tracking-tighter"
-              >
-                <span className="text-white">IN </span>
-                <span className="text-gradient-animated">3D</span>
+                TIỆM <span className="text-orange-500">3D</span>
               </motion.h1>
             </div>
           </div>
@@ -540,7 +458,7 @@ function CinematicHero({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 2.8 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
             className="mt-8 md:mt-12"
           >
             <p className="text-base md:text-xl lg:text-2xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
@@ -554,7 +472,7 @@ function CinematicHero({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 3 }}
+            transition={{ duration: 0.5, delay: 0.42 }}
             className="mt-8 flex flex-wrap justify-center gap-3"
           >
             {[
@@ -566,7 +484,7 @@ function CinematicHero({
                 key={item.text}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 3.2 + i * 0.1 }}
+                transition={{ delay: 0.5 + i * 0.06 }}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full text-sm text-zinc-300"
               >
                 <span>{item.icon}</span>
@@ -579,7 +497,7 @@ function CinematicHero({
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 3.4 }}
+            transition={{ duration: 0.5, delay: 0.55 }}
             className="mt-10 md:mt-14 flex flex-col sm:flex-row gap-4 justify-center"
           >
             <MagneticElement strength={0.15}>
@@ -1023,7 +941,7 @@ function ServicesSection() {
           </div>
 
           {/* SERVICE CARDS */}
-          {services.map((service, index) => (
+          {services.map((service) => (
             <div
               key={service.number}
               className="flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[40vw] xl:w-[35vw] h-full flex items-center px-4"
@@ -1353,26 +1271,30 @@ function PortfolioBento() {
   const items = [
     {
       title: "Tượng Phật A Di Đà",
-      description: "FDM 60cm, sơn vàng đồng",
-      image: "/assets/generated/projects/tuong-phat/phat-08-finished.png",
+      description: "FDM 60cm, sơn hiệu ứng đồng",
+      image: "/assets/generated/projects/tuong-phat/phat-05-display.png",
+      href: "/portfolio/tuong-phat-a-di-da/",
       span: "col-span-2 row-span-2",
     },
     {
-      title: "Rồng Trang Trí",
-      description: "FDM 80cm, sơn đỏ vàng",
-      image: "/assets/generated/projects/rong-trang-tri/rong-07-finished.png",
+      title: "Rồng trang trí 80cm",
+      description: "9 đốt tháo rời, sơn nhũ vàng",
+      image: "/assets/generated/projects/rong-trang-tri/rong-05-display.png",
+      href: "/portfolio/rong-trang-tri-tet/",
       span: "col-span-1 row-span-1",
     },
     {
-      title: "Tượng Goku 50cm",
-      description: "FDM + LED effects",
-      image: "/assets/generated/projects/tuong-anime-lon/goku-08-finished.png",
+      title: "Tượng anime 70cm",
+      description: "8 khối, phủ bóng 2K",
+      image: "/assets/generated/projects/tuong-anime-lon/goku-05-display.png",
+      href: "/portfolio/tuong-anime-lon-70cm/",
       span: "col-span-1 row-span-1",
     },
     {
-      title: "Mascot Cửa Hàng 1m",
-      description: "FDM khổ lớn, 15kg filament",
-      image: "/assets/generated/projects/mascot-cua-hang/mascot-08-finished.png",
+      title: "Linh vật thương hiệu",
+      description: "30 bản, đồng đều màu",
+      image: "/assets/generated/projects/mascot-cua-hang/mascot-05-display.png",
+      href: "/portfolio/mascot-cua-hang/",
       span: "col-span-2 row-span-1",
     },
   ];
@@ -1413,12 +1335,15 @@ function PortfolioBento() {
           {items.map((item, index) => (
             <motion.div
               key={item.title}
-              className={`relative rounded-2xl md:rounded-3xl overflow-hidden group cursor-pointer ${item.span}`}
+              className={`relative rounded-2xl md:rounded-3xl overflow-hidden group ${item.span}`}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: index * 0.1, duration: 0.6 }}
               whileHover={{ scale: 1.02 }}
             >
+              {/* The whole tile is the link — it used to be cursor-pointer with
+                  nothing to click. */}
+              <Link href={item.href} className="absolute inset-0 z-10" aria-label={item.title} />
               <Image
                 src={item.image}
                 alt={item.title}

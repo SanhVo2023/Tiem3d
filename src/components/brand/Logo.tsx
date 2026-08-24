@@ -37,7 +37,7 @@ export function Logo({
   }[color];
 
   // The Mark - Abstract 3D cube/printer nozzle
-  const Mark = () => (
+  const Mark = (
     <motion.svg
       width={s.mark}
       height={s.mark}
@@ -77,7 +77,7 @@ export function Logo({
   );
 
   // Wordmark with stylized Vietnamese text
-  const Wordmark = () => (
+  const Wordmark = (
     <motion.div
       className={`flex flex-col leading-none ${s.text}`}
       initial={animate ? { opacity: 0, x: -10 } : undefined}
@@ -94,7 +94,7 @@ export function Logo({
   );
 
   // Single line wordmark for header
-  const WordmarkInline = () => (
+  const WordmarkInline = (
     <motion.span
       className={`text-display tracking-tight ${s.text} ${textColor}`}
       initial={animate ? { opacity: 0, y: 10 } : undefined}
@@ -106,11 +106,11 @@ export function Logo({
   );
 
   if (variant === "mark") {
-    return <Mark />;
+    return Mark;
   }
 
   if (variant === "wordmark") {
-    return <WordmarkInline />;
+    return WordmarkInline;
   }
 
   return (
@@ -119,8 +119,8 @@ export function Logo({
       initial={animate ? { opacity: 0 } : undefined}
       animate={animate ? { opacity: 1 } : undefined}
     >
-      <Mark />
-      <Wordmark />
+      {Mark}
+      {Wordmark}
     </motion.div>
   );
 }

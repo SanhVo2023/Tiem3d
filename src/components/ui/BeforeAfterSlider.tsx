@@ -12,40 +12,14 @@ interface BeforeAfterSliderProps {
   className?: string;
 }
 
-export function BeforeAfterSlider({
-  beforeImage,
-  afterImage,
-  beforeLabel = "TRƯỚC",
-  afterLabel = "SAU",
-  className = "",
-}: BeforeAfterSliderProps) {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleMove = useCallback((clientX: number) => {
-    if (!containerRef.current) return;
-
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const percentage = Math.min(Math.max((x / rect.width) * 100, 0), 100);
-    setSliderPosition(percentage);
-  }, []);
-
-  const handleMouseDown = () => setIsDragging(true);
-  const handleMouseUp = () => setIsDragging(false);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    handleMove(e.clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    handleMove(e.touches[0].clientX);
-  };
-
-  // Placeholder component when no image provided
-  const PlaceholderImage = ({ type, label }: { type: "before" | "after"; label: string }) => (
+function PlaceholderImage({
+  type,
+  label,
+}: {
+  type: "before" | "after";
+  label: string;
+}) {
+  return (
     <div className={cn(
       "absolute inset-0 flex items-center justify-center",
       type === "before"
@@ -112,10 +86,45 @@ export function BeforeAfterSlider({
             />
           </svg>
         )}
-        <p className="text-mono text-xs text-noise">{label}</p>
+        <p className="text-mono text-xs text-zinc-400">{label}</p>
       </div>
     </div>
-  );
+    );
+}
+
+export function BeforeAfterSlider({
+  beforeImage,
+  afterImage,
+  beforeLabel = "TRƯỚC",
+  afterLabel = "SAU",
+  className = "",
+}: BeforeAfterSliderProps) {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMove = useCallback((clientX: number) => {
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = Math.min(Math.max((x / rect.width) * 100, 0), 100);
+    setSliderPosition(percentage);
+  }, []);
+
+  const handleMouseDown = () => setIsDragging(true);
+  const handleMouseUp = () => setIsDragging(false);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    handleMove(e.clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    handleMove(e.touches[0].clientX);
+  };
+
+  // Placeholder component when no image provided
 
   return (
     <div
@@ -141,7 +150,7 @@ export function BeforeAfterSlider({
           <PlaceholderImage type="after" label="PRINTED PART" />
         )}
         {/* After Label */}
-        <span className="absolute bottom-4 right-4 text-mono text-xs text-signal/70 bg-void/50 px-2 py-1 z-10">
+        <span className="absolute bottom-4 right-4 text-mono text-xs text-white/80 bg-zinc-900/60 px-2 py-1 z-10">
           {afterLabel}
         </span>
       </div>
@@ -165,7 +174,7 @@ export function BeforeAfterSlider({
           )}
         </div>
         {/* Before Label */}
-        <span className="absolute bottom-4 left-4 text-mono text-xs text-signal/70 bg-void/50 px-2 py-1 z-10">
+        <span className="absolute bottom-4 left-4 text-mono text-xs text-white/80 bg-zinc-900/60 px-2 py-1 z-10">
           {beforeLabel}
         </span>
       </div>

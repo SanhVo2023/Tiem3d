@@ -7,6 +7,7 @@ export function CustomCursor() {
   const [isHovering, setIsHovering] = useState(false);
   const [hoverText, setHoverText] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+
   const [isPointer, setIsPointer] = useState(false);
 
   const cursorX = useMotionValue(-100);
@@ -15,6 +16,11 @@ export function CustomCursor() {
   const springConfig = { damping: 25, stiffness: 400 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
+
+  // Hoisted out of the JSX below: calling useSpring inside a style prop meant
+  // the hooks ran conditionally, which breaks the rules of hooks.
+  const trailX = useSpring(cursorX, { damping: 35, stiffness: 200 });
+  const trailY = useSpring(cursorY, { damping: 35, stiffness: 200 });
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -132,10 +138,7 @@ export function CustomCursor() {
       {/* Trail effect */}
       <motion.div
         className="fixed top-0 left-0 pointer-events-none z-[9999]"
-        style={{
-          x: useSpring(cursorX, { damping: 35, stiffness: 200 }),
-          y: useSpring(cursorY, { damping: 35, stiffness: 200 }),
-        }}
+        style={{ x: trailX, y: trailY }}
       >
         <motion.div
           className="relative -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-orange-500/30"

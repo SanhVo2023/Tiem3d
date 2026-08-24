@@ -7,7 +7,7 @@
 
 @theme inline {
   /* Colors - Light Mode */
-  --color-background: #ffffff;
+  --color-background: #fafaf9;
   --color-foreground: #09090b;
   --color-muted: #f4f4f5;
   --color-muted-foreground: #71717a;
@@ -15,7 +15,7 @@
 
   /* Semantic colors */
   --color-surface: #ffffff;
-  --color-surface-elevated: #fafafa;
+  --color-surface-elevated: #f5f5f4;
   --color-text-primary: #09090b;
   --color-text-secondary: #3f3f46;
   --color-text-muted: #71717a;
@@ -42,7 +42,10 @@
   --color-orange-500: #f97316;
   --color-orange-600: #ea580c;
 
-  /* Cyan accent (Secondary) */
+  /* Cyan is NOT a second brand accent. It marks Resin surfaces only, so colour
+     carries meaning (FDM = orange, Resin = cyan) instead of decorating.
+     Using it as a general accent is what made neither colour read as "the"
+     brand colour. */
   --color-secondary: #06b6d4;
   --color-secondary-hover: #0891b2;
   --color-secondary-light: #ecfeff;
@@ -51,7 +54,8 @@
   --color-cyan-500: #06b6d4;
   --color-cyan-600: #0891b2;
 
-  /* Fonts - Open Sans + JetBrains Mono */
+  /* Fonts - Be Vietnam Pro (display) + Open Sans (body) + JetBrains Mono (specs) */
+  --font-display: var(--font-display);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 
@@ -120,18 +124,20 @@ body {
 
 /* Display headings - Open Sans Bold */
 .text-display {
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 0.95;
+  /* Vietnamese stacks diacritics above the cap height, so display type needs
+     more line height than a Latin-only face would. 0.95 clipped them. */
+  line-height: 1.05;
   text-transform: uppercase;
 }
 
 .text-display-thin {
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-weight: 300;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
   letter-spacing: -0.01em;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 /* Body text */
@@ -701,4 +707,52 @@ html.lenis body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ========================================
+   Reduced motion
+   The site leans heavily on scroll animation, a pinned horizontal section and
+   smooth scrolling. None of that was gated behind a user preference.
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Scroll-reveal elements start hidden; without animation they must not stay
+     that way. */
+  [style*="opacity: 0"] {
+    opacity: 1 !important;
+  }
+}
+
+/* ========================================
+   Focus visibility
+   ======================================== */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Skip link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-zinc-900);
+  color: #fff;
+  border-radius: 0 0 0.5rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.skip-link:focus {
+  top: 0;
 }

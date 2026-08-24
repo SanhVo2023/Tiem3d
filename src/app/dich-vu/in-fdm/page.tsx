@@ -5,7 +5,7 @@ import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 export const metadata: Metadata = {
   title: "In FDM - Dịch vụ in 3D sợi bền, tiết kiệm",
   description:
-    "Dịch vụ in 3D FDM chuyên nghiệp với PLA, PETG, ABS, TPU. Giá từ 500đ/gram, layer 0.1mm, giao hàng 24h. Phù hợp cho prototype, chi tiết cơ khí, sản phẩm chịu lực.",
+    "Dịch vụ in 3D FDM chuyên nghiệp với PLA, PETG, ABS, TPU. Giá thành phẩm từ 2.000đ/gram, layer 0.1mm. Phù hợp cho prototype, chi tiết cơ khí, sản phẩm chịu lực.",
   keywords: [
     "in FDM",
     "in 3D FDM",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "In FDM - Siêu bền, siêu tiết kiệm | Tiệm 3D",
     description:
-      "Công nghệ in 3D FDM phổ biến nhất. Giá từ 500đ/gram, phù hợp cho prototype và chi tiết cơ khí.",
+      "Công nghệ in 3D FDM phổ biến nhất. Giá thành phẩm từ 2.000đ/gram, phù hợp cho prototype và chi tiết cơ khí.",
     url: "https://tiem3d.com/dich-vu/in-fdm",
     images: [
       {
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "In FDM - Dịch vụ in 3D sợi bền, tiết kiệm",
-    description: "In 3D FDM với PLA, PETG, ABS, TPU. Giá từ 500đ/gram.",
+    description: "In 3D FDM với PLA, PETG, ABS, TPU. Giá thành phẩm từ 2.000đ/gram.",
     images: ["/assets/generated/services/service-fdm-hero.png"],
   },
   alternates: {
@@ -54,10 +54,10 @@ export default function FDMServicePage() {
     <>
       <ServiceJsonLd
         name="Dịch vụ in 3D FDM"
-        description="Dịch vụ in 3D FDM chuyên nghiệp với PLA, PETG, ABS, TPU. Giá từ 500đ/gram, layer 0.1mm, giao hàng toàn quốc."
+        description="Dịch vụ in 3D FDM chuyên nghiệp với PLA, PETG, ABS, TPU. Giá thành phẩm từ 2.000đ/gram, layer 0.1mm, giao hàng toàn quốc."
         url="https://tiem3d.com/dich-vu/in-fdm"
         image="https://tiem3d.com/assets/generated/services/service-fdm-hero.png"
-        priceRange="500đ - 2000đ/gram"
+        priceRange="2.000đ - 5.000đ/gram"
       />
       <BreadcrumbJsonLd
         items={[

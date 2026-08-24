@@ -77,6 +77,7 @@ export function StaggerReveal({
         visible: {
           transition: {
             staggerChildren: staggerDelay,
+            duration,
           },
         },
         hidden: {},

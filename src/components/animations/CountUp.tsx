@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useInView, useSpring, useTransform } from "framer-motion";
 
 interface CountUpProps {
@@ -12,7 +12,7 @@ interface CountUpProps {
 export function CountUp({ value, duration = 2, className = "" }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const hasAnimated = useRef(false);
 
   const spring = useSpring(0, {
     duration: duration * 1000,
@@ -23,12 +23,14 @@ export function CountUp({ value, duration = 2, className = "" }: CountUpProps) {
     Math.round(current).toLocaleString()
   );
 
+  // A ref instead of state: this only needs to fire once and nothing renders
+  // from it, so setting state here just caused an extra render pass.
   useEffect(() => {
-    if (isInView && !hasAnimated) {
+    if (isInView && !hasAnimated.current) {
+      hasAnimated.current = true;
       spring.set(value);
-      setHasAnimated(true);
     }
-  }, [isInView, value, spring, hasAnimated]);
+  }, [isInView, value, spring]);
 
   return <motion.span ref={ref} className={className}>{display}</motion.span>;
 }

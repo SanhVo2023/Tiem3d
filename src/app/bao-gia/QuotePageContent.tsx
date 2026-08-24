@@ -105,7 +105,26 @@ export default function QuotePageContent() {
     return { valid: validFiles };
   };
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  // Declared before the handlers that call it — it used to sit below them, so
+  // both handlers referenced it before initialisation.
+  const simulateUpload = (files: File[]) => {
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsUploading(false);
+          setUploadedFiles((current) => [...current, ...files]);
+          return 100;
+        }
+        return prev + 5;
+      });
+    }, 100);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
 
@@ -121,9 +140,9 @@ export default function QuotePageContent() {
       setErrors((prev) => ({ ...prev, files: undefined }));
       simulateUpload(valid);
     }
-  }, [uploadedFiles]);
+  };
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const { valid, error } = validateFiles(files);
 
@@ -138,23 +157,6 @@ export default function QuotePageContent() {
     }
 
     e.target.value = "";
-  }, [uploadedFiles]);
-
-  const simulateUpload = (files: File[]) => {
-    setIsUploading(true);
-    setUploadProgress(0);
-
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsUploading(false);
-          setUploadedFiles((prev) => [...prev, ...files]);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 100);
   };
 
   const removeFile = (index: number) => {

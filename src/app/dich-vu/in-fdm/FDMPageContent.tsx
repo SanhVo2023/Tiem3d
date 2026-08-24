@@ -85,7 +85,7 @@ export default function FDMPageContent() {
                   className="text-lg text-zinc-600 mb-8"
                 >
                   Công nghệ in 3D phổ biến nhất thế giới. Phù hợp cho chi tiết cơ khí,
-                  vỏ bảo vệ, nguyên mẫu chức năng. Giá chỉ từ 500đ/gram.
+                  vỏ bảo vệ, nguyên mẫu chức năng. Giá thành phẩm từ 2.000đ/gram.
                 </motion.p>
 
                 {/* Stats */}
@@ -96,7 +96,7 @@ export default function FDMPageContent() {
                   className="flex gap-10 mb-8"
                 >
                   {[
-                    { value: "500đ", label: "/ gram" },
+                    { value: "2.000đ", label: "/ gram" },
                     { value: "0.1mm", label: "Layer" },
                     { value: "24h", label: "Turnaround" },
                   ].map((stat) => (

@@ -95,9 +95,9 @@ export default function ResinPageContent() {
                   className="flex gap-10 mb-8"
                 >
                   {[
-                    { value: "8K", label: "Resolution" },
-                    { value: "0.05mm", label: "Layer" },
-                    { value: "28.5", label: "Micron" },
+                    { value: "8K", label: "Độ phân giải" },
+                    { value: "28,5µm", label: "Điểm ảnh XY" },
+                    { value: "0,03mm", label: "Lớp in" },
                   ].map((stat) => (
                     <div key={stat.label}>
                       <p className="text-3xl font-bold text-zinc-900">{stat.value}</p>
@@ -156,9 +156,9 @@ export default function ResinPageContent() {
               </div>
               <div className="flex flex-col justify-center space-y-6">
                 {[
-                  { name: "8K Resolution", desc: "7680 x 4320 pixel, chi tiết siêu nhỏ" },
-                  { name: "Layer 0.025mm", desc: "Không nhìn thấy layer, bề mặt mịn như kính" },
-                  { name: "Độ chính xác ±0.05mm", desc: "Phù hợp trang sức, nha khoa, kỹ thuật" },
+                  { name: "Độ phân giải 8K", desc: "Điểm ảnh XY 28,5 micron - giữ được chi tiết cỡ 0,2mm" },
+                  { name: "Lớp in 0,02 - 0,05mm", desc: "Không nhìn thấy vân lớp, bề mặt mịn như đúc" },
+                  { name: "Độ chính xác ±0,05mm", desc: "Phù hợp trang sức, nha khoa, kỹ thuật" },
                   { name: "Nhiều loại resin", desc: "Standard, ABS-like, Flexible, Dental, Castable" },
                 ].map((item) => (
                   <div key={item.name} className="flex gap-4 items-start">

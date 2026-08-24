@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import {useRef, useEffect} from "react";
 import { motion, useInView, useAnimation, Variants } from "framer-motion";
 
 interface SplitTextProps {

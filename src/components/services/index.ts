@@ -1,1 +1,0 @@
-export { ServiceTemplate } from "./ServiceTemplate";

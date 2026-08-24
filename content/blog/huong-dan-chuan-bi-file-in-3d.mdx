@@ -1,61 +1,181 @@
 ---
-title: "Hướng Dẫn Chuẩn Bị File Để In 3D Chuẩn Nhất"
-description: "Hướng dẫn chi tiết cách chuẩn bị file 3D để in. Các định dạng file, phần mềm, và lưu ý quan trọng khi gửi file in 3D."
-date: "2024-01-05"
+title: "Gửi File In 3D Sao Cho Đúng: Định Dạng, Lỗi Thường Gặp Và Chỗ Tải File Miễn Phí"
+description: "Định dạng file in 3D nào nên dùng, 6 lỗi file khiến bản in hỏng và cách sửa trong Blender hay Fusion 360, checklist trước khi gửi Zalo, và những trang tải file STL miễn phí kèm lưu ý về giấy phép."
+date: "2026-01-06"
+updated: "2026-08-25"
 author: "Tiệm 3D"
-image: "/assets/blog/chuan-bi-file.jpg"
-tags: ["hướng dẫn", "file 3D", "STL", "thiết kế"]
+image: "/assets/blog/huong-dan-chuan-bi-file-in-3d.jpg"
+tags: ["file 3D & STL", "thiết kế 3D"]
 featured: false
+faqs:
+  - question: "File in 3D nên dùng định dạng nào?"
+    answer: "STL là định dạng phổ biến nhất và mọi xưởng đều nhận. 3MF tốt hơn vì lưu được cả đơn vị đo và màu sắc. STEP dùng cho chi tiết kỹ thuật vì giữ được hình học chính xác thay vì lưới tam giác. Tránh gửi file .blend, .skp hay .max — đó là file dự án, không phải file in."
+  - question: "Vì sao file của tôi in ra bị sai kích thước?"
+    answer: "Gần như luôn là lỗi đơn vị đo. STL không lưu đơn vị, nên file xuất từ phần mềm dùng inch sẽ bị hiểu là milimet — sai đúng 25,4 lần. Cách kiểm tra: mở file và xem kích thước tổng, nếu nó nhỏ hơn hoặc lớn hơn mong đợi khoảng 25 lần thì đây là nguyên nhân."
+  - question: "Thành mỏng bao nhiêu thì in được?"
+    answer: "Với FDM, thành mỏng nhất nên từ 0,8mm trở lên — tương đương hai lần đường kính vòi phun 0,4mm. Dưới mức đó máy sẽ in không liền hoặc bỏ qua hẳn. Với Resin thì mỏng tới 0,3–0,5mm vẫn in được nhưng rất dễ gãy."
+  - question: "Tải file STL miễn phí ở đâu?"
+    answer: "Các trang phổ biến là Printables, MakerWorld, Thingiverse, Cults3D và MyMiniFactory. Lưu ý kiểm tra giấy phép của từng mẫu: in một bản cho cá nhân thì hầu hết đều cho phép, nhưng nhiều mẫu cấm dùng cho mục đích thương mại."
+  - question: "Tôi không có phần mềm 3D thì gửi gì?"
+    answer: "Gửi ảnh. Ba tấm chụp mặt trên, mặt bên và mặt dưới, có đặt cây thước bên cạnh, là đủ để chúng tôi dựng lại mẫu. Phí thiết kế từ 200.000đ tùy độ phức tạp."
 ---
 
-# Hướng Dẫn Chuẩn Bị File Để In 3D
+File đúng thì in một lần là xong. File sai thì mất thêm một vòng trao đổi, đôi khi mất cả một bản in hỏng. Bài này gom lại mọi thứ cần biết trước khi bấm nút gửi — kể cả khi bạn chưa có file nào cả.
 
-Để sản phẩm in 3D đạt chất lượng tốt nhất, việc chuẩn bị file đúng cách rất quan trọng. Bài viết này sẽ hướng dẫn bạn từ A-Z.
+<TomTatNhanh>
 
-## Các Định Dạng File Được Chấp Nhận
+- **STL** là mặc định an toàn; **3MF** tốt hơn vì lưu cả đơn vị đo; **STEP** cho chi tiết kỹ thuật
+- Lỗi số một là **sai đơn vị đo** — sai đúng 25,4 lần vì nhầm inch với milimet
+- Thành mỏng nhất cho FDM là **0,8mm**; mỏng hơn máy sẽ bỏ qua
+- Có **checklist 6 bước** ở cuối bài, copy dán vào Zalo
+- **Chưa có file vẫn in được** — gửi 3 tấm ảnh có đặt thước
 
-### Định dạng phổ biến:
-- **STL**: Phổ biến nhất, hỗ trợ bởi mọi phần mềm
-- **OBJ**: Có thể giữ màu sắc, texture
-- **3MF**: Định dạng mới, giữ nhiều thông tin hơn STL
+</TomTatNhanh>
 
-### Định dạng CAD:
-- **STEP/STP**: File kỹ thuật, độ chính xác cao
-- **F3D**: File Fusion 360
-- **BLEND**: File Blender
+## Chọn định dạng file
 
-## Checklist Trước Khi Gửi File
+| Định dạng | Dùng khi nào | Lưu ý |
+|---|---|---|
+| **STL** | Mặc định, mọi xưởng đều nhận | Không lưu đơn vị đo, không lưu màu |
+| **3MF** | Tốt hơn STL nếu phần mềm của bạn xuất được | Lưu được đơn vị, màu, và nhiều vật thể |
+| **OBJ** | Khi mẫu có màu hoặc texture | Cần kèm file .mtl đi cùng |
+| **STEP / IGES** | Chi tiết kỹ thuật, cơ khí | Giữ hình học chính xác, chỉnh sửa được |
+| ~~.blend, .skp, .max, .f3d~~ | Không gửi | Đây là file dự án, không phải file in |
 
-1. **Kiểm tra Watertight (kín nước)**
-   - Mesh phải kín hoàn toàn
-   - Không có lỗ hổng hoặc mặt bị thiếu
+<Callout type="tip" title="Nếu phần mềm của bạn xuất được 3MF, hãy chọn 3MF">
 
-2. **Kiểm tra Normal**
-   - Tất cả normal phải hướng ra ngoài
-   - Flip normal nếu cần
+STL là chuẩn cũ từ thập niên 1980 và không lưu đơn vị đo — đó chính là nguồn gốc của lỗi phổ biến nhất trong danh sách dưới. 3MF lưu đơn vị, nên loại bỏ hẳn vấn đề đó.
 
-3. **Đơn vị đo lường**
-   - Xác nhận đơn vị: mm, cm, hoặc inch
-   - Ghi rõ kích thước mong muốn
+</Callout>
 
-4. **Độ dày tường**
-   - FDM: Tối thiểu 1.2mm
-   - Resin: Tối thiểu 0.8mm
+## 6 lỗi file thường gặp và cách sửa
 
-## Phần Mềm Thiết Kế Miễn Phí
+### 1. Sai đơn vị đo (lỗi phổ biến nhất)
 
-| Phần mềm | Độ khó | Phù hợp cho |
-|----------|--------|-------------|
-| Tinkercad | Dễ | Người mới bắt đầu |
-| Blender | Trung bình | Mô hình nghệ thuật |
-| Fusion 360 | Khó | Thiết kế kỹ thuật |
-| FreeCAD | Trung bình | CAD miễn phí |
+**Triệu chứng:** mẫu mở ra bé xíu như hạt gạo, hoặc to bằng cả căn phòng.
 
-## Không Có File? Không Sao!
+**Nguyên nhân:** STL chỉ lưu các con số, không lưu "đây là milimet hay inch". Phần mềm Mỹ như SolidWorks hay Fusion 360 mặc định inch; máy in đọc là milimet. Kết quả sai đúng **25,4 lần**.
 
-Tiệm 3D nhận **thiết kế 3D từ ảnh hoặc ý tưởng**. Chỉ cần:
-- Gửi ảnh mẫu qua Zalo
-- Mô tả kích thước mong muốn
-- Chúng tôi sẽ thiết kế và báo giá
+**Cách sửa:** xuất lại với đơn vị milimet, hoặc scale mẫu lên/xuống 25,4 lần. Nếu không chắc, cứ ghi kích thước mong muốn khi gửi — chúng tôi sẽ scale đúng.
 
-**Liên hệ ngay: Zalo 0384 844 730**
+### 2. Thành quá mỏng
+
+**Triệu chứng:** phần mềm cắt lớp bỏ qua hẳn một số chi tiết, hoặc in ra lỗ thủng.
+
+**Nguyên nhân:** vòi phun FDM tiêu chuẩn có đường kính 0,4mm. Thành mỏng hơn 0,8mm (hai lượt vòi) máy không in liền được.
+
+**Cách sửa:** làm dày lên tối thiểu 0,8mm, tốt nhất 1,2mm. Trong Blender dùng modifier Solidify; trong Fusion dùng lệnh Thicken.
+
+### 3. Lưới hở (non-manifold)
+
+**Triệu chứng:** phần mềm báo lỗi "mesh not watertight", hoặc bản in bị thủng lỗ chỗ.
+
+**Nguyên nhân:** mẫu có cạnh không nối liền, mặt bị lật ngược, hoặc lỗ hổng trong lưới. Máy in cần biết rõ đâu là trong, đâu là ngoài.
+
+**Cách sửa:** Blender → chọn tất cả → Mesh → Clean Up → Make Manifold. Hoặc dùng Microsoft 3D Builder, có chức năng sửa lỗi tự động khá tốt cho lỗi đơn giản.
+
+### 4. Mặt bị lật ngược (flipped normals)
+
+**Triệu chứng:** mẫu nhìn bình thường trong phần mềm nhưng cắt lớp ra kết quả kỳ lạ.
+
+**Cách sửa:** Blender → Edit Mode → chọn tất cả → Shift+N (Recalculate Normals).
+
+### 5. Quá nhiều tam giác
+
+**Triệu chứng:** file nặng hàng trăm MB, phần mềm cắt lớp treo.
+
+**Nguyên nhân:** xuất với độ phân giải lưới quá cao. Vượt một ngưỡng nhất định, tăng thêm tam giác không làm bản in đẹp hơn vì đã vượt độ chính xác của máy.
+
+**Cách sửa:** giảm lưới bằng modifier Decimate trong Blender, hoặc xuất lại với dung sai lớn hơn.
+
+### 6. Nhiều vật thể rời rạc chồng nhau
+
+**Triệu chứng:** các phần không dính vào nhau khi in.
+
+**Nguyên nhân:** mẫu gồm nhiều khối chỉ đặt cạnh nhau chứ chưa hợp nhất.
+
+**Cách sửa:** Boolean Union tất cả các khối thành một khối liền.
+
+## Checklist trước khi gửi Zalo
+
+<Callout type="info" title="Copy đoạn này và kiểm tra lần lượt">
+
+1. **Đơn vị là milimet** — mở file và xác nhận kích thước tổng đúng như mong đợi
+2. **Thành mỏng nhất từ 0,8mm trở lên**
+3. **Lưới kín**, không lỗ hổng, không mặt lật
+4. **Đã hợp nhất** các khối rời thành một
+5. **Biết chiều cao mong muốn** của thành phẩm, ghi rõ bằng cm
+6. **Biết món đó dùng để làm gì** — trưng bày, chịu lực, hay để ngoài trời
+
+</Callout>
+
+Điểm 6 quan trọng ngang các điểm kỹ thuật. Nó quyết định vật liệu, và chọn sai vật liệu là lý do phải in lại nhiều hơn cả lỗi file.
+
+## Chưa có file? Vẫn in được
+
+Phần lớn khách của chúng tôi không gửi file — họ gửi ảnh.
+
+Với chi tiết hình học đơn giản, ba tấm ảnh có đặt cây thước bên cạnh là đủ để dựng lại mẫu. Cách chụp và chi phí cụ thể ở [bài về đồ nhựa bị gãy](/blog/in-3d-do-nhua-bi-gay-khong-co-file/).
+
+Với tượng, nhân vật hay hình dáng tự do, chúng tôi dựng từ ảnh tham khảo — cần nhiều góc hơn và thời gian lâu hơn, nhưng vẫn làm được. Xem [dịch vụ thiết kế 3D](/dich-vu/thiet-ke-3d/).
+
+<ZaloCTA
+  title="Gửi file hoặc ảnh, chúng tôi kiểm tra miễn phí"
+  message={`Chào Tiệm 3D, em gửi file cần in
+Chiều cao mong muốn: ___ cm
+Số lượng: ___
+Dùng để: [trưng bày / chịu lực / để ngoài trời]
+Cần trước ngày: ___`}
+>
+Chúng tôi mở file kiểm tra và báo lại nếu có lỗi — kể cả khi bạn chưa quyết định in ở đâu.
+</ZaloCTA>
+
+## Tải file STL miễn phí ở đâu
+
+Nếu bạn không tự dựng mẫu, có rất nhiều mẫu sẵn để tải.
+
+| Trang | Điểm mạnh |
+|---|---|
+| **Printables** | Chất lượng mẫu cao, cộng đồng kiểm duyệt tốt |
+| **MakerWorld** | Nhiều mẫu đã tối ưu sẵn cho in, có mẫu nhiều màu |
+| **Thingiverse** | Kho lớn nhất, lâu đời nhất, chất lượng không đồng đều |
+| **Cults3D** | Nhiều mẫu figure và nghệ thuật, có cả mẫu trả phí |
+| **MyMiniFactory** | Mẫu được kiểm tra in được trước khi đăng |
+
+### Đọc giấy phép trước khi in để bán
+
+Đây là phần ít người để ý và có thể gây rắc rối thật.
+
+| Giấy phép | In cho mình | In để bán |
+|---|---|---|
+| CC BY | ✅ | ✅ (phải ghi nguồn) |
+| CC BY-SA | ✅ | ✅ (bản phái sinh cùng giấy phép) |
+| **CC BY-NC** | ✅ | ❌ Cấm thương mại |
+| **CC BY-ND** | ✅ | ❌ Cấm sửa đổi |
+| Standard / Personal use | ✅ | ❌ |
+| Commercial license (trả phí) | ✅ | ✅ |
+
+In một bản cho mình gần như luôn được phép. In hàng chục bản để bán ở hội chợ là chuyện khác — và **người chịu trách nhiệm là bạn**, không phải xưởng in. Chúng tôi sẽ nhắc nếu thấy mẫu có giới hạn, nhưng chúng tôi không thể kiểm tra thay bạn với mọi file.
+
+## Phần mềm miễn phí để tự sửa file
+
+- **Microsoft 3D Builder** (Windows, miễn phí) — sửa lỗi lưới tự động, đủ cho lỗi đơn giản
+- **Blender** (miễn phí) — mạnh nhất, học hơi khó, làm được mọi thứ
+- **Meshmixer** (miễn phí) — chuyên sửa và chia mẫu, giao diện dễ hơn Blender
+- **Tinkercad** (miễn phí, chạy trên trình duyệt) — dựng khối cơ bản, hợp người mới
+- **Fusion 360** (miễn phí cho cá nhân) — CAD chuyên nghiệp cho chi tiết kỹ thuật
+
+Nếu bạn chỉ cần sửa một lỗi nhỏ, 3D Builder thường xử lý được trong hai phút. Nếu phức tạp hơn, cứ gửi cho chúng tôi — sửa file là việc chúng tôi làm hằng ngày.
+
+<ZaloCTA title="Không chắc file có in được không?">
+Gửi qua Zalo, chúng tôi mở kiểm tra và báo lại trong 30 phút. Mở cửa 8:00–22:00 tất cả các ngày.
+</ZaloCTA>
+
+<DocThem>
+
+- [Đồ nhựa bị gãy, không có file thì in lại được không](/blog/in-3d-do-nhua-bi-gay-khong-co-file/)
+- [Chọn vật liệu in 3D](/blog/chon-vat-lieu-in-3d-pla-petg-abs-tpu/)
+- [Giá in 3D tính như thế nào](/blog/gia-in-3d-tinh-nhu-the-nao/)
+- [In 3D chi tiết kỹ thuật](/blog/in-3d-chi-tiet-ky-thuat/) — dung sai cho chi tiết lắp ghép
+
+</DocThem>

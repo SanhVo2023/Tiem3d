@@ -48,7 +48,7 @@ export function LenisProvider({ children }: LenisProviderProps) {
 
         // Disable GSAP's default lag smoothing for instant response
         gsap.ticker.lagSmoothing(0);
-      } catch (error) {
+      } catch {
         // Fallback to requestAnimationFrame if GSAP fails
         function raf(time: number) {
           lenis.raf(time);

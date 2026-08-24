@@ -59,7 +59,7 @@ export function Typewriter({
   cursor = true,
 }: TypewriterProps) {
   const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [, setIsTyping] = useState(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => {

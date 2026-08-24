@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { BUSINESS } from "@/lib/business";
 import { SERVICES } from "@/lib/navigation";
-import { getAllPosts, getAllTagSlugs } from "@/lib/blog";
+import { getAllPosts, getAllTags } from "@/lib/blog";
 import { getAllCaseStudies } from "@/lib/portfolio";
 
 export const dynamic = "force-static";
@@ -61,11 +61,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: post.featured ? 0.7 : 0.6,
   }));
 
-  const tagPages: MetadataRoute.Sitemap = getAllTagSlugs().map((slug) => ({
-    url: url(`/blog/tag/${slug}`),
-    changeFrequency: "weekly" as const,
-    priority: 0.4,
-  }));
+  // A tag page holding one post is a thin duplicate of that post, so it stays
+  // out of the sitemap (and is noindex'd on the page itself).
+  const tagPages: MetadataRoute.Sitemap = getAllTags()
+    .filter((tag) => tag.count >= 2)
+    .map((tag) => ({
+      url: url(`/blog/tag/${tag.slug}`),
+      changeFrequency: "weekly" as const,
+      priority: 0.4,
+    }));
 
   return [
     ...staticPages,

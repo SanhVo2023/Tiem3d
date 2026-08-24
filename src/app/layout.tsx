@@ -1,20 +1,34 @@
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
-import { JetBrains_Mono } from "next/font/google";
+import { Be_Vietnam_Pro, Open_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/effects/LenisProvider";
 import { SiteJsonLd } from "@/components/seo/JsonLd";
 import { BUSINESS, PRIMARY_BRANCH } from "@/lib/business";
 
+// Display face. Be Vietnam Pro is designed for Vietnamese, so the stacked
+// diacritics in the shop's own name ("TIỆM") sit correctly at display size —
+// Open Sans cramped the circumflex-plus-dot against the cap height.
+const beVietnamPro = Be_Vietnam_Pro({
+  variable: "--font-display",
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "600", "700", "800"],
+  display: "swap",
+});
+
+// Body face, kept for long-form legibility.
 const openSans = Open_Sans({
   variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
+// The machine voice: every measurement, spec and price on the site.
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -142,7 +156,7 @@ export default function RootLayout({
         <SiteJsonLd />
       </head>
       <body
-        className={`${openSans.variable} ${jetbrainsMono.variable} antialiased bg-white text-zinc-950 font-sans`}
+        className={`${beVietnamPro.variable} ${openSans.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground font-sans`}
       >
         <LenisProvider>
           {/* Subtle noise overlay */}

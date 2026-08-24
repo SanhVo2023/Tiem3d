@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
-// R2 CDN URL - set via environment variable
+// R2 CDN URL - set via environment variable.
+//
+// WARNING: setting this points assetPrefix at the CDN, which means every
+// /_next/* file (JS, CSS and the self-hosted font files) is requested from that
+// host. scripts/upload-to-r2.mjs only uploads public/assets, so unless the
+// build output is also pushed there with permissive CORS, the fonts fail with
+// a CORS error and the site renders unstyled. Leave blank to serve from origin.
 const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL || "";
 
 const nextConfig: NextConfig = {

@@ -190,13 +190,13 @@ export function ZaloWidget({
 
           {/* Online badge */}
           {!isExpanded && (
-            <div className="absolute -top-1 -right-1 flex items-center gap-1 bg-zinc-900 px-2 py-0.5 rounded-full border border-zinc-800">
+            <div className="absolute -top-1.5 right-full mr-2 flex items-center gap-1 whitespace-nowrap rounded-full border border-zinc-800 bg-zinc-900 px-2 py-0.5">
               <motion.div
-                className="w-2 h-2 rounded-full bg-green-500"
+                className="h-2 w-2 rounded-full bg-green-500"
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span className="text-[10px] text-white font-mono">ONLINE</span>
+              <span className="font-mono text-[10px] text-white">ONLINE</span>
             </div>
           )}
         </motion.button>

@@ -132,15 +132,30 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
               onMouseEnter={() => setIsServicesOpen(true)}
               onMouseLeave={() => setIsServicesOpen(false)}
             >
-              <button className="flex items-center gap-1 px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors rounded-full hover:bg-zinc-100">
-                Dịch vụ
-                <motion.span
-                  animate={{ rotate: isServicesOpen ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
+              <div className="flex items-center rounded-full hover:bg-zinc-100">
+                <Link
+                  href="/dich-vu/"
+                  className="py-2 pl-4 pr-1 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
                 >
-                  <ChevronDown className="w-4 h-4" />
-                </motion.span>
-              </button>
+                  Dịch vụ
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsServicesOpen((open) => !open)}
+                  aria-expanded={isServicesOpen}
+                  aria-haspopup="true"
+                  aria-label="Mở danh sách dịch vụ"
+                  className="py-2 pr-3 pl-1 text-zinc-500 hover:text-zinc-900 transition-colors"
+                >
+                  <motion.span
+                    className="inline-block"
+                    animate={{ rotate: isServicesOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </motion.span>
+                </button>
+              </div>
 
               <AnimatePresence>
                 {isServicesOpen && (
@@ -174,13 +189,15 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
               </AnimatePresence>
             </div>
 
-            <NavLink href="/portfolio">Portfolio</NavLink>
-            <NavLink href="/blog">Blog</NavLink>
+            <NavLink href="/bang-gia/">Bảng giá</NavLink>
+            <NavLink href="/portfolio/">Portfolio</NavLink>
+            <NavLink href="/blog/">Blog</NavLink>
+            <NavLink href="/lien-he/">Liên hệ</NavLink>
 
             {/* CTA Button */}
             <MagneticElement strength={0.2}>
               <Link
-                href="/bao-gia"
+                href="/bao-gia/"
                 className="ml-2 px-6 py-2.5 bg-zinc-900 text-white text-sm font-semibold rounded-full hover:bg-orange-500 transition-all duration-300 flex items-center gap-2 group"
               >
                 <span>Báo giá</span>
@@ -239,9 +256,12 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
                 <MobileNavLink href="/" onClick={() => setIsMobileMenuOpen(false)}>
                   Trang chủ
                 </MobileNavLink>
+                <MobileNavLink href="/dich-vu/" onClick={() => setIsMobileMenuOpen(false)}>
+                  Dịch vụ
+                </MobileNavLink>
                 <div className="py-2">
                   <p className="text-[10px] text-zinc-400 uppercase tracking-widest px-4 mb-2">
-                    Dịch vụ
+                    Tất cả dịch vụ
                   </p>
                   {services.map((service, i) => (
                     <motion.div
@@ -256,11 +276,17 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
                     </motion.div>
                   ))}
                 </div>
-                <MobileNavLink href="/portfolio" onClick={() => setIsMobileMenuOpen(false)}>
+                <MobileNavLink href="/bang-gia/" onClick={() => setIsMobileMenuOpen(false)}>
+                  Bảng giá
+                </MobileNavLink>
+                <MobileNavLink href="/portfolio/" onClick={() => setIsMobileMenuOpen(false)}>
                   Portfolio
                 </MobileNavLink>
-                <MobileNavLink href="/blog" onClick={() => setIsMobileMenuOpen(false)}>
+                <MobileNavLink href="/blog/" onClick={() => setIsMobileMenuOpen(false)}>
                   Blog
+                </MobileNavLink>
+                <MobileNavLink href="/lien-he/" onClick={() => setIsMobileMenuOpen(false)}>
+                  Liên hệ
                 </MobileNavLink>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -269,7 +295,7 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
                   className="pt-4"
                 >
                   <Link
-                    href="/bao-gia"
+                    href="/bao-gia/"
                     className="block w-full text-center py-4 bg-zinc-900 text-white font-bold rounded-xl"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -420,10 +446,10 @@ function CinematicHero({
 
       {/* Floating Elements - CSS animations for better perf */}
       <div className="absolute top-[20%] right-[10%] w-24 h-24 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-orange-500/30 to-transparent blur-2xl animate-float-slow" />
-      <div className="absolute bottom-[30%] left-[5%] w-32 h-32 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-cyan-500/20 to-transparent blur-3xl animate-float-slower" />
+      <div className="absolute bottom-[30%] left-[5%] w-32 h-32 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-orange-500/15 to-transparent blur-3xl animate-float-slower" />
 
       {/* Content - GSAP controlled */}
-      <div className="relative z-10 w-full px-4 md:px-6 text-center">
+      <div className="relative z-10 w-full px-4 md:px-6 pb-24 md:pb-28 text-center">
         <div ref={contentRef} className="origin-center will-change-transform">
           {/* Eyebrow */}
           <motion.div
@@ -528,13 +554,14 @@ function CinematicHero({
         {/* Scroll Indicator - hidden on mobile, GSAP fade */}
         <div
           ref={scrollIndicatorRef}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block"
+          aria-hidden
+          className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 hidden md:block"
         >
-          <div className="flex flex-col items-center gap-2 animate-bounce-slow">
-            <span className="text-xs text-zinc-500 font-mono uppercase tracking-widest">
+          <div className="flex flex-col items-center gap-1.5 animate-bounce-slow">
+            <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-[0.3em]">
               Scroll
             </span>
-            <div className="w-[1px] h-12 bg-gradient-to-b from-zinc-500 to-transparent" />
+            <div className="w-px h-8 bg-gradient-to-b from-zinc-500 to-transparent" />
           </div>
         </div>
       </div>

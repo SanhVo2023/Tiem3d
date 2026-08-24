@@ -36,6 +36,9 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_CDN_URL: cdnUrl,
   },
+
+  // Turbopack config for Next.js 16+
+  turbopack: {},
 };
 
 export default nextConfig;

@@ -3,14 +3,13 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, Upload, Check, FileText, X, AlertCircle } from "lucide-react";
+import { ArrowLeft, Upload, Check, FileText, X, AlertCircle, MessageCircle, Copy } from "lucide-react";
 import { LenisProvider, CustomCursor } from "@/components/effects";
 import { ZaloWidget, MagneticButton } from "@/components/ui";
-import { FormSuccess } from "@/components/ui/FormSuccess";
 
 // Vietnamese phone validation regex
 const PHONE_REGEX = /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$/;
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB Netlify limit
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 interface FormErrors {
   name?: string;
@@ -24,8 +23,9 @@ export default function QuotePageContent() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [zaloMessage, setZaloMessage] = useState("");
+  const [copied, setCopied] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
@@ -43,7 +43,6 @@ export default function QuotePageContent() {
         return undefined;
       case "phone":
         if (!value.trim()) return "Vui lòng nhập số điện thoại";
-        // Remove spaces and dashes for validation
         const cleanPhone = value.replace(/[\s-]/g, "");
         if (!PHONE_REGEX.test(cleanPhone)) {
           return "Số điện thoại không hợp lệ (VD: 0912345678)";
@@ -98,7 +97,6 @@ export default function QuotePageContent() {
       validFiles.push(file);
     }
 
-    // Check total size
     const totalSize = [...uploadedFiles, ...validFiles].reduce((acc, f) => acc + f.size, 0);
     if (totalSize > MAX_FILE_SIZE) {
       return { valid: [], error: "Tổng dung lượng file vượt quá 10MB" };
@@ -139,7 +137,6 @@ export default function QuotePageContent() {
       simulateUpload(valid);
     }
 
-    // Reset input
     e.target.value = "";
   }, [uploadedFiles]);
 
@@ -178,49 +175,66 @@ export default function QuotePageContent() {
     return !Object.values(newErrors).some(Boolean);
   };
 
+  const generateZaloMessage = (): string => {
+    let message = `🖨️ YÊU CẦU BÁO GIÁ IN 3D\n\n`;
+    message += `👤 Tên: ${formData.name}\n`;
+    message += `📞 SĐT: ${formData.phone}\n`;
+    if (formData.email) {
+      message += `📧 Email: ${formData.email}\n`;
+    }
+    if (uploadedFiles.length > 0) {
+      message += `📁 File: ${uploadedFiles.map(f => f.name).join(", ")}\n`;
+      message += `(Sẽ gửi file qua Zalo)\n`;
+    }
+    if (formData.notes) {
+      message += `\n📝 Ghi chú:\n${formData.notes}\n`;
+    }
+    message += `\n---\nGửi từ tiem3d.com`;
+    return message;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
+    // Generate message and show success
+    const message = generateZaloMessage();
+    setZaloMessage(message);
+    setIsSuccess(true);
 
+    // Open Zalo chat after a short delay
+    setTimeout(() => {
+      window.open("https://zalo.me/0777863808", "_blank");
+    }, 500);
+  };
+
+  const copyMessage = async () => {
     try {
-      const form = e.currentTarget;
-      const formDataObj = new FormData(form);
-
-      // Add files to form data
-      uploadedFiles.forEach((file, index) => {
-        formDataObj.append(`file-${index}`, file);
-      });
-
-      // Submit to Netlify Forms
-      const response = await fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(formDataObj as unknown as Record<string, string>).toString(),
-      });
-
-      if (response.ok) {
-        setIsSuccess(true);
-      } else {
-        throw new Error("Form submission failed");
-      }
+      await navigator.clipboard.writeText(zaloMessage);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback: show success anyway since we're using static export
-      // In production, you might want to handle this differently
-      setIsSuccess(true);
-    } finally {
-      setIsSubmitting(false);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = zaloMessage;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleReset = () => {
     setIsSuccess(false);
+    setZaloMessage("");
     setFormData({ name: "", phone: "", email: "", notes: "" });
     setUploadedFiles([]);
     setErrors({});
     setTouched({});
+    setCopied(false);
   };
 
   return (
@@ -228,7 +242,7 @@ export default function QuotePageContent() {
       <CustomCursor />
 
       <div className="min-h-screen bg-void relative">
-        {/* 3D Grid Floor (Tron Style) */}
+        {/* 3D Grid Floor */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div
             className="absolute inset-0"
@@ -288,13 +302,80 @@ export default function QuotePageContent() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-8"
+                  className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-8 max-w-lg mx-auto"
                 >
-                  <FormSuccess
-                    title="Cảm ơn bạn!"
-                    message="Chúng tôi đã nhận được yêu cầu báo giá. Sẽ liên hệ bạn trong vòng 30 phút trong giờ làm việc."
-                    onReset={handleReset}
-                  />
+                  {/* Success Icon */}
+                  <div className="text-center mb-6">
+                    <motion.div
+                      className="w-20 h-20 mx-auto bg-green-500 rounded-full flex items-center justify-center mb-4"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", delay: 0.2 }}
+                    >
+                      <Check className="w-10 h-10 text-white" />
+                    </motion.div>
+                    <h2 className="text-display text-2xl text-signal mb-2">
+                      GẦN XONG RỒI!
+                    </h2>
+                    <p className="text-mono text-sm text-noise">
+                      Zalo đã được mở. Copy tin nhắn bên dưới và gửi cho chúng tôi.
+                    </p>
+                  </div>
+
+                  {/* Message to copy */}
+                  <div className="bg-zinc-800 rounded-lg p-4 mb-4">
+                    <pre className="text-mono text-xs text-zinc-300 whitespace-pre-wrap break-words">
+                      {zaloMessage}
+                    </pre>
+                  </div>
+
+                  {/* Copy button */}
+                  <button
+                    onClick={copyMessage}
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all ${
+                      copied
+                        ? "bg-green-500 text-white"
+                        : "bg-orange-500 hover:bg-orange-600 text-white"
+                    }`}
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        ĐÃ COPY!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        COPY TIN NHẮN
+                      </>
+                    )}
+                  </button>
+
+                  {/* Open Zalo again */}
+                  <a
+                    href="https://zalo.me/0777863808"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 py-3 mt-3 rounded-lg border border-zinc-700 text-signal hover:bg-zinc-800 transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    MỞ LẠI ZALO
+                  </a>
+
+                  {/* File reminder */}
+                  {uploadedFiles.length > 0 && (
+                    <p className="text-mono text-xs text-orange-500 text-center mt-4">
+                      💡 Nhớ gửi {uploadedFiles.length} file qua Zalo nhé!
+                    </p>
+                  )}
+
+                  {/* Reset */}
+                  <button
+                    onClick={handleReset}
+                    className="w-full text-mono text-xs text-zinc-500 hover:text-signal mt-6 transition-colors"
+                  >
+                    ← Gửi yêu cầu khác
+                  </button>
                 </motion.div>
               ) : (
                 <motion.div
@@ -310,7 +391,7 @@ export default function QuotePageContent() {
                       GỬI FILE CỦA BẠN
                     </h1>
                     <p className="text-mono text-sm text-noise mt-4 max-w-md mx-auto">
-                      Nhận báo giá chi tiết trong vòng 30 phút
+                      Nhận báo giá chi tiết trong vòng 30 phút qua Zalo
                     </p>
                   </div>
 
@@ -336,7 +417,6 @@ export default function QuotePageContent() {
                       />
 
                       <div className="text-center">
-                        {/* Upload Icon / Progress */}
                         <AnimatePresence mode="wait">
                           {isUploading ? (
                             <motion.div
@@ -346,7 +426,6 @@ export default function QuotePageContent() {
                               exit={{ opacity: 0, scale: 0.8 }}
                               className="mb-6"
                             >
-                              {/* Temperature Gauge */}
                               <div className="relative w-32 h-32 mx-auto">
                                 <svg className="w-full h-full -rotate-90">
                                   <circle
@@ -414,11 +493,10 @@ export default function QuotePageContent() {
                           hoặc click để chọn file
                         </p>
                         <p className="text-mono text-xs text-zinc-600">
-                          Hỗ trợ: STL, OBJ, STEP, 3MF (tối đa 10MB)
+                          Hỗ trợ: STL, OBJ, STEP, 3MF
                         </p>
                       </div>
 
-                      {/* File Error */}
                       {errors.files && (
                         <motion.p
                           initial={{ opacity: 0, y: -10 }}
@@ -430,7 +508,6 @@ export default function QuotePageContent() {
                         </motion.p>
                       )}
 
-                      {/* Uploaded Files List */}
                       {uploadedFiles.length > 0 && (
                         <div className="mt-6 space-y-2">
                           {uploadedFiles.map((file, index) => (
@@ -463,18 +540,7 @@ export default function QuotePageContent() {
                     </motion.div>
 
                     {/* Contact Form */}
-                    <form
-                      name="quote-request"
-                      method="POST"
-                      data-netlify="true"
-                      data-netlify-honeypot="bot-field"
-                      onSubmit={handleSubmit}
-                      className="space-y-6"
-                    >
-                      {/* Netlify hidden fields */}
-                      <input type="hidden" name="form-name" value="quote-request" />
-                      <input type="hidden" name="bot-field" />
-
+                    <form onSubmit={handleSubmit} className="space-y-6">
                       <div>
                         <label className="text-mono text-xs text-noise mb-2 block">
                           TÊN CỦA BẠN *
@@ -572,37 +638,20 @@ export default function QuotePageContent() {
                         />
                       </div>
 
-                      {/* Hidden field for file count */}
-                      <input type="hidden" name="file-count" value={uploadedFiles.length} />
-
                       <MagneticButton
                         variant="solid"
                         className="w-full justify-center"
                         cursorText="GỬI"
                         type="submit"
-                        disabled={isSubmitting}
                       >
                         <span className="flex items-center gap-2">
-                          {isSubmitting ? (
-                            <>
-                              <motion.div
-                                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              />
-                              ĐANG GỬI...
-                            </>
-                          ) : (
-                            <>
-                              <Check className="w-4 h-4" />
-                              GỬI YÊU CẦU BÁO GIÁ
-                            </>
-                          )}
+                          <MessageCircle className="w-4 h-4" />
+                          GỬI QUA ZALO
                         </span>
                       </MagneticButton>
 
                       <p className="text-mono text-xs text-zinc-600 text-center">
-                        Chúng tôi sẽ phản hồi trong vòng 30 phút trong giờ làm việc
+                        Sẽ mở Zalo để bạn gửi thông tin trực tiếp
                       </p>
                     </form>
                   </div>

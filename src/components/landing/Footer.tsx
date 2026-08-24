@@ -23,6 +23,7 @@ const serviceAreas = [
 const quickLinks = [
   { name: "Trang chủ", href: "/" },
   { name: "Portfolio", href: "/portfolio" },
+  { name: "Blog", href: "/blog" },
   { name: "Báo giá", href: "/bao-gia" },
 ];
 
@@ -155,7 +156,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <p className="text-xs text-zinc-500">
-              © 2024 Tiệm 3D - Dịch Vụ In 3D & Thiết Kế Thủ Đức. All rights reserved.
+              © 2025 Tiệm 3D - Dịch Vụ In 3D & Thiết Kế Thủ Đức. All rights reserved.
             </p>
             <p className="text-xs text-zinc-600 mt-1">
               In 3D FDM • In 3D Resin 8K/14K/16K • Thiết kế 3D • Sơn mô hình

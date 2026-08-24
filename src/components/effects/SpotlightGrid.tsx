@@ -38,6 +38,11 @@ export function SpotlightGrid({ className = "" }: SpotlightGridProps) {
       className={`absolute inset-0 overflow-hidden ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{
+        // Force GPU layer to prevent jitter on mobile scroll
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+      }}
     >
       {/* Grid Pattern */}
       <div
@@ -48,6 +53,8 @@ export function SpotlightGrid({ className = "" }: SpotlightGridProps) {
             linear-gradient(90deg, rgba(249, 115, 22, 0.05) 1px, transparent 1px)
           `,
           backgroundSize: "60px 60px",
+          // Fixed background to prevent scroll jitter
+          backgroundAttachment: 'local',
         }}
       />
 

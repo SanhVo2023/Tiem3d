@@ -1,36 +1,33 @@
-import { GoogleGenAI } from "@google/genai";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { generateImage, pause } from "./lib/gemini.mjs";
 
 // ============================================
 // CONFIG
 // ============================================
-const API_KEY = "AIzaSyBlLvICd8PB0vq14ADcnJWcre1pF3WvM_8";
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-const MODEL = "gemini-2.5-flash-image";
+// API key comes from .env.local (gitignored) — see scripts/lib/env.mjs
 
 // Output directory
 const OUTPUT_DIR = path.join(process.cwd(), "public", "assets", "generated");
 
 // ============================================
-// REALISTIC VIETNAMESE WORKSHOP STYLE
+// CLEAN PRODUCT PHOTOGRAPHY STYLE
 // ============================================
-const REALISTIC_STYLE = `
-Documentary photography style. Authentic Vietnamese small workshop.
-Natural uneven lighting, some fluorescent mixed with daylight.
-Real workspace - tools scattered, some mess on desk.
-Smartphone camera quality, not professional studio.
-Vietnamese workshop aesthetic - functional, hardworking environment.
-Visible wear on equipment. Authentic and relatable.
-NO HDR. NO over-saturation. NOT perfectly composed.
+const CLEAN_STYLE = `
+Clean product photography. Soft natural daylight from window.
+Simple wooden desk or table surface. Light wood tone.
+Minimal background - white wall, blurred green plant.
+Bright and airy. Shallow depth of field.
+Professional but approachable. Modern minimalist aesthetic.
+NO harsh shadows. NO cluttered background. NO dramatic lighting.
 `;
 
-const WORK_IN_PROGRESS_STYLE = `
-Mid-work chaos. Vietnamese workshop setting.
-Harsh fluorescent lighting mixed with window light.
-Camera slightly tilted. Quick snapshot aesthetic.
-Dust particles visible. Real working conditions.
-NOT a product photo - documentation of actual work.
+const WORK_STYLE = `
+Clean workspace photography. Soft natural lighting.
+Wooden desk surface. Minimal tools visible - only what's needed.
+White/light background. Small plant in corner blurred.
+Focused on the subject. Professional product photo style.
+Bright, clean, modern aesthetic.
 `;
 
 // ============================================
@@ -43,648 +40,290 @@ const PROJECTS = {
   // Very popular in Vietnam - 60cm tall, 8-10kg filament
   // ==========================================
   "tuong-phat": {
-    name: "Tượng Phật A Di Đà 60cm",
-    description: "Tượng Phật lớn in nhiều phần, cao 60cm, ~8kg filament, sơn vàng đồng",
+    name: "Tượng Phật A Di Đà",
+    description: "Tượng Phật vàng đồng từ ảnh tham khảo của khách",
     product: {
-      type: "large Buddha Amitabha statue (Phật A Di Đà)",
-      material: "gray PLA, multiple printed parts",
-      size: "60cm tall, split into 12 parts for printing",
-      features: "serene expression, flowing robes, lotus base, meditation pose",
-      weight: "approximately 8kg of filament total",
+      type: "golden Buddha statue",
+      material: "gray PLA, gold spray painted",
+      features: "serene meditation pose, flowing robes, lotus base",
     },
     steps: [
       {
-        name: "phat-01-parts",
-        stage: "Các phần đã in xong",
-        ratio: "16:9",
+        name: "phat-01-zalo",
+        stage: "Khách gửi qua Zalo",
         prompt: (p) => `
-          All 12 printed parts of ${p.type} laid out on large table.
-          ${p.material}. Head, torso sections, arms, lotus base pieces.
-          Layer lines visible on all parts. Some parts still have supports.
-          Industrial workspace, Vietnamese small business setting.
-          Multiple filament spools visible (used up). Scale impressive.
-          ${WORK_IN_PROGRESS_STYLE}
+          Phone screenshot of Zalo chat conversation. Vietnamese interface.
+          Customer sent a blurry photo of a ${p.type} they want printed.
+          Chat bubbles visible, customer name blurred out for privacy.
+          Phone lying on messy desk with keyboard visible. Real chat screenshot aesthetic.
         `,
       },
       {
-        name: "phat-02-gluing",
-        stage: "Ghép nối các phần",
-        ratio: "4:3",
-        prompt: (p) => `
-          Vietnamese worker assembling ${p.type} parts.
-          Using super glue and clamps to join torso sections.
-          ${p.material} parts being carefully aligned.
-          Workbench with glue bottles, clamps, alignment tools.
-          Partially assembled Buddha showing scale - already 40cm tall.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "phat-03-filling",
-        stage: "Trám khe và mài",
-        ratio: "1:1",
-        prompt: (p) => `
-          Filling seams on assembled ${p.type} with putty filler.
-          Worker applying filler to visible seam lines.
-          ${p.size}. Pink/gray filler paste on joints.
-          Sandpaper, putty knives, mixing board on messy desk.
-          Buddha face visible - peaceful expression emerging.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "phat-04-sanding",
-        stage: "Chà nhám toàn bộ",
-        ratio: "4:3",
-        prompt: (p) => `
-          Major sanding work on ${p.type}.
-          Worker wearing mask, using orbital sander on large surfaces.
-          Manual sanding on detailed areas like face and hands.
-          ${p.size}. Dust everywhere. Various sandpaper grits.
-          Statue getting smooth, layer lines disappearing.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "phat-05-priming",
-        stage: "Phun lót sơn",
-        ratio: "1:1",
-        prompt: (p) => `
-          ${p.type} with gray primer coat in spray area.
-          Newspaper on floor, statue on rotating stand.
-          Primer spray cans nearby. Even gray coat applied.
-          Some imperfections visible - will need touch up.
-          ${p.size} - impressive scale visible.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "phat-06-goldpaint",
-        stage: "Sơn màu vàng đồng",
-        ratio: "1:1",
-        prompt: (p) => `
-          Applying gold/bronze paint to ${p.type}.
-          Worker with airbrush applying metallic gold paint.
-          Beautiful golden color emerging on Buddha surface.
-          ${p.features} becoming visible in gold.
-          Traditional Vietnamese Buddha aesthetic.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "phat-07-details",
-        stage: "Vẽ chi tiết",
-        ratio: "4:3",
-        prompt: (p) => `
-          Hand-painting details on ${p.type}.
-          Fine brush adding dark accents to robes folds.
-          Face details being painted - eyes, lips, eyebrows.
-          Reference image of traditional Buddha nearby.
-          Paints, fine brushes, magnifying lamp on desk.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "phat-08-finished",
-        stage: "Hoàn thiện",
-        ratio: "3:4",
-        prompt: (p) => `
-          Completed ${p.type} on display.
-          Stunning gold/bronze finish. ${p.size}.
-          ${p.features}. Traditional Vietnamese Buddhist aesthetic.
-          Placed on altar-like display with red cloth.
-          Soft lighting. Impressive craftsmanship from 3D print.
-          Professional quality statue. Spiritual presence.
-          ${REALISTIC_STYLE}
-        `,
-      },
-    ],
-  },
-
-  // ==========================================
-  // PROJECT 2: Vietnamese Dragon (Rồng)
-  // Cultural symbol - 80cm long, decorative piece
-  // ==========================================
-  "rong-trang-tri": {
-    name: "Rồng Trang Trí 80cm",
-    description: "Rồng Việt Nam phong cách truyền thống, 80cm, sơn đỏ vàng",
-    product: {
-      type: "traditional Vietnamese dragon decoration (Rồng)",
-      material: "gray PLA, 15+ separate parts",
-      size: "80cm long, 30cm tall, curved S-shape body",
-      features: "detailed scales, fierce head with horns, flowing mane, clawed feet",
-      weight: "approximately 6kg of filament",
-    },
-    steps: [
-      {
-        name: "rong-01-parts",
-        stage: "In xong các phần",
-        ratio: "16:9",
-        prompt: (p) => `
-          All printed parts of ${p.type} spread on large workshop table.
-          Head piece, 8 body segments, 4 legs, tail, mane pieces.
-          ${p.material}. Supports still attached to some parts.
-          Vietnamese workshop setting. Scale of parts impressive.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "rong-02-assembly",
-        stage: "Lắp ráp thân rồng",
-        ratio: "4:3",
-        prompt: (p) => `
-          Assembling body segments of ${p.type}.
-          Worker connecting curved body sections with glue.
-          S-shape dragon body taking form on workbench.
-          Clamps holding sections together while drying.
-          ${p.features} - scales visible on each segment.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "rong-03-head",
-        stage: "Hoàn thiện đầu rồng",
-        ratio: "1:1",
-        prompt: (p) => `
-          Dragon head of ${p.type} being detailed.
-          Fierce expression, horns, open mouth with teeth.
-          Filling seams around jaw and horns.
-          Mane pieces being attached to head.
-          Impressive Vietnamese dragon aesthetic.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "rong-04-sanding",
-        stage: "Chà nhám vảy rồng",
-        ratio: "4:3",
-        prompt: (p) => `
-          Careful sanding of dragon scales on ${p.type}.
-          Worker with small files working on scale details.
-          ${p.size}. Body assembled and being smoothed.
-          Preserving scale texture while removing layer lines.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "rong-05-priming",
-        stage: "Sơn lót",
-        ratio: "16:9",
-        prompt: (p) => `
-          ${p.type} fully assembled with primer coat.
-          ${p.size} - impressive S-curve dragon on stand.
-          Gray primer showing all the details clearly.
-          Spray booth setup. Dragon on rotating display.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "rong-06-redgold",
-        stage: "Sơn đỏ vàng truyền thống",
-        ratio: "1:1",
-        prompt: (p) => `
-          Painting ${p.type} in traditional red and gold.
-          Body being painted deep red. Gold accents on scales.
-          Airbrush and hand brush work combination.
-          Traditional Vietnamese color scheme emerging.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "rong-07-finished",
-        stage: "Hoàn thiện",
-        ratio: "16:9",
-        prompt: (p) => `
-          Completed ${p.type} on display stand.
-          Stunning red body with gold scale highlights.
-          ${p.size}. ${p.features}. Fierce golden eyes.
-          Traditional Vietnamese dragon - symbol of power.
-          Display in Vietnamese home/business setting.
-          Professional decoration piece from 3D printing.
-          ${REALISTIC_STYLE}
-        `,
-      },
-    ],
-  },
-
-  // ==========================================
-  // PROJECT 3: Giant Store Mascot
-  // Large business display - 1m tall character
-  // ==========================================
-  "mascot-cua-hang": {
-    name: "Mascot Cửa Hàng 1 Mét",
-    description: "Mascot nhân vật hoạt hình khổng lồ cho cửa hàng, cao 1m, ~15kg filament",
-    product: {
-      type: "giant cartoon character mascot for store display",
-      material: "white and colored PLA, 20+ parts",
-      size: "1 meter tall, split into many sections",
-      features: "cute cartoon style, big head, friendly expression, holding product",
-      weight: "approximately 15kg of filament",
-    },
-    steps: [
-      {
-        name: "mascot-01-printing",
-        stage: "In các phần lớn",
-        ratio: "4:3",
-        prompt: (p) => `
-          Large format 3D printer running huge part for ${p.type}.
-          Big head section being printed - 30cm diameter piece.
-          Industrial FDM printer with large build volume.
-          ${p.material}. Print time display showing 40+ hours.
-          Vietnamese workshop with multiple large printers.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "mascot-02-allparts",
-        stage: "Tất cả phần đã in",
-        ratio: "16:9",
-        prompt: (p) => `
-          All printed parts for ${p.type} on workshop floor.
-          Massive scale - head pieces, body sections, arms, legs, base.
-          ${p.size}. Worker standing next to parts for scale.
-          ${p.material}. Some parts white, some colored.
-          Impressive amount of plastic. ${p.weight}.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "mascot-03-structure",
-        stage: "Lắp khung bên trong",
-        ratio: "1:1",
-        prompt: (p) => `
-          Installing internal support structure for ${p.type}.
-          Metal/PVC pipe frame inside body sections.
-          Needed to support ${p.weight} and ${p.size}.
-          Worker assembling internal skeleton.
-          Engineering for large-scale 3D print display.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "mascot-04-assembly",
-        stage: "Ghép nối thân",
-        ratio: "4:3",
-        prompt: (p) => `
-          Assembling body of ${p.type}.
-          Two workers lifting and connecting large body sections.
-          Super glue, epoxy, and mechanical fasteners used.
-          ${p.size} - already impressive even partially assembled.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "mascot-05-filling",
-        stage: "Trám và mài",
-        ratio: "1:1",
-        prompt: (p) => `
-          Filling seams on assembled ${p.type}.
-          Large amount of filler being applied to joints.
-          Worker on ladder reaching upper sections.
-          ${p.size}. Cartoon shape clearly visible.
-          ${WORK_IN_PROGRESS_STYLE}
-        `,
-      },
-      {
-        name: "mascot-06-painting",
-        stage: "Sơn màu sắc",
-        ratio: "4:3",
-        prompt: (p) => `
-          Painting ${p.type} with vibrant colors.
-          Airbrush applying bright cartoon colors.
-          ${p.features} - cute face being painted.
-          Multiple paint colors on table. Masking tape used.
-          ${p.size}. Character coming to life.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "mascot-07-details",
-        stage: "Chi tiết và phụ kiện",
-        ratio: "1:1",
-        prompt: (p) => `
-          Adding final details to ${p.type}.
-          Eyes being painted, accessories attached.
-          Product/item being placed in character's hands.
-          Clear coat being applied for durability.
-          ${p.features}. Almost complete.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "mascot-08-finished",
-        stage: "Hoàn thiện tại cửa hàng",
-        ratio: "3:4",
-        prompt: (p) => `
-          Completed ${p.type} displayed in store front.
-          ${p.size} - towering cute character welcoming customers.
-          ${p.features}. Vibrant colors, glossy finish.
-          Vietnamese shop setting. Customers taking photos.
-          Professional store display from 3D printing.
-          Eye-catching marketing piece.
-          ${REALISTIC_STYLE}
-        `,
-      },
-    ],
-  },
-
-  // ==========================================
-  // PROJECT 4: Architectural Model
-  // Vietnamese pagoda/temple for display
-  // ==========================================
-  "mo-hinh-chua": {
-    name: "Mô Hình Chùa Một Cột",
-    description: "Mô hình chùa Một Cột tỉ lệ 1:50, chi tiết cao, sơn truyền thống",
-    product: {
-      type: "One Pillar Pagoda model (Chùa Một Cột) - Vietnamese heritage",
-      material: "gray PLA with wood-fill PLA accents",
-      size: "40cm tall, 50cm base, 1:50 scale",
-      features: "single pillar, lotus-shaped structure, curved roof tiles, ornate details",
-      weight: "approximately 3kg of filament",
-    },
-    steps: [
-      {
-        name: "chua-01-design",
+        name: "phat-02-blender",
         stage: "Thiết kế 3D",
-        ratio: "16:9",
         prompt: (p) => `
-          Computer screen showing 3D model of ${p.type}.
-          Fusion 360 or Blender with detailed pagoda model.
-          Reference photos of real Chùa Một Cột nearby.
-          Designer's desk in Vietnamese office setting.
-          Technical notes about scale and print orientation.
-          ${REALISTIC_STYLE}
+          Computer workstation in a small Vietnamese 3D printing shop.
+          Monitor showing Blender with ${p.type} 3D model being sculpted.
+          Messy desk - coffee cup, sticky notes, mouse pad, tangled cables.
+          Fluorescent lighting. Real workspace not studio.
         `,
       },
       {
-        name: "chua-02-parts",
-        stage: "In các chi tiết",
-        ratio: "4:3",
+        name: "phat-03-printing",
+        stage: "Đang in",
         prompt: (p) => `
-          Printed parts for ${p.type} on table.
-          Lotus base, central pillar, pagoda structure, roof tiles.
-          ${p.material}. Fine details visible on roof pieces.
-          Multiple small parts for ornate decorations.
-          ${WORK_IN_PROGRESS_STYLE}
+          Metal shelf rack with multiple 3D printers in Vietnamese print shop.
+          5-6 FDM printers (Creality Ender, orange Prusa style) on shelves.
+          One printer printing the ${p.type} in gray PLA, partially done.
+          Filament spools hanging, some printers running, industrial look.
         `,
       },
       {
-        name: "chua-03-assembly",
-        stage: "Lắp ráp",
-        ratio: "1:1",
+        name: "phat-04-painting",
+        stage: "Sơn hoàn thiện",
         prompt: (p) => `
-          Careful assembly of ${p.type}.
-          Delicate work attaching roof tiles and decorations.
-          ${p.features}. Single pillar being centered.
-          Tweezers, small clamps, precision work.
-          ${WORK_IN_PROGRESS_STYLE}
+          Finishing workbench in 3D print shop. Newspaper on table.
+          ${p.type} being spray painted gold. Gold spray can nearby.
+          Other pieces drying on rack. Paint masks, sandpaper scattered.
+          Workshop corner with good ventilation, practical messy setup.
         `,
       },
       {
-        name: "chua-04-painting",
-        stage: "Sơn chi tiết",
-        ratio: "4:3",
+        name: "phat-05-display",
+        stage: "Sản phẩm hoàn thiện",
         prompt: (p) => `
-          Hand-painting ${p.type} with traditional colors.
-          Red and gold for roof, brown for wood elements.
-          Fine brushes for detailed work on tiles.
-          ${p.size}. Traditional Vietnamese pagoda colors.
-          ${REALISTIC_STYLE}
+          Completed ${p.type} in beautiful gold finish.
+          Product photography setup - white backdrop, soft lighting.
+          ${p.features}. Professional product shot for portfolio.
+          Clean presentation, the statue looks premium.
         `,
       },
       {
-        name: "chua-05-base",
-        stage: "Làm hồ sen",
-        ratio: "1:1",
+        name: "phat-06-shipping",
+        stage: "Đóng gói giao hàng",
         prompt: (p) => `
-          Creating lotus pond base for ${p.type}.
-          Resin being poured for water effect.
-          Tiny lotus flowers and leaves being placed.
-          Realistic pond scene around single pillar.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "chua-06-finished",
-        stage: "Hoàn thiện",
-        ratio: "1:1",
-        prompt: (p) => `
-          Completed ${p.type} on display base.
-          ${p.size}. ${p.features}. Stunning detail.
-          Traditional red roof, golden accents.
-          Lotus pond with water effect around pillar.
-          Vietnamese cultural heritage piece.
-          Museum-quality architectural model from 3D printing.
-          ${REALISTIC_STYLE}
+          Packing station in Vietnamese shop. The ${p.type} wrapped in bubble wrap.
+          Cardboard box with GHN or GHTK shipping label visible.
+          Tape dispenser, scissors, packing materials on table.
+          Ready to ship to customer. Real e-commerce packing scene.
         `,
       },
     ],
   },
 
   // ==========================================
-  // PROJECT 5: Gaming/Anime Giant Figure
-  // Popular in Vietnam - large character display
+  // PROJECT 2: Iron Man Helmet
+  // Client sends reference image from internet
   // ==========================================
-  "tuong-anime-lon": {
-    name: "Tượng Goku Ultra Instinct 50cm",
-    description: "Tượng Goku khổng lồ từ Dragon Ball, 50cm, hiệu ứng năng lượng",
+  "iron-man-helmet": {
+    name: "Mũ Iron Man",
+    description: "Mũ Iron Man từ ảnh tham khảo trên mạng",
     product: {
-      type: "giant Goku Ultra Instinct figure from Dragon Ball",
-      material: "gray PLA body, transparent PLA for energy effects",
-      size: "50cm tall on dynamic action base",
-      features: "silver hair, muscular pose, energy aura effects, detailed face",
-      weight: "approximately 4kg of filament",
+      type: "Iron Man MK85 helmet",
+      material: "red PLA, gold spray painted",
+      features: "iconic faceplate with LED eye slots, metallic red and gold finish, wearable size",
     },
     steps: [
       {
-        name: "goku-01-parts",
-        stage: "In xong các phần",
-        ratio: "16:9",
+        name: "ironman-01-zalo",
+        stage: "Khách gửi qua Zalo",
         prompt: (p) => `
-          All printed parts for ${p.type} on worktable.
-          Body split into head, torso, arms, legs sections.
-          ${p.material}. Energy effect pieces in clear filament.
-          Action base parts. ${p.size} parts impressive.
-          Vietnamese workshop, anime figure project.
-          ${WORK_IN_PROGRESS_STYLE}
+          Phone screen showing Zalo chat. Vietnamese chat interface.
+          Customer sent a screenshot of ${p.type} from Google Images.
+          Red and gold helmet reference image in chat bubble.
+          Phone on clean wooden desk, keyboard edge visible. Bright daylight.
         `,
       },
       {
-        name: "goku-02-assembly",
-        stage: "Lắp ráp thân",
-        ratio: "4:3",
+        name: "ironman-02-blender",
+        stage: "Thiết kế 3D",
         prompt: (p) => `
-          Assembling main body of ${p.type}.
-          Torso and limbs being connected.
-          Dynamic action pose taking shape.
-          ${p.features}. Muscular anatomy visible.
-          Glue, clamps, reference images of Goku nearby.
-          ${WORK_IN_PROGRESS_STYLE}
+          Clean computer workstation. 27-inch monitor showing Blender software.
+          ${p.type} 3D model being detailed - wireframe and solid viewport.
+          Organized desk with coffee mug, small plant. Bright workspace.
+          Modern Vietnamese office aesthetic, natural window light.
         `,
       },
       {
-        name: "goku-03-sanding",
-        stage: "Xử lý bề mặt",
-        ratio: "1:1",
+        name: "ironman-03-printing",
+        stage: "Đang in",
         prompt: (p) => `
-          Surface finishing on ${p.type}.
-          Sanding muscle definition areas carefully.
-          Filling seams on torso and limbs.
-          ${p.size}. Preserving anatomical details.
-          ${WORK_IN_PROGRESS_STYLE}
+          3D printing area with organized metal shelving.
+          Multiple FDM printers (Creality, Prusa orange) on clean shelves.
+          One printer showing ${p.type} faceplate in red PLA, 70% done.
+          Neat filament storage, good lighting. Professional workshop.
         `,
       },
       {
-        name: "goku-04-priming",
-        stage: "Sơn lót",
-        ratio: "4:3",
+        name: "ironman-04-painting",
+        stage: "Sơn hoàn thiện",
         prompt: (p) => `
-          ${p.type} with gray primer coat.
-          Full figure assembled on base.
-          Primer revealing all details - muscles, face, hair.
-          ${p.size}. ${p.features}. Ready for painting.
-          ${REALISTIC_STYLE}
+          Clean finishing workbench with newspaper protection.
+          ${p.type} parts being spray painted gold accents.
+          Organized setup - masking tape, gold spray can, respirator mask.
+          Well-ventilated corner of shop. Practical but tidy.
         `,
       },
       {
-        name: "goku-05-skinpaint",
-        stage: "Sơn da",
-        ratio: "1:1",
+        name: "ironman-05-display",
+        stage: "Sản phẩm hoàn thiện",
         prompt: (p) => `
-          Airbrushing skin tones on ${p.type}.
-          Realistic skin color with muscle shading.
-          Face being carefully painted.
-          Anime-accurate skin tones. Professional painting.
-          ${REALISTIC_STYLE}
+          Completed ${p.type} displayed on wooden table.
+          ${p.features}. Stunning metallic finish catches light.
+          Clean product photography - white backdrop, soft shadows.
+          Premium cosplay quality piece.
         `,
       },
       {
-        name: "goku-06-details",
-        stage: "Chi tiết trang phục",
-        ratio: "4:3",
+        name: "ironman-06-shipping",
+        stage: "Đóng gói giao hàng",
         prompt: (p) => `
-          Painting clothing and details on ${p.type}.
-          Blue/orange gi costume colors being applied.
-          ${p.features} - silver Ultra Instinct hair.
-          Eyes being painted with anime style.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "goku-07-effects",
-        stage: "Lắp hiệu ứng",
-        ratio: "1:1",
-        prompt: (p) => `
-          Attaching energy effect pieces to ${p.type}.
-          Transparent aura pieces around figure.
-          LED lights being installed in base.
-          Energy flowing effect taking shape.
-          ${REALISTIC_STYLE}
-        `,
-      },
-      {
-        name: "goku-08-finished",
-        stage: "Hoàn thiện",
-        ratio: "3:4",
-        prompt: (p) => `
-          Completed ${p.type} with LED lights on.
-          ${p.size}. ${p.features}. Glowing energy aura.
-          Stunning Ultra Instinct silver hair.
-          Dynamic pose on action base with lighting effects.
-          Professional anime figure from 3D printing.
-          Collector quality display piece.
-          ${REALISTIC_STYLE}
+          Packing area with the ${p.type} carefully wrapped in bubble wrap.
+          Large cardboard box with GHN shipping label. Vietnamese text visible.
+          Foam padding inside box. Tape gun on table.
+          Ready for delivery. Clean organized shipping station.
         `,
       },
     ],
   },
 
   // ==========================================
-  // PROJECT 6: Wedding Decoration Set
-  // Popular service in Vietnam
+  // PROJECT 3: Phone Stand
+  // Client sends pencil sketch
   // ==========================================
-  "trang-tri-cuoi": {
-    name: "Bộ Trang Trí Đám Cưới",
-    description: "Bộ chữ cưới và khung ảnh lớn, tên cô dâu chú rể, sơn vàng hồng",
+  "phone-stand": {
+    name: "Giá Đỡ Điện Thoại",
+    description: "Giá đỡ điện thoại từ bản vẽ tay của khách",
     product: {
-      type: "wedding decoration set with large letters and photo frame",
-      material: "white PLA, gold and rose gold painted",
-      size: "letters 40cm tall, photo frame 60x40cm",
-      features: "custom names, heart decorations, elegant script font, floral accents",
-      weight: "approximately 5kg of filament total",
+      type: "geometric minimalist phone stand",
+      material: "orange PLA plastic",
+      features: "clean angular design, stable weighted base, adjustable viewing angle",
     },
     steps: [
       {
-        name: "cuoi-01-design",
-        stage: "Thiết kế theo tên",
-        ratio: "16:9",
+        name: "stand-01-zalo",
+        stage: "Khách gửi qua Zalo",
         prompt: (p) => `
-          Computer screen showing ${p.type} design.
-          Vietnamese names in elegant script: "MINH & LINH".
-          Heart shapes, floral decorations in 3D software.
-          Customer reference photos nearby. Wedding theme.
-          ${REALISTIC_STYLE}
+          Phone screen showing Zalo chat conversation in Vietnamese.
+          Customer sent a photo of hand-drawn pencil sketch on paper.
+          Simple ${p.type} design concept with dimensions written.
+          Phone lying flat on light wooden desk. Natural daylight.
         `,
       },
       {
-        name: "cuoi-02-printing",
-        stage: "In các chữ lớn",
-        ratio: "4:3",
+        name: "stand-02-fusion",
+        stage: "Thiết kế 3D",
         prompt: (p) => `
-          3D printer creating large letter for ${p.type}.
-          Letter "M" being printed, 40cm tall.
-          ${p.material}. Elegant script font visible.
-          Multiple letters already printed on table.
-          ${WORK_IN_PROGRESS_STYLE}
+          Clean computer setup with Fusion 360 on screen.
+          ${p.type} CAD model with precise measurements and dimensions.
+          Technical parametric design view. Gray and orange preview.
+          Organized desk, white wall background, good lighting.
         `,
       },
       {
-        name: "cuoi-03-parts",
-        stage: "Tất cả bộ phận",
-        ratio: "16:9",
+        name: "stand-03-printing",
+        stage: "Đang in",
         prompt: (p) => `
-          All printed parts for ${p.type} on table.
-          Large letters spelling names, heart pieces, frame parts.
-          ${p.size}. Floral accent pieces. Decorative elements.
-          ${p.material}. Ready for finishing.
-          ${WORK_IN_PROGRESS_STYLE}
+          FDM 3D printer printing ${p.type} in bright orange PLA.
+          Clean Creality or Bambu printer, object 60% complete on bed.
+          Orange filament spool visible. Clean print area with good lighting.
+          Simple functional workshop corner.
         `,
       },
       {
-        name: "cuoi-04-sanding",
-        stage: "Xử lý bề mặt",
-        ratio: "1:1",
+        name: "stand-04-display",
+        stage: "Sản phẩm hoàn thiện",
         prompt: (p) => `
-          Sanding and finishing ${p.type} letters.
-          Smooth surface preparation for painting.
-          Script font edges being perfected.
-          ${WORK_IN_PROGRESS_STYLE}
+          Completed ${p.type} in vibrant orange on wooden table.
+          ${p.features}. Modern smartphone placed in stand at angle.
+          Clean product photography - soft shadows, bright daylight.
+          Minimalist aesthetic, blurred plant in background.
         `,
       },
       {
-        name: "cuoi-05-painting",
-        stage: "Sơn vàng và hồng",
-        ratio: "4:3",
+        name: "stand-05-shipping",
+        stage: "Đóng gói giao hàng",
         prompt: (p) => `
-          Spray painting ${p.type} in gold and rose gold.
-          Letters getting metallic gold finish.
-          Hearts in rose gold. Elegant color scheme.
-          Wedding aesthetic emerging.
-          ${REALISTIC_STYLE}
+          Small shipping station. ${p.type} in small cardboard box.
+          Bubble wrap protection, GHTK shipping label on box.
+          Compact neat packaging. Ready for delivery.
+          Clean desk area with tape and scissors.
+        `,
+      },
+    ],
+  },
+
+  // ==========================================
+  // PROJECT 4: Anime Figure (Resin)
+  // Client sends character drawing
+  // ==========================================
+  "anime-figure": {
+    name: "Figure Anime Resin",
+    description: "Figure anime từ hình vẽ nhân vật của khách",
+    product: {
+      type: "cute chibi anime girl figure",
+      material: "8K resin, hand painted with acrylics",
+      features: "big expressive eyes, pink twin-tails hair, school uniform, dynamic cute pose",
+    },
+    steps: [
+      {
+        name: "anime-01-zalo",
+        stage: "Khách gửi qua Zalo",
+        prompt: (p) => `
+          Phone screen showing Zalo chat in Vietnamese.
+          Customer sent a colorful hand-drawn ${p.type} character design.
+          Cute anime art style drawing in chat bubble.
+          Phone on wooden desk, natural daylight. Clean setup.
         `,
       },
       {
-        name: "cuoi-06-finished",
-        stage: "Hoàn thiện",
-        ratio: "16:9",
+        name: "anime-02-zbrush",
+        stage: "Điêu khắc 3D",
         prompt: (p) => `
-          Completed ${p.type} displayed at wedding venue.
-          "MINH & LINH" in gold script letters, 40cm tall.
-          Large photo frame with rose gold finish.
-          Heart decorations, floral accents. Elegant setup.
-          Vietnamese wedding decoration. Romantic lighting.
-          Professional custom wedding decor from 3D printing.
-          ${REALISTIC_STYLE}
+          Computer workstation with ZBrush on large monitor.
+          ${p.type} being digitally sculpted - high poly mesh visible.
+          Multiple viewport angles showing character from different sides.
+          Clean creative workspace, drawing tablet on desk.
+        `,
+      },
+      {
+        name: "anime-03-resin",
+        stage: "In Resin 8K",
+        prompt: (p) => `
+          Resin printing corner of the shop. Elegoo or Anycubic 8K printer.
+          ${p.type} emerging upside down from resin vat. Purple UV glow.
+          Clean dedicated resin area with IPA wash station nearby.
+          Professional setup with good ventilation.
+        `,
+      },
+      {
+        name: "anime-04-painting",
+        stage: "Sơn màu thủ công",
+        prompt: (p) => `
+          Painting workstation with magnifying lamp. Good task lighting.
+          ${p.type} being hand painted with fine brushes.
+          Small acrylic paint bottles arranged neatly. Painting handle holder.
+          Detailed face painting work in progress. Clean workspace.
+        `,
+      },
+      {
+        name: "anime-05-display",
+        stage: "Sản phẩm hoàn thiện",
+        prompt: (p) => `
+          Completed ${p.type} on clean display surface.
+          ${p.features}. Vibrant hand-painted colors, smooth resin finish.
+          Product photography setup - soft even lighting, white backdrop.
+          Collectible quality figure, adorable and detailed.
+        `,
+      },
+      {
+        name: "anime-06-shipping",
+        stage: "Đóng gói giao hàng",
+        prompt: (p) => `
+          Careful packing of the ${p.type} in foam-lined box.
+          Figure secured with foam cutout protection.
+          Small gift box with GHN label. Tissue paper wrapping.
+          Delicate item packaging. Clean shipping area.
         `,
       },
     ],
@@ -694,66 +333,10 @@ const PROJECTS = {
 // ============================================
 // IMAGE GENERATION FUNCTION WITH RETRY
 // ============================================
-async function generateImage(prompt, aspectRatio, outputPath, retries = 3) {
-  const filename = path.basename(outputPath);
-  console.log(`\n📸 Generating: ${filename}`);
-  console.log(`   Ratio: ${aspectRatio}`);
-
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      const response = await ai.models.generateContent({
-        model: MODEL,
-        contents: prompt.trim().replace(/\s+/g, " "),
-        config: {
-          responseModalities: ["TEXT", "IMAGE"],
-        },
-      });
-
-      if (response.candidates && response.candidates[0]) {
-        const parts = response.candidates[0].content?.parts || [];
-        for (const part of parts) {
-          if (part.inlineData) {
-            const imageData = part.inlineData.data;
-            const buffer = Buffer.from(imageData, "base64");
-
-            const dir = path.dirname(outputPath);
-            if (!fs.existsSync(dir)) {
-              fs.mkdirSync(dir, { recursive: true });
-            }
-
-            fs.writeFileSync(outputPath, buffer);
-            console.log(`   ✅ Saved: ${outputPath}`);
-            return true;
-          }
-        }
-      }
-
-      console.log(`   ❌ No image in response`);
-      return false;
-    } catch (error) {
-      const errorMsg = error.message || String(error);
-
-      // Check if it's a rate limit error
-      if (errorMsg.includes("429") || errorMsg.includes("RESOURCE_EXHAUSTED") || errorMsg.includes("quota")) {
-        const waitTime = attempt * 60; // 60s, 120s, 180s
-        console.log(`   ⏳ Rate limited. Waiting ${waitTime}s before retry ${attempt}/${retries}...`);
-        await new Promise((resolve) => setTimeout(resolve, waitTime * 1000));
-        continue;
-      }
-
-      console.error(`   ❌ Error: ${errorMsg}`);
-      if (attempt < retries) {
-        console.log(`   🔄 Retrying (${attempt}/${retries})...`);
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-      }
-    }
-  }
-
-  return false;
-}
 
 // ============================================
 // GENERATE PROJECT SEQUENCE
+// Strategy: Generate finished product FIRST, then use as reference
 // ============================================
 async function generateProject(projectKey) {
   const project = PROJECTS[projectKey];
@@ -770,8 +353,27 @@ async function generateProject(projectKey) {
 
   const projectDir = path.join(OUTPUT_DIR, "projects", projectKey);
 
+  // Find the "finished" step (last step or one marked as finished)
+  const finishedStep = project.steps.find(s => s.name.includes("finished")) || project.steps[project.steps.length - 1];
+  const finishedPath = path.join(projectDir, `${finishedStep.name}.png`);
+
+  // Step 1: Generate FINISHED product first (no reference)
+  if (!fs.existsSync(finishedPath)) {
+    console.log(`\n🎯 FIRST: Generating finished product...`);
+    const prompt = finishedStep.prompt(project.product);
+    await generateImage(prompt, finishedPath);
+    await pause(10000);
+  } else {
+    console.log(`\n⏭️  Finished product exists: ${finishedStep.name}`);
+  }
+
+  // Step 2: Generate all OTHER steps using finished image as reference
   for (let i = 0; i < project.steps.length; i++) {
     const step = project.steps[i];
+
+    // Skip the finished step (already generated)
+    if (step.name === finishedStep.name) continue;
+
     const outputPath = path.join(projectDir, `${step.name}.png`);
 
     // Skip if exists
@@ -782,11 +384,14 @@ async function generateProject(projectKey) {
 
     console.log(`\n📍 Step ${i + 1}/${project.steps.length}: ${step.stage}`);
 
-    const prompt = step.prompt(project.product);
-    await generateImage(prompt, step.ratio, outputPath);
+    // Build prompt with reference instruction
+    const basePrompt = step.prompt(project.product);
+    const refPrompt = `Based on this finished product image, show an earlier stage: ${basePrompt}`;
+
+    await generateImage(refPrompt, outputPath, { referenceImagePath: finishedPath });
 
     // Rate limiting - 10 second delay between requests
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await pause(10000);
   }
 
   console.log(`\n✅ Project "${project.name}" complete!`);

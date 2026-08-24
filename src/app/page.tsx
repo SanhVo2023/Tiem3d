@@ -3,11 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import {
   motion,
-  useScroll,
-  useTransform,
-  useMotionValueEvent,
   useInView,
-  useSpring,
   AnimatePresence,
 } from "framer-motion";
 import Link from "next/link";
@@ -28,14 +24,41 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
+  // Use GSAP for smooth scroll tracking instead of Framer Motion
+  useEffect(() => {
+    let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setScrollProgress(latest);
-  });
+    const initScrollTracking = async () => {
+      const gsapModule = await import("gsap");
+      const ScrollTriggerModule = await import("gsap/ScrollTrigger");
+      const gsap = gsapModule.default;
+      const ScrollTrigger = ScrollTriggerModule.default;
+      gsap.registerPlugin(ScrollTrigger);
+
+      ctx = gsap.context(() => {
+        ScrollTrigger.create({
+          trigger: heroRef.current,
+          start: "top top",
+          end: "bottom top",
+          onUpdate: (self) => {
+            // Only update state at key thresholds to avoid excessive re-renders
+            const progress = self.progress;
+            if (progress > 0.2 && scrollProgress <= 0.2) {
+              setScrollProgress(0.3);
+            } else if (progress <= 0.2 && scrollProgress > 0.2) {
+              setScrollProgress(0);
+            }
+          },
+        });
+      });
+    };
+
+    initScrollTracking();
+
+    return () => {
+      if (ctx) ctx.revert();
+    };
+  }, [scrollProgress]);
 
   // Intro loading animation
   useEffect(() => {
@@ -54,7 +77,7 @@ export default function Home() {
       <FloatingHeader scrollProgress={scrollProgress} />
 
       <main className="overflow-x-hidden">
-        <CinematicHero heroRef={heroRef} scrollYProgress={scrollYProgress} />
+        <CinematicHero heroRef={heroRef} />
         <TypographyMarquee />
         <ServicesSection />
         <ManifestoSection />
@@ -62,8 +85,8 @@ export default function Home() {
         <PortfolioBento />
         <StatsReveal />
         <TestimonialsSection />
-        <FAQSection />
         <MagneticCTA />
+        <FAQSection />
       </main>
       <Footer />
       <ZaloWidget />
@@ -223,6 +246,7 @@ function FloatingHeader({ scrollProgress }: { scrollProgress: number }) {
             </div>
 
             <NavLink href="/portfolio">Portfolio</NavLink>
+            <NavLink href="/blog">Blog</NavLink>
 
             {/* CTA Button */}
             <MagneticElement strength={0.2}>
@@ -306,6 +330,9 @@ function FloatingHeader({ scrollProgress }: { scrollProgress: number }) {
                 <MobileNavLink href="/portfolio" onClick={() => setIsMobileMenuOpen(false)}>
                   Portfolio
                 </MobileNavLink>
+                <MobileNavLink href="/blog" onClick={() => setIsMobileMenuOpen(false)}>
+                  Blog
+                </MobileNavLink>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -361,30 +388,91 @@ function MobileNavLink({
 }
 
 // ============================================
-// CINEMATIC HERO - Giant Typography + Parallax
+// CINEMATIC HERO - Giant Typography + GSAP Parallax
 // ============================================
 function CinematicHero({
   heroRef,
-  scrollYProgress,
 }: {
   heroRef: React.RefObject<HTMLDivElement | null>;
-  scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
 }) {
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 300]);
-  const bgScale = useTransform(scrollYProgress, [0, 0.5], [1, 1.2]);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+
+  // Use GSAP for buttery smooth parallax
+  useEffect(() => {
+    let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
+
+    const initParallax = async () => {
+      const gsapModule = await import("gsap");
+      const ScrollTriggerModule = await import("gsap/ScrollTrigger");
+      const gsap = gsapModule.default;
+      const ScrollTrigger = ScrollTriggerModule.default;
+      gsap.registerPlugin(ScrollTrigger);
+
+      ctx = gsap.context(() => {
+        // Background parallax - moves slower than scroll
+        if (bgRef.current) {
+          gsap.to(bgRef.current, {
+            y: 150,
+            ease: "none",
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: "top top",
+              end: "bottom top",
+              scrub: 0.5, // Smooth scrubbing
+            },
+          });
+        }
+
+        // Content fade out and move up
+        if (contentRef.current) {
+          gsap.to(contentRef.current, {
+            y: -100,
+            opacity: 0,
+            scale: 0.9,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: "top top",
+              end: "50% top",
+              scrub: 0.3,
+            },
+          });
+        }
+
+        // Scroll indicator fade
+        if (scrollIndicatorRef.current) {
+          gsap.to(scrollIndicatorRef.current, {
+            opacity: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: heroRef.current,
+              start: "top top",
+              end: "30% top",
+              scrub: true,
+            },
+          });
+        }
+      }, heroRef);
+    };
+
+    initParallax();
+
+    return () => {
+      if (ctx) ctx.revert();
+    };
+  }, [heroRef]);
 
   return (
     <section
       ref={heroRef}
       className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-zinc-950"
     >
-      {/* Parallax Background */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        style={{ y: bgY, scale: bgScale }}
+      {/* Parallax Background - GSAP controlled */}
+      <div
+        ref={bgRef}
+        className="absolute inset-0 z-0 will-change-transform"
       >
         <Image
           src="/assets/generated/hero/hero-main.png"
@@ -394,34 +482,20 @@ function CinematicHero({
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-zinc-950/40 to-zinc-950" />
-      </motion.div>
+      </div>
 
       {/* Grid overlay */}
       <div className="absolute inset-0 z-[1] opacity-20">
         <div className="w-full h-full grid-bg-orange" />
       </div>
 
-      {/* Floating Elements */}
-      <motion.div
-        className="absolute top-[20%] right-[10%] w-24 h-24 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-orange-500/30 to-transparent blur-2xl"
-        animate={{
-          y: [0, -30, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-[30%] left-[5%] w-32 h-32 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-cyan-500/20 to-transparent blur-3xl"
-        animate={{
-          y: [0, 40, 0],
-          scale: [1.1, 1, 1.1],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* Floating Elements - CSS animations for better perf */}
+      <div className="absolute top-[20%] right-[10%] w-24 h-24 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-orange-500/30 to-transparent blur-2xl animate-float-slow" />
+      <div className="absolute bottom-[30%] left-[5%] w-32 h-32 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-cyan-500/20 to-transparent blur-3xl animate-float-slower" />
 
-      {/* Content */}
+      {/* Content - GSAP controlled */}
       <div className="relative z-10 w-full px-4 md:px-6 text-center">
-        <motion.div style={{ opacity, scale, y }} className="origin-center">
+        <div ref={contentRef} className="origin-center will-change-transform">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -531,27 +605,20 @@ function CinematicHero({
               </Link>
             </MagneticElement>
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 4 }}
-          style={{ opacity }}
+        {/* Scroll Indicator - hidden on mobile, GSAP fade */}
+        <div
+          ref={scrollIndicatorRef}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block"
         >
-          <motion.div
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="flex flex-col items-center gap-2"
-          >
+          <div className="flex flex-col items-center gap-2 animate-bounce-slow">
             <span className="text-xs text-zinc-500 font-mono uppercase tracking-widest">
               Scroll
             </span>
             <div className="w-[1px] h-12 bg-gradient-to-b from-zinc-500 to-transparent" />
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1032,51 +1099,128 @@ function ServicesSection() {
 }
 
 // ============================================
-// MANIFESTO SECTION
+// MANIFESTO SECTION - Kinetic Typography
 // ============================================
 function ManifestoSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-20%" });
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-20%" });
+
+  // GSAP text animation
+  useEffect(() => {
+    if (!isInView || !textRef.current) return;
+
+    let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
+
+    const animateText = async () => {
+      const gsapModule = await import("gsap");
+      const gsap = gsapModule.default;
+
+      ctx = gsap.context(() => {
+        // Animate each word
+        const words = textRef.current?.querySelectorAll(".word");
+        if (words) {
+          gsap.fromTo(
+            words,
+            {
+              opacity: 0,
+              y: 100,
+              rotateX: -90,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1,
+              ease: "power3.out",
+              stagger: 0.1,
+            }
+          );
+        }
+
+        // Animate the line
+        const line = sectionRef.current?.querySelector(".animated-line");
+        if (line) {
+          gsap.fromTo(
+            line,
+            { scaleX: 0 },
+            { scaleX: 1, duration: 1.5, ease: "power3.inOut", delay: 0.5 }
+          );
+        }
+      }, sectionRef);
+    };
+
+    animateText();
+
+    return () => {
+      if (ctx) ctx.revert();
+    };
+  }, [isInView]);
 
   return (
-    <section ref={ref} className="py-24 md:py-40 px-4 md:px-6 bg-zinc-950 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 1 }}
-          className="relative"
+    <section
+      ref={sectionRef}
+      className="relative py-24 md:py-32 bg-zinc-950 overflow-hidden"
+    >
+      {/* Background accent */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="text-[30vw] md:text-[25vw] font-black text-zinc-900/30 select-none leading-none">
+          3D
+        </div>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 md:px-6 text-center">
+        {/* Main Typography */}
+        <div
+          ref={textRef}
+          className="perspective-[1000px]"
+          style={{ perspective: "1000px" }}
         >
-          {/* Large Quote */}
-          <div className="text-[20vw] md:text-[15vw] text-zinc-900 font-bold absolute -top-[0.3em] -left-[0.05em] select-none pointer-events-none">
-            "
+          {/* Line 1 */}
+          <div className="overflow-hidden mb-2 md:mb-4">
+            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] text-white leading-[0.9] tracking-tight">
+              BIẾN
+            </span>{" "}
+            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] text-white leading-[0.9] tracking-tight">
+              Ý
+            </span>{" "}
+            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] text-white leading-[0.9] tracking-tight">
+              TƯỞNG
+            </span>
           </div>
 
-          <motion.p
-            className="text-2xl md:text-4xl lg:text-5xl text-white leading-tight md:leading-snug max-w-4xl"
-            initial={{ opacity: 0, y: 40 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <span className="text-zinc-500">Chúng tôi tin rằng</span>{" "}
-            <span className="text-white">mọi ý tưởng đều xứng đáng được hiện thực hóa.</span>{" "}
-            <span className="text-gradient">Không chỉ in 3D,</span>{" "}
-            <span className="text-zinc-500">mà là biến tầm nhìn của bạn thành sản phẩm thực.</span>
-          </motion.p>
+          {/* Line 2 - Gradient */}
+          <div className="overflow-hidden">
+            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] leading-[0.9] tracking-tight text-gradient-animated">
+              THÀNH
+            </span>{" "}
+            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] leading-[0.9] tracking-tight text-gradient-animated">
+              HIỆN
+            </span>{" "}
+            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] leading-[0.9] tracking-tight text-gradient-animated">
+              THỰC
+            </span>
+          </div>
+        </div>
 
-          {/* Signature */}
-          <motion.div
-            className="mt-12 md:mt-16 flex items-center gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <div className="w-12 h-[2px] bg-gradient-to-r from-orange-500 to-cyan-500" />
-            <p className="text-sm text-zinc-500 font-mono uppercase tracking-widest">
-              Tiệm 3D, 2024
-            </p>
-          </motion.div>
-        </motion.div>
+        {/* Animated Line */}
+        <div className="flex justify-center mt-10 md:mt-14">
+          <div
+            className="animated-line h-[3px] w-32 md:w-48 bg-gradient-to-r from-orange-500 to-cyan-500 origin-center"
+            style={{ transformOrigin: "center" }}
+          />
+        </div>
+
+        {/* Tagline */}
+        <motion.p
+          className="mt-8 md:mt-10 text-lg md:text-xl text-zinc-400 max-w-xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          Từ <span className="text-white font-semibold">bản phác thảo</span> đến{" "}
+          <span className="text-white font-semibold">sản phẩm hoàn chỉnh</span>
+        </motion.p>
       </div>
     </section>
   );

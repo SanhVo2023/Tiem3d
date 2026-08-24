@@ -515,6 +515,44 @@ html.lenis body {
   50% { transform: translateY(-20px); }
 }
 
+/* Float slow - for hero elements */
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-30px) scale(1.1);
+  }
+}
+
+/* Float slower - for hero elements */
+.animate-float-slower {
+  animation: float-slower 10s ease-in-out infinite;
+}
+
+@keyframes float-slower {
+  0%, 100% {
+    transform: translateY(0) scale(1.1);
+  }
+  50% {
+    transform: translateY(40px) scale(1);
+  }
+}
+
+/* Bounce slow - for scroll indicator */
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(12px); }
+}
+
 /* Pulse glow */
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
@@ -625,6 +663,33 @@ html.lenis body {
   .text-display {
     letter-spacing: -0.02em;
   }
+
+  /* Fix mobile viewport height jitter from address bar */
+  .h-screen {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height - accounts for address bar */
+  }
+
+  /* Prevent background repaints on mobile scroll */
+  .sticky {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Disable complex transforms on mobile for performance */
+  .mobile-no-transform {
+    transform: none !important;
+  }
+}
+
+/* GPU acceleration for sticky hero sections */
+.hero-stable {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: auto;
+  contain: layout style paint;
 }
 
 /* Reduce motion preference */

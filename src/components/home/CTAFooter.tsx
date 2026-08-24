@@ -140,7 +140,7 @@ export function CTAFooter() {
 
           {/* Copyright */}
           <p className="text-mono text-xs text-zinc-600 mt-8">
-            © 2024 TIỆM 3D. ALL RIGHTS RESERVED.
+            © 2025 TIỆM 3D. ALL RIGHTS RESERVED.
           </p>
         </motion.div>
       </motion.div>

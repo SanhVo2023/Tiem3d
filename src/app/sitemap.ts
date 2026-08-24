@@ -1,4 +1,6 @@
 import { MetadataRoute } from "next";
+import fs from "fs";
+import path from "path";
 
 export const dynamic = "force-static";
 
@@ -16,6 +18,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "in-hang-loat",
     "du-an-tron-goi",
   ];
+
+  // Get blog post slugs
+  const blogDir = path.join(process.cwd(), "content", "blog");
+  let blogSlugs: string[] = [];
+  try {
+    blogSlugs = fs
+      .readdirSync(blogDir)
+      .filter((file) => file.endsWith(".mdx"))
+      .map((file) => file.replace(".mdx", ""));
+  } catch {
+    // Blog directory may not exist
+  }
 
   return [
     {
@@ -36,6 +50,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...blogSlugs.map((slug) => ({
+      url: `${baseUrl}/blog/${slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
     ...services.map((service) => ({
       url: `${baseUrl}/dich-vu/${service}`,
       lastModified,

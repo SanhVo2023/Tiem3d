@@ -1,14 +1,14 @@
-import { GoogleGenAI } from "@google/genai";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { generateImage, pause, MODEL } from "./lib/gemini.mjs";
 
 // API Key
-const API_KEY = "API_KEY_HERE";
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// API key comes from .env.local (gitignored) - see scripts/lib/env.mjs
 
 // Models
-const MODEL_PREMIUM = "gemini-2.5-flash-image"; // For all images (this works)
-const MODEL_STANDARD = "gemini-2.5-flash-image"; // For all images
+// Both tiers now resolve to GEMINI_IMAGE_MODEL from .env.local
+const MODEL_PREMIUM = MODEL;
+const MODEL_STANDARD = MODEL;
 
 // Equipment Reference
 const EQUIPMENT = {
@@ -516,46 +516,6 @@ const OUTPUT_DIR = path.join(process.cwd(), "public", "assets", "generated");
 // ============================================
 // IMAGE GENERATION FUNCTION
 // ============================================
-async function generateImage(prompt, aspectRatio, outputPath, model) {
-  const filename = path.basename(outputPath);
-  console.log(`\n[${model === MODEL_PREMIUM ? "PREMIUM" : "STANDARD"}] ${filename}`);
-  console.log(`Ratio: ${aspectRatio}`);
-
-  try {
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: prompt,
-      generationConfig: {
-        responseModalities: ["TEXT", "IMAGE"],
-        imageConfig: {
-          aspectRatio: aspectRatio,
-        },
-      },
-    });
-
-    for (const part of response.candidates[0].content.parts) {
-      if (part.inlineData) {
-        const imageData = part.inlineData.data;
-        const buffer = Buffer.from(imageData, "base64");
-
-        const dir = path.dirname(outputPath);
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
-        }
-
-        fs.writeFileSync(outputPath, buffer);
-        console.log(`✓ Saved: ${outputPath}`);
-        return true;
-      }
-    }
-
-    console.log("✗ No image in response");
-    return false;
-  } catch (error) {
-    console.error(`✗ Error: ${error.message}`);
-    return false;
-  }
-}
 
 // ============================================
 // GENERATE BY CATEGORY
@@ -582,11 +542,11 @@ async function generateCategory(categoryName) {
       continue;
     }
 
-    await generateImage(img.prompt, img.ratio, outputPath, category.model);
+    await generateImage(img.prompt, outputPath, { model: category.model, aspectRatio: img.ratio });
 
     // Rate limiting - longer delay for premium model
     const delay = category.model === MODEL_PREMIUM ? 5000 : 2000;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await pause(delay);
   }
 }
 
@@ -656,8 +616,8 @@ async function generateSamples() {
 
   for (const sample of samples) {
     const outputPath = path.join(samplesDir, `${sample.name}.png`);
-    await generateImage(sample.prompt, sample.ratio, outputPath, sample.model);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await generateImage(sample.prompt, outputPath, { model: sample.model, aspectRatio: sample.ratio });
+    await pause(2000);
   }
 
   console.log("\n✓ Samples complete!");

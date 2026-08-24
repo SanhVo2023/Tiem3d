@@ -40,6 +40,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# scripts with API keys
-generate-images.mjs
-scripts/upload-to-r2.mjs
+# Secrets live in .env.local only (covered by the .env* rule above).
+# The scripts/ files used to hold hardcoded keys and were ignored to hide them —
+# that never worked, because .gitignore has no effect on already-tracked files.
+# They now read from process.env and are safe to commit.
+
+# Local screenshots / scratch
+.playwright-mcp/
+*.local.png
+*.local.jpeg
+
+# Contentlayer
+.contentlayer

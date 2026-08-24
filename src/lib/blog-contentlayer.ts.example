@@ -1,0 +1,97 @@
+/**
+ * CONTENTLAYER APPROACH (Alternative to lib/blog.ts)
+ *
+ * To use Contentlayer:
+ * 1. Rename this file to blog-contentlayer.ts
+ * 2. In next.config.ts, change to: export default withContentlayer(nextConfig);
+ * 3. Run: npm run dev (Contentlayer will generate types)
+ * 4. Update blog pages to import from here instead of lib/blog.ts
+ *
+ * Benefits:
+ * - Type-safe content (auto-generated TypeScript types)
+ * - Hot reload when content changes
+ * - Better DX for large blogs
+ *
+ * Trade-offs:
+ * - Slightly more complex setup
+ * - Extra build step
+ * - May have compatibility issues with some Next.js features
+ */
+
+import { allPosts, type Post } from "contentlayer/generated";
+import { compareDesc } from "date-fns";
+
+export type { Post };
+
+/**
+ * Get all blog posts, sorted by date
+ */
+export function getAllPosts(): Post[] {
+  return allPosts.sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
+}
+
+/**
+ * Get featured posts
+ */
+export function getFeaturedPosts(): Post[] {
+  return getAllPosts().filter((post) => post.featured);
+}
+
+/**
+ * Get a single post by slug
+ */
+export function getPostBySlug(slug: string): Post | undefined {
+  return allPosts.find((post) => post.slug === slug);
+}
+
+/**
+ * Get all unique tags
+ */
+export function getAllTags(): string[] {
+  const tags = new Set<string>();
+  allPosts.forEach((post) => {
+    post.tags?.forEach((tag) => tags.add(tag));
+  });
+  return Array.from(tags).sort();
+}
+
+/**
+ * Get posts by tag
+ */
+export function getPostsByTag(tag: string): Post[] {
+  return getAllPosts().filter((post) => post.tags?.includes(tag));
+}
+
+/**
+ * Format date for display
+ */
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("vi-VN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+// Example usage in blog/[slug]/page.tsx:
+/*
+import { allPosts } from "contentlayer/generated";
+import { useMDXComponent } from "next-contentlayer2/hooks";
+
+export function generateStaticParams() {
+  return allPosts.map((post) => ({ slug: post.slug }));
+}
+
+export default function PostPage({ params }) {
+  const post = allPosts.find((p) => p.slug === params.slug);
+  const MDXContent = useMDXComponent(post.body.code);
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <MDXContent />
+    </article>
+  );
+}
+*/

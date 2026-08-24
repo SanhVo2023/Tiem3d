@@ -20,6 +20,7 @@ const navItems = [
   { name: "Trang chủ", href: "/" },
   { name: "Dịch vụ", href: "#", hasDropdown: true },
   { name: "Portfolio", href: "/portfolio" },
+  { name: "Blog", href: "/blog" },
   { name: "Báo giá", href: "/bao-gia" },
 ];
 

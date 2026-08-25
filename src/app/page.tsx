@@ -5,6 +5,7 @@ import {
   motion,
   useInView,
   AnimatePresence,
+  useReducedMotion,
 } from "framer-motion";
 import Link from "next/link";
 import Image from "@/components/ui/Img";
@@ -16,44 +17,59 @@ import { CountUp } from "@/components/animations/CountUp";
 import { TestimonialsSection, FAQSection } from "@/components/home";
 import { Menu, X, ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { SERVICES } from "@/lib/navigation";
+import { BUSINESS } from "@/lib/business";
+import LayerField from "@/components/home/LayerField";
 
 // ============================================
 // MAIN PAGE - SUPER PREMIUM
 // ============================================
 export default function Home() {
-  const [scrolledPastHero, setScrolledPastHero] = useState(false);
+  // Which surface the header is currently floating over. The page alternates
+  // dark and light sections, so a simple "past the hero" flag put a white bar
+  // on top of the dark services and testimonials sections.
+  const [headerOnDark, setHeaderOnDark] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
 
-  // Tracks whether the hero has scrolled far enough to switch the header to its
-  // solid state. The dependency array previously listed the same state this
-  // effect sets, so the ScrollTrigger was torn down and rebuilt on every flip.
+  // Reads the surface directly under the header by watching a 1px band at the
+  // header's own height, so each section declares its own palette via
+  // data-surface and the header follows.
   useEffect(() => {
-    let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-surface]")
+    );
+    if (sections.length === 0) return;
 
-    const initScrollTracking = async () => {
-      const gsapModule = await import("gsap");
-      const ScrollTriggerModule = await import("gsap/ScrollTrigger");
-      const gsap = gsapModule.default;
-      const ScrollTrigger = ScrollTriggerModule.default;
-      gsap.registerPlugin(ScrollTrigger);
+    const HEADER_BAND = 84; // header top offset + its height
 
-      ctx = gsap.context(() => {
-        ScrollTrigger.create({
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom top",
-          onUpdate: (self) => {
-            // Functional update, so this never needs to read current state.
-            setScrolledPastHero(self.progress > 0.2);
-          },
-        });
+    const read = () => {
+      // The section whose box contains the band wins; the last match down the
+      // page is the one actually on top.
+      let surface: string | null = null;
+      for (const section of sections) {
+        const { top, bottom } = section.getBoundingClientRect();
+        if (top <= HEADER_BAND && bottom > HEADER_BAND) {
+          surface = section.dataset.surface ?? null;
+        }
+      }
+      if (surface) setHeaderOnDark(surface === "dark");
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        read();
+        ticking = false;
       });
     };
 
-    initScrollTracking();
-
+    read();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
-      if (ctx) ctx.revert();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
@@ -66,7 +82,7 @@ export default function Home() {
         Tới nội dung chính
       </a>
 
-      <FloatingHeader scrolledPastHero={scrolledPastHero} />
+      <FloatingHeader onDark={headerOnDark} />
 
       <main id="noi-dung" className="overflow-x-hidden">
         <CinematicHero heroRef={heroRef} />
@@ -89,13 +105,13 @@ export default function Home() {
 // ============================================
 // FLOATING HEADER - Glass Morphism
 // ============================================
-function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
+function FloatingHeader({ onDark }: { onDark: boolean }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
 
   // The header is always present. It used to be hidden until 20% scroll, which
   // left the homepage with no navigation at all in the first viewport.
-  // scrolledPastHero now only controls how solid it looks.
+  // The header is always present; onDark controls which palette it wears.
   const services = SERVICES;
 
   return (
@@ -107,16 +123,20 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
     >
       <div
         className={`max-w-7xl mx-auto px-4 md:px-6 py-3 rounded-2xl border transition-colors duration-300 ${
-          scrolledPastHero
-            ? "bg-white/95 backdrop-blur-xl border-zinc-200 shadow-[0_8px_32px_rgba(0,0,0,0.08)]"
-            : "bg-white/70 backdrop-blur-xl border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.08)]"
+          onDark
+            ? "bg-zinc-950/50 backdrop-blur-xl border-white/10"
+            : "bg-white/95 backdrop-blur-xl border-zinc-200 shadow-[0_8px_32px_rgba(0,0,0,0.08)]"
         }`}
       >
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <span className="text-display text-lg md:text-xl text-zinc-900">
+              <span
+                className={`text-display text-lg md:text-xl transition-colors duration-300 ${
+                  onDark ? "text-white" : "text-zinc-900"
+                }`}
+              >
                 TIỆM <span className="text-orange-500">3D</span>
               </span>
             </motion.div>
@@ -124,7 +144,7 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
-            <NavLink href="/">Trang chủ</NavLink>
+            <NavLink href="/" onDark={onDark}>Trang chủ</NavLink>
 
             {/* Services Dropdown */}
             <div
@@ -132,10 +152,18 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
               onMouseEnter={() => setIsServicesOpen(true)}
               onMouseLeave={() => setIsServicesOpen(false)}
             >
-              <div className="flex items-center rounded-full hover:bg-zinc-100">
+              <div
+                className={`flex items-center rounded-full ${
+                  onDark ? "hover:bg-white/10" : "hover:bg-zinc-100"
+                }`}
+              >
                 <Link
                   href="/dich-vu/"
-                  className="py-2 pl-4 pr-1 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
+                  className={`py-2 pl-4 pr-1 text-sm transition-colors ${
+                    onDark
+                      ? "text-zinc-300 hover:text-white"
+                      : "text-zinc-600 hover:text-zinc-900"
+                  }`}
                 >
                   Dịch vụ
                 </Link>
@@ -145,7 +173,11 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
                   aria-expanded={isServicesOpen}
                   aria-haspopup="true"
                   aria-label="Mở danh sách dịch vụ"
-                  className="py-2 pr-3 pl-1 text-zinc-500 hover:text-zinc-900 transition-colors"
+                  className={`py-2 pr-3 pl-1 transition-colors ${
+                    onDark
+                      ? "text-zinc-400 hover:text-white"
+                      : "text-zinc-500 hover:text-zinc-900"
+                  }`}
                 >
                   <motion.span
                     className="inline-block"
@@ -189,16 +221,20 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
               </AnimatePresence>
             </div>
 
-            <NavLink href="/bang-gia/">Bảng giá</NavLink>
-            <NavLink href="/portfolio/">Portfolio</NavLink>
-            <NavLink href="/blog/">Blog</NavLink>
-            <NavLink href="/lien-he/">Liên hệ</NavLink>
+            <NavLink href="/bang-gia/" onDark={onDark}>Bảng giá</NavLink>
+            <NavLink href="/portfolio/" onDark={onDark}>Portfolio</NavLink>
+            <NavLink href="/blog/" onDark={onDark}>Blog</NavLink>
+            <NavLink href="/lien-he/" onDark={onDark}>Liên hệ</NavLink>
 
             {/* CTA Button */}
             <MagneticElement strength={0.2}>
               <Link
                 href="/bao-gia/"
-                className="ml-2 px-6 py-2.5 bg-zinc-900 text-white text-sm font-semibold rounded-full hover:bg-orange-500 transition-all duration-300 flex items-center gap-2 group"
+                className={`ml-2 px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 flex items-center gap-2 group ${
+                  onDark
+                    ? "bg-orange-500 text-white hover:bg-orange-600"
+                    : "bg-zinc-900 text-white hover:bg-orange-500"
+                }`}
               >
                 <span>Báo giá</span>
                 <motion.span
@@ -214,7 +250,9 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="md:hidden p-2 rounded-xl hover:bg-zinc-100"
+            className={`md:hidden p-2 rounded-xl ${
+              onDark ? "text-white hover:bg-white/10" : "hover:bg-zinc-100"
+            }`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             whileTap={{ scale: 0.95 }}
           >
@@ -311,11 +349,23 @@ function FloatingHeader({ scrolledPastHero }: { scrolledPastHero: boolean }) {
   );
 }
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({
+  href,
+  children,
+  onDark = false,
+}: {
+  href: string;
+  children: React.ReactNode;
+  onDark?: boolean;
+}) {
   return (
     <Link
       href={href}
-      className="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors rounded-full hover:bg-zinc-100"
+      className={`px-4 py-2 text-sm transition-colors rounded-full ${
+        onDark
+          ? "text-zinc-300 hover:text-white hover:bg-white/10"
+          : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+      }`}
     >
       {children}
     </Link>
@@ -345,6 +395,17 @@ function MobileNavLink({
 // ============================================
 // CINEMATIC HERO - Giant Typography + GSAP Parallax
 // ============================================
+// The three things every enquiry opens with — what can you print it in, how
+// fine, how fast — answered before anyone has to ask. Material names track
+// src/data/pricing.ts; no prices live here.
+const HERO_SPECS = [
+  { label: "Vật liệu", value: "PLA · PETG · ABS · TPU · Resin" },
+  { label: "Độ dày lớp", value: "0,03 – 0,30 mm" },
+  { label: "Khổ in", value: "Tới 500 mm+" },
+  { label: "Báo giá", value: "30 phút qua Zalo" },
+  { label: "Giao hàng", value: "COD toàn quốc" },
+];
+
 function CinematicHero({
   heroRef,
 }: {
@@ -353,9 +414,12 @@ function CinematicHero({
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
 
-  // Use GSAP for buttery smooth parallax
+  // Parallax on scroll. The layer field drifts slower than the page so the hero
+  // has depth; the content lifts and fades as it leaves.
   useEffect(() => {
+    if (reduceMotion) return;
     let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
 
     const initParallax = async () => {
@@ -366,37 +430,31 @@ function CinematicHero({
       gsap.registerPlugin(ScrollTrigger);
 
       ctx = gsap.context(() => {
-        // Background parallax - moves slower than scroll
         if (bgRef.current) {
           gsap.to(bgRef.current, {
-            y: 150,
+            y: 120,
             ease: "none",
             scrollTrigger: {
               trigger: heroRef.current,
               start: "top top",
               end: "bottom top",
-              scrub: 0.5, // Smooth scrubbing
+              scrub: 0.5,
             },
           });
         }
-
-        // Content fade out and move up
         if (contentRef.current) {
           gsap.to(contentRef.current, {
-            y: -100,
+            y: -60,
             opacity: 0,
-            scale: 0.9,
             ease: "power2.out",
             scrollTrigger: {
               trigger: heroRef.current,
               start: "top top",
-              end: "50% top",
+              end: "55% top",
               scrub: 0.3,
             },
           });
         }
-
-        // Scroll indicator fade
         if (scrollIndicatorRef.current) {
           gsap.to(scrollIndicatorRef.current, {
             opacity: 0,
@@ -404,7 +462,7 @@ function CinematicHero({
             scrollTrigger: {
               trigger: heroRef.current,
               start: "top top",
-              end: "30% top",
+              end: "25% top",
               scrub: true,
             },
           });
@@ -413,156 +471,144 @@ function CinematicHero({
     };
 
     initParallax();
-
     return () => {
       if (ctx) ctx.revert();
     };
-  }, [heroRef]);
+  }, [heroRef, reduceMotion]);
+
+  // One orchestrated entrance rather than scattered per-element delays. The
+  // whole sequence resolves inside 700ms, so the CTA is never what the visitor
+  // is waiting on.
+  const rise = {
+    hidden: { opacity: 0, y: reduceMotion ? 0 : 18 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
 
   return (
     <section
       ref={heroRef}
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden bg-zinc-950"
+      data-surface="dark"
+      className="relative flex min-h-[100svh] items-center overflow-hidden bg-zinc-950"
     >
-      {/* Parallax Background - GSAP controlled */}
+      {/* WebGL layer field — contours warming as a print head climbs past.
+          The print-bed grid sits underneath as a plain CSS layer, so the hero
+          still has a ground under reduced motion and on anything without a
+          WebGL context, where the canvas draws nothing at all. */}
+      <div ref={bgRef} className="absolute inset-0 z-0 will-change-transform">
+        <div aria-hidden className="absolute inset-0 grid-bg-orange opacity-60" />
+        <LayerField />
+      </div>
+
+      {/* Ground the type: darken the lower half and the left edge so every line
+          clears contrast regardless of what the shader is doing behind it. */}
       <div
-        ref={bgRef}
-        className="absolute inset-0 z-0 will-change-transform"
-      >
-        <Image
-          src="/assets/generated/hero/hero-main.webp"
-          alt="Xưởng in 3D của Tiệm 3D tại TP.HCM"
-          fill
-          className="object-cover opacity-40"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-zinc-950/40 to-zinc-950" />
-      </div>
+        aria-hidden
+        className="absolute inset-0 z-[1] bg-gradient-to-b from-zinc-950/70 via-zinc-950/30 to-zinc-950"
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 z-[1] bg-[radial-gradient(120%_90%_at_10%_50%,rgba(9,9,11,0.78)_0%,transparent_58%)]"
+      />
 
-      {/* Grid overlay */}
-      <div className="absolute inset-0 z-[1] opacity-20">
-        <div className="w-full h-full grid-bg-orange" />
-      </div>
-
-      {/* Floating Elements - CSS animations for better perf */}
-      <div className="absolute top-[20%] right-[10%] w-24 h-24 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-orange-500/30 to-transparent blur-2xl animate-float-slow" />
-      <div className="absolute bottom-[30%] left-[5%] w-32 h-32 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-orange-500/15 to-transparent blur-3xl animate-float-slower" />
-
-      {/* Content - GSAP controlled */}
-      <div className="relative z-10 w-full px-4 md:px-6 pb-24 md:pb-28 text-center">
-        <div ref={contentRef} className="origin-center will-change-transform">
-          {/* Eyebrow */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="mb-6 md:mb-8"
-          >
-            <span className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full">
-              <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-              <span className="text-xs md:text-sm text-zinc-400 font-mono uppercase tracking-wider">
-                Dịch vụ in 3D chuyên nghiệp tại Việt Nam
-              </span>
-            </span>
-          </motion.div>
-
-          {/* Giant Brand Typography */}
-          <div className="space-y-0">
-            <div className="overflow-hidden pb-[0.08em]">
-              <motion.h1
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.8, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
-                className="text-display text-[18vw] md:text-[13vw] lg:text-[11vw] leading-[1] tracking-tighter text-white"
-              >
-                TIỆM <span className="text-orange-500">3D</span>
-              </motion.h1>
-            </div>
-          </div>
-
-          {/* Tagline with staggered reveal */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-8 md:mt-12"
-          >
-            <p className="text-base md:text-xl lg:text-2xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-              <span className="text-white font-medium">Từ bản vẽ đến sản phẩm thực.</span>
-              <br className="hidden md:block" />
-              {" "}FDM · Resin 8K · Hoàn thiện chuyên nghiệp
-            </p>
-          </motion.div>
-
-          {/* Feature Pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.42 }}
-            className="mt-8 flex flex-wrap justify-center gap-3"
-          >
-            {[
-              { text: "Báo giá 30 phút", icon: "⚡" },
-              { text: "Ship COD toàn quốc", icon: "📦" },
-              { text: "Bảo hành sản phẩm", icon: "✓" },
-            ].map((item, i) => (
-              <motion.span
-                key={item.text}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 + i * 0.06 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full text-sm text-zinc-300"
-              >
-                <span>{item.icon}</span>
-                <span>{item.text}</span>
-              </motion.span>
-            ))}
-          </motion.div>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.55 }}
-            className="mt-10 md:mt-14 flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <MagneticElement strength={0.15}>
-              <Link
-                href="/bao-gia"
-                className="group inline-flex items-center justify-center gap-3 px-8 md:px-10 py-4 md:py-5 bg-white text-zinc-900 font-bold text-base md:text-lg rounded-full hover:bg-orange-500 hover:text-white transition-all duration-500 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
-              >
-                <span>BÁO GIÁ NGAY</span>
-                <motion.span
-                  animate={{ x: [0, 6, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <ArrowRight className="w-5 h-5" />
-                </motion.span>
-              </Link>
-            </MagneticElement>
-            <MagneticElement strength={0.15}>
-              <Link
-                href="https://zalo.me/0384844730"
-                className="inline-flex items-center justify-center gap-2 px-8 md:px-10 py-4 md:py-5 bg-transparent border-2 border-white/30 text-white font-bold text-base md:text-lg rounded-full hover:border-cyan-400 hover:text-cyan-400 transition-all duration-300"
-              >
-                <span>CHAT ZALO</span>
-              </Link>
-            </MagneticElement>
-          </motion.div>
-        </div>
-
-        {/* Scroll Indicator - hidden on mobile, GSAP fade */}
-        <div
-          ref={scrollIndicatorRef}
-          aria-hidden
-          className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 hidden md:block"
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-32 pb-24 md:px-8 md:pt-36 md:pb-28">
+        <motion.div
+          ref={contentRef}
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.08 } } }}
+          className="grid gap-12 will-change-transform lg:grid-cols-12 lg:items-end lg:gap-10"
         >
-          <div className="flex flex-col items-center gap-1.5 animate-bounce-slow">
-            <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-[0.3em]">
-              Scroll
-            </span>
-            <div className="w-px h-8 bg-gradient-to-b from-zinc-500 to-transparent" />
+          {/* ---- Left: the offer ---- */}
+          <div className="lg:col-span-7">
+            <motion.h1 variants={rise} className="text-white">
+              <span className="text-mono-sm mb-5 block tracking-[0.32em] text-orange-400 md:mb-6">
+                In 3D FDM · Resin · Thiết kế
+              </span>
+              <span className="text-display-sentence block text-hero">
+                <span className="text-zinc-500">Từ bản vẽ đến</span>
+                <br />
+                sản phẩm thực
+              </span>
+            </motion.h1>
+
+            <motion.p
+              variants={rise}
+              className="mt-7 max-w-xl text-lg leading-relaxed text-zinc-300 md:mt-8 md:text-xl"
+            >
+              Xưởng in 3D ở{" "}
+              {BUSINESS.branches.map((b) => b.shortName).join(" và ")}. Gửi ảnh
+              hoặc bản vẽ tay — chúng tôi dựng mẫu, in, sơn hoàn thiện và giao
+              tận nơi.{" "}
+              <span className="text-white">Chưa có file 3D vẫn in được.</span>
+            </motion.p>
+
+            <motion.div
+              variants={rise}
+              className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4 md:mt-10"
+            >
+              <MagneticElement strength={0.15}>
+                <Link
+                  href="/bao-gia/"
+                  className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-orange-500 px-8 py-4 text-base font-bold text-white transition-colors duration-300 hover:bg-orange-600 sm:w-auto"
+                >
+                  <span>Gửi ảnh, nhận báo giá</span>
+                  <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
+              </MagneticElement>
+              <Link
+                href={BUSINESS.zalo}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 px-8 py-4 text-base font-bold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-zinc-900 sm:w-auto"
+              >
+                Nhắn Zalo {BUSINESS.phoneDisplay}
+              </Link>
+            </motion.div>
           </div>
+
+          {/* ---- Right: the spec plate ----
+              The shop's own machine language used as page furniture, in the
+              mono face the rest of the site reserves for numbers and specs. */}
+          <motion.div variants={rise} className="lg:col-span-5">
+            <dl className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm md:p-7">
+              <div className="mb-4 flex items-baseline justify-between gap-4 border-b border-white/10 pb-4">
+                <span className="text-mono-sm tracking-[0.28em] text-zinc-400">
+                  Thông số xưởng
+                </span>
+                <span className="text-mono-sm flex shrink-0 items-center gap-2 tracking-widest text-orange-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                  {BUSINESS.hours.display}
+                </span>
+              </div>
+              {HERO_SPECS.map((spec) => (
+                <div
+                  key={spec.label}
+                  className="flex items-baseline justify-between gap-4 border-b border-white/5 py-3 last:border-0 last:pb-0"
+                >
+                  <dt className="text-sm text-zinc-400">{spec.label}</dt>
+                  <dd className="text-mono-sm text-right text-sm text-zinc-100">
+                    {spec.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Scroll cue */}
+      <div
+        ref={scrollIndicatorRef}
+        aria-hidden
+        className="pointer-events-none absolute bottom-7 left-1/2 z-10 hidden -translate-x-1/2 md:block"
+      >
+        <div className="animate-bounce-slow flex flex-col items-center gap-2">
+          <span className="text-mono-sm tracking-[0.3em] text-zinc-500">
+            Cuộn xuống
+          </span>
+          <div className="h-8 w-px bg-gradient-to-b from-zinc-500 to-transparent" />
         </div>
       </div>
     </section>
@@ -584,7 +630,7 @@ function TypographyMarquee() {
   ];
 
   return (
-    <div className="py-6 bg-zinc-950 border-y border-zinc-800 overflow-hidden">
+    <div data-surface="dark" className="py-6 bg-zinc-950 border-y border-zinc-800 overflow-hidden">
       <Marquee speed={30}>
         <div className="flex items-center gap-12 px-6">
           {items.map((item, i) => (
@@ -771,7 +817,7 @@ function ServicesSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative">
+    <section ref={sectionRef} data-surface="dark" className="relative">
       {/* The trigger/pin container */}
       <div ref={triggerRef} className="h-screen w-full overflow-hidden bg-zinc-950">
         {/* The horizontal track */}
@@ -803,7 +849,7 @@ function ServicesSection() {
                   transition={{ duration: 1.5, ease: [0.25, 0.4, 0.25, 1] }}
                 >
                   <span
-                    className="text-[40vh] md:text-[60vh] font-black leading-none"
+                    className="text-watermark font-black leading-none"
                     style={{
                       WebkitTextStroke: '2px rgba(249,115,22,0.2)',
                       WebkitTextFillColor: 'transparent',
@@ -836,7 +882,7 @@ function ServicesSection() {
                 }}
                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
               >
-                <div className="w-full h-full border-2 border-cyan-500/20 rounded-full" />
+                <div className="w-full h-full border-2 border-orange-500/20 rounded-full" />
               </motion.div>
 
               <motion.div
@@ -848,7 +894,7 @@ function ServicesSection() {
                 transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
               >
                 <div
-                  className="w-full h-full bg-gradient-to-br from-orange-500/10 to-cyan-500/10 backdrop-blur-sm"
+                  className="w-full h-full bg-gradient-to-br from-orange-500/15 to-orange-500/0 backdrop-blur-sm"
                   style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}
                 />
               </motion.div>
@@ -864,7 +910,7 @@ function ServicesSection() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  <div className="w-12 h-[2px] bg-gradient-to-r from-orange-500 to-cyan-500" />
+                  <div className="w-12 h-[2px] bg-gradient-to-r from-orange-500 to-orange-500/0" />
                   <span className="text-xs text-zinc-500 font-mono uppercase tracking-[0.3em]">
                     Dịch vụ
                   </span>
@@ -874,7 +920,7 @@ function ServicesSection() {
                 <div className="mb-8">
                   <div className="overflow-hidden">
                     <motion.h2
-                      className="text-display text-5xl md:text-7xl lg:text-[8rem] text-white leading-[0.85]"
+                      className="text-display text-feature text-white leading-[0.9]"
                       initial={{ y: "100%" }}
                       animate={{ y: 0 }}
                       transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
@@ -884,7 +930,7 @@ function ServicesSection() {
                   </div>
                   <div className="overflow-hidden">
                     <motion.h2
-                      className="text-display text-5xl md:text-7xl lg:text-[8rem] leading-[0.85]"
+                      className="text-display text-feature leading-[0.9]"
                       initial={{ y: "100%" }}
                       animate={{ y: 0 }}
                       transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.4, 0.25, 1] }}
@@ -1105,11 +1151,12 @@ function ManifestoSection() {
   return (
     <section
       ref={sectionRef}
+      data-surface="dark"
       className="relative py-24 md:py-32 bg-zinc-950 overflow-hidden"
     >
       {/* Background accent */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="text-[30vw] md:text-[25vw] font-black text-zinc-900/30 select-none leading-none">
+        <div className="text-watermark font-black text-zinc-900/30 select-none leading-none">
           3D
         </div>
       </div>
@@ -1123,26 +1170,26 @@ function ManifestoSection() {
         >
           {/* Line 1 */}
           <div className="overflow-hidden mb-2 md:mb-4">
-            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] text-white leading-[0.9] tracking-tight">
+            <span className="word inline-block text-display text-feature text-white leading-[0.9] tracking-tight">
               BIẾN
             </span>{" "}
-            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] text-white leading-[0.9] tracking-tight">
+            <span className="word inline-block text-display text-feature text-white leading-[0.9] tracking-tight">
               Ý
             </span>{" "}
-            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] text-white leading-[0.9] tracking-tight">
+            <span className="word inline-block text-display text-feature text-white leading-[0.9] tracking-tight">
               TƯỞNG
             </span>
           </div>
 
           {/* Line 2 - Gradient */}
           <div className="overflow-hidden">
-            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] leading-[0.9] tracking-tight text-gradient-animated">
+            <span className="word inline-block text-display text-feature leading-[0.9] tracking-tight text-gradient-animated">
               THÀNH
             </span>{" "}
-            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] leading-[0.9] tracking-tight text-gradient-animated">
+            <span className="word inline-block text-display text-feature leading-[0.9] tracking-tight text-gradient-animated">
               HIỆN
             </span>{" "}
-            <span className="word inline-block text-display text-[12vw] md:text-[10vw] lg:text-[8vw] leading-[0.9] tracking-tight text-gradient-animated">
+            <span className="word inline-block text-display text-feature leading-[0.9] tracking-tight text-gradient-animated">
               THỰC
             </span>
           </div>
@@ -1151,7 +1198,7 @@ function ManifestoSection() {
         {/* Animated Line */}
         <div className="flex justify-center mt-10 md:mt-14">
           <div
-            className="animated-line h-[3px] w-32 md:w-48 bg-gradient-to-r from-orange-500 to-cyan-500 origin-center"
+            className="animated-line h-[3px] w-32 md:w-48 bg-gradient-to-r from-orange-500 to-amber-400 origin-center"
             style={{ transformOrigin: "center" }}
           />
         </div>
@@ -1210,7 +1257,7 @@ function ProcessTimeline() {
   ];
 
   return (
-    <section ref={ref} className="py-20 md:py-32 px-4 md:px-6 bg-white">
+    <section ref={ref} data-surface="light" className="py-20 md:py-32 px-4 md:px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -1243,7 +1290,7 @@ function ProcessTimeline() {
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-16 left-[calc(100%+1rem)] w-[calc(100%-2rem)] h-[2px]">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-orange-500 to-cyan-500"
+                    className="h-full bg-gradient-to-r from-orange-500 to-amber-400"
                     initial={{ scaleX: 0 }}
                     animate={isInView ? { scaleX: 1 } : {}}
                     transition={{ delay: index * 0.15 + 0.3, duration: 0.5 }}
@@ -1327,7 +1374,7 @@ function PortfolioBento() {
   ];
 
   return (
-    <section ref={ref} className="py-20 md:py-32 px-4 md:px-6 bg-zinc-50">
+    <section ref={ref} data-surface="light" className="py-20 md:py-32 px-4 md:px-6 bg-zinc-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -1425,7 +1472,7 @@ function StatsReveal() {
   ];
 
   return (
-    <section ref={ref} className="py-24 md:py-40 bg-zinc-950 overflow-hidden">
+    <section ref={ref} data-surface="dark" className="py-24 md:py-40 bg-zinc-950 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Header */}
         <motion.div
@@ -1494,10 +1541,11 @@ function MagneticCTA() {
   return (
     <section
       ref={ref}
+      data-surface="light"
       className="relative py-32 md:py-48 px-4 md:px-6 overflow-hidden"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-cyan-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-white to-amber-50" />
 
       {/* Floating Blobs */}
       <motion.div
@@ -1510,7 +1558,7 @@ function MagneticCTA() {
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-20 right-10 w-80 md:w-[500px] h-80 md:h-[500px] bg-cyan-500/10 rounded-full blur-[120px]"
+        className="absolute bottom-20 right-10 w-80 md:w-[500px] h-80 md:h-[500px] bg-amber-500/10 rounded-full blur-[120px]"
         animate={{
           scale: [1.2, 1, 1.2],
           x: [0, -40, 0],
@@ -1532,7 +1580,7 @@ function MagneticCTA() {
         </motion.div>
 
         <motion.h2
-          className="text-display text-5xl md:text-7xl lg:text-[10rem] text-zinc-900 leading-[0.9] mb-8"
+          className="text-display text-feature text-zinc-900 leading-[0.95] mb-8"
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.1 }}
@@ -1577,7 +1625,7 @@ function MagneticCTA() {
           <MagneticElement strength={0.15}>
             <Link
               href="https://zalo.me/0384844730"
-              className="inline-flex items-center justify-center px-10 md:px-14 py-5 md:py-6 bg-white border-2 border-zinc-300 text-zinc-700 text-lg md:text-xl font-bold rounded-full hover:border-cyan-500 hover:text-cyan-500 transition-all duration-300 shadow-lg"
+              className="inline-flex items-center justify-center px-10 md:px-14 py-5 md:py-6 bg-white border-2 border-zinc-300 text-zinc-700 text-lg md:text-xl font-bold rounded-full hover:border-zinc-900 hover:text-zinc-900 transition-all duration-300 shadow-lg"
             >
               CHAT ZALO
             </Link>

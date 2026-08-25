@@ -41,7 +41,7 @@ export function FAQSection() {
   return (
     <>
       <FAQJsonLd faqs={faqs} />
-      <section ref={sectionRef} className="py-16 md:py-20 px-6 md:px-12 bg-zinc-50">
+      <section data-surface="light" ref={sectionRef} className="py-16 md:py-20 px-6 md:px-12 bg-zinc-50">
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <motion.div

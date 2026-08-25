@@ -93,7 +93,7 @@ export function TestimonialsSection() {
   };
 
   return (
-    <section ref={sectionRef} className="py-24 md:py-32 px-4 md:px-6 bg-zinc-950 overflow-hidden relative">
+    <section data-surface="dark" ref={sectionRef} className="py-24 md:py-32 px-4 md:px-6 bg-zinc-950 overflow-hidden relative">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div

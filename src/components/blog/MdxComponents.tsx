@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { BUSINESS, formatAddressShort } from "@/lib/business";
 import {
   PRICE_DISCLAIMER,

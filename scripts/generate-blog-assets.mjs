@@ -67,6 +67,22 @@ const COVERS = {
     "An FPV drone frame and RC car suspension parts printed in black and orange plastic, laid out on a workbench with hex drivers and spare propellers.",
 };
 
+// In-body article images. These live outside public/assets/blog/ because that
+// directory is reserved for social cards, which must stay JPEG; everything
+// here is a display image and gets converted to WebP by optimize-images.mjs.
+const INLINE = {
+  "cosplay-3d-printing":
+    "A cosplayer's workbench covered with freshly 3D printed armour pieces waiting to be assembled, sanding sponges and a craft knife beside them, warm afternoon light.",
+  "cosplay-genshin":
+    "An ornate fantasy prop sword and a glowing translucent crystal accessory, both 3D printed and painted, displayed against a dark studio backdrop.",
+  "cosplay-onepiece":
+    "A large stylised prop weapon and a wide straw hat arranged on a wooden floor, printed and hand painted, bright even lighting.",
+  "cosplay-materials":
+    "Two filament spools side by side on a bench, one matte and one glossy, each with a printed test bracket in front showing the difference in surface finish.",
+  "cosplay-painting":
+    "Hands holding an airbrush spraying metallic paint onto a 3D printed helmet on a turntable, spray booth and paint bottles around, focused workshop light.",
+};
+
 const BRAND = [
   {
     file: path.join(PUBLIC_DIR, "logo.png"),
@@ -202,6 +218,21 @@ async function generateBranch() {
   summarise(results, "Branch photos");
 }
 
+async function generateInline() {
+  const dir = path.join(ASSET_OUT, "blog");
+  fs.mkdirSync(dir, { recursive: true });
+  const results = [];
+  for (const [name, subject] of Object.entries(INLINE)) {
+    results.push(
+      await generateImage(`${subject} ${COVER_STYLE}`, path.join(dir, `${name}.png`), {
+        aspectRatio: "16:9",
+      })
+    );
+    await pause(6000);
+  }
+  summarise(results, "Inline article images");
+}
+
 const command = process.argv[2] || "help";
 
 switch (command) {
@@ -214,10 +245,14 @@ switch (command) {
   case "branch":
     await generateBranch();
     break;
+  case "inline":
+    await generateInline();
+    break;
   case "all":
     await generateCovers();
     await generateBrand();
     await generateBranch();
+    await generateInline();
     break;
   default:
     console.log(`
@@ -225,6 +260,7 @@ Usage:
   node scripts/generate-blog-assets.mjs covers   blog cover images (16:9)
   node scripts/generate-blog-assets.mjs brand    logo.png + og-image.jpg
   node scripts/generate-blog-assets.mjs branch   branch and workspace photos
+  node scripts/generate-blog-assets.mjs inline   in-body article images
   node scripts/generate-blog-assets.mjs all
 `);
 }

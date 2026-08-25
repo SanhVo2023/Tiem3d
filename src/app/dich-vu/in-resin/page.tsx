@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ResinPageContent from "./ResinPageContent";
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "In 3D Resin 8K - Chi Tiết Hoàn Hảo",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/dich-vu/in-resin",
     images: [
       {
-        url: "/assets/generated/services/service-resin-hero.png",
+        url: socialCard("/assets/generated/services/service-resin-hero.webp"),
         width: 1200,
         height: 630,
         alt: "In 3D Resin 8K",
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "In 3D Resin 8K - Chi Tiết Hoàn Hảo | Tiệm 3D",
     description: "Độ phân giải 8K (28.5 micron) cho chi tiết siêu mịn. Hoàn hảo cho figure, trang sức, nha khoa.",
-    images: ["/assets/generated/services/service-resin-hero.png"],
+    images: [socialCard("/assets/generated/services/service-resin-hero.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/dich-vu/in-resin",
@@ -57,7 +58,7 @@ export default function ResinPage() {
         name="In 3D Resin 8K"
         description="Dịch vụ in 3D Resin độ phân giải 8K (28.5 micron) cho chi tiết siêu mịn. Hoàn hảo cho figure, trang sức, nha khoa với quy trình wash & cure chuyên nghiệp."
         url="https://tiem3d.com/dich-vu/in-resin"
-        image="https://tiem3d.com/assets/generated/services/service-resin-hero.png"
+        image="https://tiem3d.com/assets/generated/services/service-resin-hero.webp"
       />
       <BreadcrumbJsonLd
         items={[

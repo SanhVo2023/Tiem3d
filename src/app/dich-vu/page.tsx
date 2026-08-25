@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { ArrowRight } from "lucide-react";
 import { BUSINESS } from "@/lib/business";
 import { SERVICES } from "@/lib/navigation";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
 import { BreadcrumbJsonLd, ItemListJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 const TITLE = "Dịch vụ in 3D & thiết kế";
 const DESCRIPTION =
@@ -14,14 +15,14 @@ const DESCRIPTION =
 
 // Hero images already on disk, matched to the right service.
 const SERVICE_IMAGES: Record<string, string> = {
-  "/dich-vu/in-fdm/": "/assets/generated/services/service-fdm-hero.png",
-  "/dich-vu/in-resin/": "/assets/generated/services/service-resin-hero.png",
-  "/dich-vu/in-kho-lon/": "/assets/generated/workspace/workspace-fdm-farm.png",
-  "/dich-vu/in-ky-thuat/": "/assets/generated/products/product-gear.png",
-  "/dich-vu/thiet-ke-3d/": "/assets/generated/services/service-design-hero.png",
-  "/dich-vu/hoan-thien/": "/assets/generated/services/service-finish-hero.png",
-  "/dich-vu/in-hang-loat/": "/assets/generated/services/service-batch-hero.png",
-  "/dich-vu/du-an-tron-goi/": "/assets/generated/workspace/workspace-overview.png",
+  "/dich-vu/in-fdm/": "/assets/generated/services/service-fdm-hero.webp",
+  "/dich-vu/in-resin/": "/assets/generated/services/service-resin-hero.webp",
+  "/dich-vu/in-kho-lon/": "/assets/generated/workspace/workspace-fdm-farm.webp",
+  "/dich-vu/in-ky-thuat/": "/assets/generated/products/product-gear.webp",
+  "/dich-vu/thiet-ke-3d/": "/assets/generated/services/service-design-hero.webp",
+  "/dich-vu/hoan-thien/": "/assets/generated/services/service-finish-hero.webp",
+  "/dich-vu/in-hang-loat/": "/assets/generated/services/service-batch-hero.webp",
+  "/dich-vu/du-an-tron-goi/": "/assets/generated/workspace/workspace-overview.webp",
 };
 
 export const metadata: Metadata = {
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     locale: "vi_VN",
     images: [
       {
-        url: "/assets/generated/workspace/workspace-overview.png",
+        url: socialCard("/assets/generated/workspace/workspace-overview.webp"),
         width: 1200,
         height: 630,
         alt: TITLE,
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${TITLE} | Tiệm 3D`,
     description: DESCRIPTION,
-    images: ["/assets/generated/workspace/workspace-overview.png"],
+    images: [socialCard("/assets/generated/workspace/workspace-overview.webp")],
   },
 };
 

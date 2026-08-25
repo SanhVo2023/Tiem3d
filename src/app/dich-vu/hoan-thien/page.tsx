@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import FinishingPageContent from "./FinishingPageContent";
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "Hoàn Thiện & Sơn 3D Print - Mạ Chrome, Airbrush",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/dich-vu/hoan-thien",
     images: [
       {
-        url: "/assets/generated/services/service-finish-hero.png",
+        url: socialCard("/assets/generated/services/service-finish-hero.webp"),
         width: 1200,
         height: 630,
         alt: "Hoàn Thiện 3D Print",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Hoàn Thiện & Sơn 3D Print - Mạ Chrome, Airbrush | Tiệm 3D",
     description: "Xử lý bề mặt, sơn airbrush, mạ chrome/vàng/đồng. Biến sản phẩm in 3D thô thành tác phẩm hoàn chỉnh.",
-    images: ["/assets/generated/services/service-finish-hero.png"],
+    images: [socialCard("/assets/generated/services/service-finish-hero.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/dich-vu/hoan-thien",
@@ -56,7 +57,7 @@ export default function FinishingPage() {
         name="Hoàn Thiện & Sơn 3D Print"
         description="Dịch vụ hoàn thiện sản phẩm in 3D chuyên nghiệp. Xử lý bề mặt, sơn airbrush, mạ chrome/vàng/đồng, weathering effects để biến sản phẩm thô thành tác phẩm hoàn chỉnh."
         url="https://tiem3d.com/dich-vu/hoan-thien"
-        image="https://tiem3d.com/assets/generated/services/service-finish-hero.png"
+        image="https://tiem3d.com/assets/generated/services/service-finish-hero.webp"
       />
       <BreadcrumbJsonLd
         items={[

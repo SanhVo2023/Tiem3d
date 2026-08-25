@@ -18,8 +18,11 @@ npm run rss      # regenerate public/feed.xml only
 There is **no test suite**. `@playwright/test` and `lighthouse` are devDependencies with no specs or config — don't report tests as passing. Verification is done by building and inspecting `out/`.
 
 ```bash
-node scripts/check-assets.mjs            # every referenced image exists in public/
+npm run assets:check            # every referenced image exists in public/
 node scripts/check-assets.mjs --orphans  # also list unreferenced files
+npm run assets:optimize         # PNG/JPEG -> WebP, recompress social JPEGs, rewrite refs
+npm run assets:social           # rebuild the 1200x630 JPEG og:image cards
+npm run cdn:upload              # push public/assets to R2 via Wrangler
 ```
 
 Asset generation (manual, never part of the build — needs `GEMINI_API_KEY`):
@@ -84,6 +87,34 @@ Adding a post: create the MDX, add a cover prompt to `COVERS` in `scripts/genera
 ### Portfolio case studies
 
 Each study follows the shop's real workflow — customer sends a photo over Zalo → model built → printed → finished → shipped. Images live in `public/assets/generated/projects/<imageDir>/<file>.png`, and the same project keys exist in `scripts/data/projects-vn.mjs` so the generator can produce them. If you add a study, add its generator entry too or the page renders broken images.
+
+### Images
+
+Two formats, decided by destination — `scripts/optimize-images.mjs` enforces both.
+
+**In-page images are WebP.** The generated assets arrived as 1024x1024 PNGs: 200 MB across 187 files, over 1 MB each. Nothing can make an LCP good behind a 1.9 MB hero. The optimiser resizes to 1400px and converts, which took the tree to 13.7 MB — 93% smaller — then rewrites every reference by reading the truth off disk, so a half-finished run is safe to re-run.
+
+**Social cards stay JPEG.** Facebook, Zalo and X all decline to render a WebP `og:image`, so a shared link would preview as nothing. `scripts/generate-social-cards.mjs` cuts a 1200x630 JPEG into `public/assets/social/` for every image used as a card, and `src/lib/social.ts` `socialCard()` resolves the path. **Metadata must call `socialCard("/assets/…")` on the original path, never hardcode `/assets/social/x.jpg`** — the generator finds its work list by scanning for those call sites, so a hardcoded card path becomes ungeneratable.
+
+Regenerating images means re-running the optimiser; the generators still write PNG.
+
+### CDN
+
+Images are served from Cloudflare R2 (`tiem3d-assets`) when `NEXT_PUBLIC_CDN_URL` is set.
+
+`scripts/upload-to-r2.mjs` drives **Wrangler**, not the S3 API, so it reuses the `wrangler login` session and there are no long-lived R2 keys to leak. It hashes into `.cache/r2-manifest.json` and only uploads what changed.
+
+The rewrite happens in `src/lib/cdn.ts` `asset()`, applied through `src/components/ui/Img.tsx` — a `next/image` wrapper that all 15 importers use instead of `next/image` directly. **Do not wire the CDN to `assetPrefix`.** That routes every `/_next/*` file through the CDN including the self-hosted fonts, which then fail CORS and the site renders unstyled; only `public/assets` is mirrored into the bucket. `public/assets` also ships in the deploy, so blanking the variable is a complete rollback.
+
+`og:image` deliberately stays on the origin — scrapers should see the canonical host.
+
+### AI search
+
+`/llms.txt` and `/llms-full.txt` are static route handlers built by `src/lib/llms.ts`, which reads the same `business.ts` / `pricing.ts` / `navigation.ts` modules the pages render from, so the facts cannot drift from the site. The short file is the index plus hard facts (phone, both branches, hours, price bands); the full file is every article as plain text.
+
+`robots.ts` names 16 answer-engine crawlers explicitly (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot…) rather than relying on the `*` rule.
+
+`HowTo` schema is deliberately absent: Google removed those rich results in 2023, so it would be markup with no consumer.
 
 ### SEO
 

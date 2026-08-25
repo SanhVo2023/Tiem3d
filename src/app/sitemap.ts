@@ -2,7 +2,8 @@ import { MetadataRoute } from "next";
 import { BUSINESS } from "@/lib/business";
 import { SERVICES } from "@/lib/navigation";
 import { getAllPosts, getAllTags } from "@/lib/blog";
-import { getAllCaseStudies } from "@/lib/portfolio";
+import { getAllCaseStudies, coverImage } from "@/lib/portfolio";
+import { asset } from "@/lib/cdn";
 
 export const dynamic = "force-static";
 
@@ -17,6 +18,18 @@ function url(path: string): string {
   if (path === "/") return `${BASE}/`;
   const clean = path.startsWith("/") ? path : `/${path}`;
   return `${BASE}${clean.endsWith("/") ? clean : `${clean}/`}`;
+}
+
+/**
+ * Image sitemap entries. Google discovers images it never crawled to on its own
+ * this way, and image search is a real entry point for a shop whose product is
+ * visual. The URL has to be the one the page actually renders, so it goes
+ * through the same asset() helper the components use.
+ */
+function imageUrl(path?: string): string[] {
+  if (!path) return [];
+  const src = asset(path);
+  return [src.startsWith("http") ? src : `${BASE}${src}`];
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -50,6 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: url(`/portfolio/${study.slug}`),
     changeFrequency: "yearly" as const,
     priority: 0.6,
+    images: imageUrl(coverImage(study)),
   }));
 
   // lastModified comes from each post's own frontmatter (updated ?? date)
@@ -59,6 +73,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(post.updated || post.date),
     changeFrequency: "monthly" as const,
     priority: post.featured ? 0.7 : 0.6,
+    images: imageUrl(post.image),
   }));
 
   // A tag page holding one post is a thin duplicate of that post, so it stays

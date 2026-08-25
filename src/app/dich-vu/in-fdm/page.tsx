@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import FDMPageContent from "./FDMPageContent";
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "In FDM - Dịch vụ in 3D sợi bền, tiết kiệm",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/dich-vu/in-fdm",
     images: [
       {
-        url: "/assets/generated/services/service-fdm-hero.png",
+        url: socialCard("/assets/generated/services/service-fdm-hero.webp"),
         width: 1200,
         height: 630,
         alt: "Dịch vụ in FDM - Tiệm 3D",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "In FDM - Dịch vụ in 3D sợi bền, tiết kiệm",
     description: "In 3D FDM với PLA, PETG, ABS, TPU. Giá thành phẩm từ 2.000đ/gram.",
-    images: ["/assets/generated/services/service-fdm-hero.png"],
+    images: [socialCard("/assets/generated/services/service-fdm-hero.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/dich-vu/in-fdm",
@@ -56,7 +57,7 @@ export default function FDMServicePage() {
         name="Dịch vụ in 3D FDM"
         description="Dịch vụ in 3D FDM chuyên nghiệp với PLA, PETG, ABS, TPU. Giá thành phẩm từ 2.000đ/gram, layer 0.1mm, giao hàng toàn quốc."
         url="https://tiem3d.com/dich-vu/in-fdm"
-        image="https://tiem3d.com/assets/generated/services/service-fdm-hero.png"
+        image="https://tiem3d.com/assets/generated/services/service-fdm-hero.webp"
         priceRange="2.000đ - 5.000đ/gram"
       />
       <BreadcrumbJsonLd

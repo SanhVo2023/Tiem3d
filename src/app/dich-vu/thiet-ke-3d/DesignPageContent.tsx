@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -15,12 +15,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Anime Character", category: "Organic", image: "/assets/generated/projects/project2-02-sculpt.png" },
-  { title: "Mechanical Part", category: "Mechanical", image: "/assets/generated/projects/project3-02-cad.png" },
-  { title: "Phone Stand", category: "Functional", image: "/assets/generated/projects/project1-02-cad.png" },
-  { title: "Custom Figure", category: "Organic", image: "/assets/generated/products/product-figure-01.png" },
-  { title: "Gear Assembly", category: "Mechanical", image: "/assets/generated/products/product-gear.png" },
-  { title: "Product Design", category: "Industrial", image: "/assets/generated/products/product-enclosure.png" },
+  { title: "Anime Character", category: "Organic", image: "/assets/generated/projects/project2-02-sculpt.webp" },
+  { title: "Mechanical Part", category: "Mechanical", image: "/assets/generated/projects/project3-02-cad.webp" },
+  { title: "Phone Stand", category: "Functional", image: "/assets/generated/projects/project1-02-cad.webp" },
+  { title: "Custom Figure", category: "Organic", image: "/assets/generated/products/product-figure-01.webp" },
+  { title: "Gear Assembly", category: "Mechanical", image: "/assets/generated/products/product-gear.webp" },
+  { title: "Product Design", category: "Industrial", image: "/assets/generated/products/product-enclosure.webp" },
 ];
 
 export default function DesignPageContent() {
@@ -34,7 +34,7 @@ export default function DesignPageContent() {
         {/* Hero */}
         <section className="relative py-24 px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image src="/assets/generated/services/service-design-hero.png" alt="3D Design" fill className="object-cover opacity-20" />
+            <Image src="/assets/generated/services/service-design-hero.webp" alt="Thiết kế mô hình 3D theo yêu cầu" fill className="object-cover opacity-20" />
             <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white" />
           </div>
           <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -54,7 +54,7 @@ export default function DesignPageContent() {
               <Link href="/bao-gia" className="inline-flex items-center gap-2 px-8 py-4 bg-cyan-500 text-white text-sm font-bold tracking-wide rounded-full hover:bg-cyan-600 transition-colors">BÁO GIÁ NGAY →</Link>
             </div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-              <Image src="/assets/generated/services/service-design-tablet.png" alt="3D Design Process" fill className="object-cover" />
+              <Image src="/assets/generated/services/service-design-tablet.webp" alt="Quy trình thiết kế mô hình 3D trên máy tính" fill className="object-cover" />
             </motion.div>
           </div>
         </section>

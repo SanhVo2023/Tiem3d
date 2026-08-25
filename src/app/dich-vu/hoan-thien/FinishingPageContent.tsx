@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -15,12 +15,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Iron Man Helmet", category: "Cosplay", image: "/assets/generated/projects/project4-06-finished.png" },
-  { title: "Painted Figure", category: "Figure", image: "/assets/generated/products/product-figure-01.png" },
-  { title: "Sanding Process", category: "Process", image: "/assets/generated/projects/project4-04-sanding.png" },
-  { title: "Airbrush Painting", category: "Process", image: "/assets/generated/projects/project4-05-painting.png" },
-  { title: "Assembly", category: "Process", image: "/assets/generated/projects/project4-03-assembly.png" },
-  { title: "Finished Product", category: "Result", image: "/assets/generated/products/product-lamp.png" },
+  { title: "Iron Man Helmet", category: "Cosplay", image: "/assets/generated/projects/project4-06-finished.webp" },
+  { title: "Painted Figure", category: "Figure", image: "/assets/generated/products/product-figure-01.webp" },
+  { title: "Sanding Process", category: "Process", image: "/assets/generated/projects/project4-04-sanding.webp" },
+  { title: "Airbrush Painting", category: "Process", image: "/assets/generated/projects/project4-05-painting.webp" },
+  { title: "Assembly", category: "Process", image: "/assets/generated/projects/project4-03-assembly.webp" },
+  { title: "Finished Product", category: "Result", image: "/assets/generated/products/product-lamp.webp" },
 ];
 
 export default function FinishingPageContent() {
@@ -34,7 +34,7 @@ export default function FinishingPageContent() {
         {/* Hero */}
         <section className="relative py-24 px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image src="/assets/generated/services/service-finish-hero.png" alt="Finishing" fill className="object-cover opacity-20" />
+            <Image src="/assets/generated/services/service-finish-hero.webp" alt="Hoàn thiện và sơn sản phẩm in 3D" fill className="object-cover opacity-20" />
             <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white" />
           </div>
           <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -54,7 +54,7 @@ export default function FinishingPageContent() {
               <Link href="/bao-gia" className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white text-sm font-bold tracking-wide rounded-full hover:bg-orange-600 transition-colors">BÁO GIÁ NGAY →</Link>
             </div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-              <Image src="/assets/generated/services/service-finish-paint.png" alt="Airbrush Painting" fill className="object-cover" />
+              <Image src="/assets/generated/services/service-finish-paint.webp" alt="Sơn airbrush hoàn thiện mô hình in 3D" fill className="object-cover" />
             </motion.div>
           </div>
         </section>

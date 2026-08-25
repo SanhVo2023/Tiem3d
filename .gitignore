@@ -52,3 +52,6 @@ next-env.d.ts
 
 # Contentlayer
 .contentlayer
+
+# Local upload manifest for scripts/upload-to-r2.mjs
+.cache/

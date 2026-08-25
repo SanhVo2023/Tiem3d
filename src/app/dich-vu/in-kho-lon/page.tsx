@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import LargeFormatPageContent from "./LargeFormatPageContent";
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "In 3D Khổ Lớn 500mm+ - Mô Hình Kiến Trúc & Props",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/dich-vu/in-kho-lon",
     images: [
       {
-        url: "/assets/generated/workspace/workspace-fdm-farm.png",
+        url: socialCard("/assets/generated/workspace/workspace-fdm-farm.webp"),
         width: 1200,
         height: 630,
         alt: "In 3D Khổ Lớn",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "In 3D Khổ Lớn 500mm+ - Mô Hình Kiến Trúc & Props | Tiệm 3D",
     description: "Build volume 500mm+. Hoàn hảo cho mô hình kiến trúc, props cosplay lớn, và prototype kích thước thực.",
-    images: ["/assets/generated/workspace/workspace-fdm-farm.png"],
+    images: [socialCard("/assets/generated/workspace/workspace-fdm-farm.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/dich-vu/in-kho-lon",
@@ -56,7 +57,7 @@ export default function LargeFormatPage() {
         name="In 3D Khổ Lớn"
         description="Dịch vụ in 3D khổ lớn với build volume 500mm+. Hoàn hảo cho mô hình kiến trúc, props cosplay, tượng trang trí với máy in công nghiệp và lắp ráp chuyên nghiệp."
         url="https://tiem3d.com/dich-vu/in-kho-lon"
-        image="https://tiem3d.com/assets/generated/workspace/workspace-fdm-farm.png"
+        image="https://tiem3d.com/assets/generated/workspace/workspace-fdm-farm.webp"
       />
       <BreadcrumbJsonLd
         items={[

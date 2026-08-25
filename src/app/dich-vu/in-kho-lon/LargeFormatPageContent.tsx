@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -15,12 +15,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Architectural Model", category: "Kiến trúc", image: "/assets/generated/portfolio/portfolio-01.png" },
-  { title: "Large Props", category: "Cosplay", image: "/assets/generated/projects/project4-06-finished.png" },
-  { title: "Display Model", category: "Trưng bày", image: "/assets/generated/products/product-lamp.png" },
-  { title: "Industrial Part", category: "Công nghiệp", image: "/assets/generated/products/product-enclosure.png" },
-  { title: "Sculpture", category: "Nghệ thuật", image: "/assets/generated/products/product-figure-01.png" },
-  { title: "Prototype", category: "Prototype", image: "/assets/generated/products/product-bracket.png" },
+  { title: "Architectural Model", category: "Kiến trúc", image: "/assets/generated/portfolio/portfolio-01.webp" },
+  { title: "Large Props", category: "Cosplay", image: "/assets/generated/projects/project4-06-finished.webp" },
+  { title: "Display Model", category: "Trưng bày", image: "/assets/generated/products/product-lamp.webp" },
+  { title: "Industrial Part", category: "Công nghiệp", image: "/assets/generated/products/product-enclosure.webp" },
+  { title: "Sculpture", category: "Nghệ thuật", image: "/assets/generated/products/product-figure-01.webp" },
+  { title: "Prototype", category: "Prototype", image: "/assets/generated/products/product-bracket.webp" },
 ];
 
 export default function LargeFormatPageContent() {
@@ -34,7 +34,7 @@ export default function LargeFormatPageContent() {
         {/* Hero */}
         <section className="relative py-24 px-4 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image src="/assets/generated/workspace/workspace-fdm-farm.png" alt="Large Format Printing" fill className="object-cover opacity-20" />
+            <Image src="/assets/generated/workspace/workspace-fdm-farm.webp" alt="In 3D khổ lớn cho mô hình trên 500mm" fill className="object-cover opacity-20" />
             <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white" />
           </div>
           <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -54,7 +54,7 @@ export default function LargeFormatPageContent() {
               <Link href="/bao-gia" className="inline-flex items-center gap-2 px-8 py-4 bg-amber-500 text-white text-sm font-bold tracking-wide rounded-full hover:bg-amber-600 transition-colors">BÁO GIÁ NGAY →</Link>
             </div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-              <Image src="/assets/generated/workspace/workspace-fdm-farm.png" alt="Large Format 3D Printer" fill className="object-cover" />
+              <Image src="/assets/generated/workspace/workspace-fdm-farm.webp" alt="Máy in 3D khổ lớn" fill className="object-cover" />
             </motion.div>
           </div>
         </section>

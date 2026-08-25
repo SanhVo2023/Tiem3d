@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -15,12 +15,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Batch Production", category: "Industrial", image: "/assets/generated/services/service-batch-hero.png" },
-  { title: "Print Farm", category: "Workspace", image: "/assets/generated/services/service-batch-farm.png" },
-  { title: "Mass Parts", category: "Production", image: "/assets/generated/workspace/workspace-fdm-farm.png" },
-  { title: "Keycaps Batch", category: "Merch", image: "/assets/generated/portfolio/portfolio-05.png" },
-  { title: "Multiple Prints", category: "Production", image: "/assets/generated/products/product-bracket.png" },
-  { title: "Packaged Items", category: "Shipping", image: "/assets/generated/process/process-packing.png" },
+  { title: "Batch Production", category: "Industrial", image: "/assets/generated/services/service-batch-hero.webp" },
+  { title: "Print Farm", category: "Workspace", image: "/assets/generated/services/service-batch-farm.webp" },
+  { title: "Mass Parts", category: "Production", image: "/assets/generated/workspace/workspace-fdm-farm.webp" },
+  { title: "Keycaps Batch", category: "Merch", image: "/assets/generated/portfolio/portfolio-05.webp" },
+  { title: "Multiple Prints", category: "Production", image: "/assets/generated/products/product-bracket.webp" },
+  { title: "Packaged Items", category: "Shipping", image: "/assets/generated/process/process-packing.webp" },
 ];
 
 export default function BatchPageContent() {
@@ -34,7 +34,7 @@ export default function BatchPageContent() {
         {/* Hero */}
         <section className="relative py-24 px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image src="/assets/generated/services/service-batch-hero.png" alt="Batch Printing" fill className="object-cover opacity-20" />
+            <Image src="/assets/generated/services/service-batch-hero.webp" alt="In 3D hàng loạt nhiều sản phẩm cùng lúc" fill className="object-cover opacity-20" />
             <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white" />
           </div>
           <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -54,7 +54,7 @@ export default function BatchPageContent() {
               <Link href="/bao-gia" className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white text-sm font-bold tracking-wide rounded-full hover:bg-orange-600 transition-colors">BÁO GIÁ NGAY →</Link>
             </div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-              <Image src="/assets/generated/workspace/workspace-fdm-farm.png" alt="Print Farm" fill className="object-cover" />
+              <Image src="/assets/generated/workspace/workspace-fdm-farm.webp" alt="Dàn máy in 3D chạy đơn hàng loạt" fill className="object-cover" />
             </motion.div>
           </div>
         </section>

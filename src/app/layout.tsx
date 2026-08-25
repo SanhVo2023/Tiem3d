@@ -3,7 +3,9 @@ import { Be_Vietnam_Pro, Open_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/effects/LenisProvider";
 import { SiteJsonLd } from "@/components/seo/JsonLd";
+import { cdnOrigin } from "@/lib/cdn";
 import { BUSINESS, PRIMARY_BRANCH } from "@/lib/business";
+import { socialCard } from "@/lib/social";
 
 // Display face. Be Vietnam Pro is designed for Vietnamese, so the stacked
 // diacritics in the shop's own name ("TIỆM") sit correctly at display size —
@@ -97,11 +99,11 @@ export const metadata: Metadata = {
     title: "Tiệm 3D | In 3D & Thiết Kế Chuyên Nghiệp TP.HCM",
     description:
       `In 3D FDM, Resin 8K/14K/16K siêu sắc nét tại TP.HCM. 2 chi nhánh: Thủ Đức và Sơn Kỳ (Tân Phú). Thiết kế 3D theo yêu cầu, sơn hoàn thiện mô hình. Zalo ${BUSINESS.phoneDisplay}.`,
-    url: "https://tiem3d.com",
+    url: `${BUSINESS.url}/`,
     siteName: "Tiệm 3D",
     images: [
       {
-        url: "/assets/generated/hero/hero-main.png",
+        url: socialCard("/assets/generated/hero/hero-main.webp"),
         width: 1200,
         height: 630,
         alt: "Tiệm 3D - Dịch vụ in 3D chuyên nghiệp tại TP.HCM",
@@ -115,7 +117,7 @@ export const metadata: Metadata = {
     title: "Tiệm 3D | In 3D & Thiết Kế TP.HCM",
     description:
       `In 3D FDM, Resin 8K/14K/16K tại TP.HCM — Thủ Đức & Tân Phú. Thiết kế 3D, sơn mô hình. Zalo ${BUSINESS.phoneDisplay}`,
-    images: ["/assets/generated/hero/hero-main.png"],
+    images: [socialCard("/assets/generated/hero/hero-main.webp")],
   },
   robots: {
     index: true,
@@ -129,7 +131,10 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://tiem3d.com",
+    canonical: `${BUSINESS.url}/`,
+    types: {
+      "application/rss+xml": `${BUSINESS.url}/feed.xml`,
+    },
   },
   category: "3D Printing Service",
   verification: {
@@ -152,6 +157,14 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <head>
+        {/* Images are served from the R2 CDN, so the connection is opened
+            before the first <img> is parsed rather than after. */}
+        {cdnOrigin && (
+          <>
+            <link rel="preconnect" href={cdnOrigin} crossOrigin="anonymous" />
+            <link rel="dns-prefetch" href={cdnOrigin} />
+          </>
+        )}
         {/* Organization + WebSite + one LocalBusiness per branch */}
         <SiteJsonLd />
       </head>

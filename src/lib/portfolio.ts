@@ -633,7 +633,7 @@ export function getFeaturedCaseStudies(): CaseStudy[] {
 
 /** Full public path for a step image. */
 export function stepImage(study: CaseStudy, step: CaseStudyStep): string {
-  return `/assets/generated/projects/${study.imageDir}/${step.file}.png`;
+  return `/assets/generated/projects/${study.imageDir}/${step.file}.webp`;
 }
 
 /** The "thành phẩm" shot, used as the card and OG image. */

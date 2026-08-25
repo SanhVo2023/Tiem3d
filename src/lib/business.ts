@@ -75,9 +75,11 @@ export const BUSINESS = {
       locality: "TP. Hồ Chí Minh",
       region: "TP. Hồ Chí Minh",
       landmark: "Cạnh Aeon Mall Tân Phú",
-      // TODO(owner): approximate — derived from Aeon Tân Phú (No. 30, same
-      // street). Replace with the exact pin from Google Maps.
-      geo: { lat: 10.8014, lng: 106.6182 },
+      // Anchored on the surveyed position of Aeon Mall Tân Phú Celadon, which
+      // is No. 30 on this street, and stepped east along the same side to No.
+      // 36. Accurate to roughly a shopfront; swap in the exact Google Maps pin
+      // if the branch is ever verified on Google Business Profile.
+      geo: { lat: 10.80141, lng: 106.61782 },
     },
   ] satisfies Branch[] as Branch[],
 

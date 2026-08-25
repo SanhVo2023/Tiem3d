@@ -7,7 +7,7 @@ import {
   AnimatePresence,
 } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
 import { Marquee } from "@/components/animations/Marquee";
@@ -430,8 +430,8 @@ function CinematicHero({
         className="absolute inset-0 z-0 will-change-transform"
       >
         <Image
-          src="/assets/generated/hero/hero-main.png"
-          alt="3D Printing Workshop"
+          src="/assets/generated/hero/hero-main.webp"
+          alt="Xưởng in 3D của Tiệm 3D tại TP.HCM"
           fill
           className="object-cover opacity-40"
           priority
@@ -620,7 +620,7 @@ function ServicesSection() {
       title: "IN FDM",
       subtitle: "Bền · Kinh tế",
       desc: "Máy in Bambu Lab A1 Combo. Prototype, chi tiết lớn, sản phẩm chịu lực.",
-      image: "/assets/generated/services/service-fdm-hero.png",
+      image: "/assets/generated/services/service-fdm-hero.webp",
       color: "#f97316",
       href: "/dich-vu/in-fdm",
     },
@@ -629,7 +629,7 @@ function ServicesSection() {
       title: "IN RESIN 8K",
       subtitle: "Chi tiết · Siêu mịn",
       desc: "Elegoo Saturn 4 Ultra. Figure, trang sức, chi tiết micro.",
-      image: "/assets/generated/services/service-resin-hero.png",
+      image: "/assets/generated/services/service-resin-hero.webp",
       color: "#06b6d4",
       href: "/dich-vu/in-resin",
     },
@@ -638,7 +638,7 @@ function ServicesSection() {
       title: "IN KHỔ LỚN",
       subtitle: "500mm+",
       desc: "Mô hình kiến trúc, props cosplay, prototype lớn.",
-      image: "/assets/generated/workspace/workspace-fdm-farm.png",
+      image: "/assets/generated/workspace/workspace-fdm-farm.webp",
       color: "#eab308",
       href: "/dich-vu/in-kho-lon",
     },
@@ -647,7 +647,7 @@ function ServicesSection() {
       title: "KỸ THUẬT",
       subtitle: "±0.1mm",
       desc: "Chi tiết cơ khí, bánh răng, dung sai lắp ghép.",
-      image: "/assets/generated/products/product-gear.png",
+      image: "/assets/generated/products/product-gear.webp",
       color: "#3b82f6",
       href: "/dich-vu/in-ky-thuat",
     },
@@ -656,7 +656,7 @@ function ServicesSection() {
       title: "THIẾT KẾ",
       subtitle: "CAD · 3D",
       desc: "Thiết kế model 3D từ bản vẽ hoặc mô tả.",
-      image: "/assets/generated/services/service-design-hero.png",
+      image: "/assets/generated/services/service-design-hero.webp",
       color: "#a855f7",
       href: "/dich-vu/thiet-ke-3d",
     },
@@ -665,7 +665,7 @@ function ServicesSection() {
       title: "HOÀN THIỆN",
       subtitle: "Sơn · Mạ",
       desc: "Xử lý bề mặt, airbrush, mạ chrome.",
-      image: "/assets/generated/services/service-finish-hero.png",
+      image: "/assets/generated/services/service-finish-hero.webp",
       color: "#10b981",
       href: "/dich-vu/hoan-thien",
     },
@@ -674,7 +674,7 @@ function ServicesSection() {
       title: "HÀNG LOẠT",
       subtitle: "-40%",
       desc: "Print farm 24/7. Số lượng lớn, giá tối ưu.",
-      image: "/assets/generated/services/service-batch-hero.png",
+      image: "/assets/generated/services/service-batch-hero.webp",
       color: "#ef4444",
       href: "/dich-vu/in-hang-loat",
     },
@@ -683,7 +683,7 @@ function ServicesSection() {
       title: "TRỌN GÓI",
       subtitle: "E2E",
       desc: "Từ ý tưởng đến sản phẩm hoàn chỉnh.",
-      image: "/assets/generated/hero/hero-main.png",
+      image: "/assets/generated/hero/hero-main.webp",
       color: "#6366f1",
       href: "/dich-vu/du-an-tron-goi",
     },
@@ -1183,28 +1183,28 @@ function ProcessTimeline() {
       number: "01",
       title: "Gửi yêu cầu",
       description: "Upload file 3D (.stl, .obj, .step) hoặc mô tả ý tưởng của bạn. Chấp nhận mọi định dạng.",
-      image: "/assets/generated/process/process-upload.png",
+      image: "/assets/generated/process/process-upload.webp",
       time: "5 phút",
     },
     {
       number: "02",
       title: "Nhận báo giá",
       description: "Báo giá chi tiết trong vòng 30 phút. Bao gồm công nghệ, vật liệu, thời gian.",
-      image: "/assets/generated/process/process-quote.png",
+      image: "/assets/generated/process/process-quote.webp",
       time: "30 phút",
     },
     {
       number: "03",
       title: "Sản xuất",
       description: "In 3D với công nghệ phù hợp. Theo dõi tiến độ realtime qua Zalo.",
-      image: "/assets/generated/process/process-printing.png",
+      image: "/assets/generated/process/process-printing.webp",
       time: "1-5 ngày",
     },
     {
       number: "04",
       title: "Giao hàng",
       description: "Đóng gói cẩn thận, ship COD toàn quốc. Hỗ trợ sau bán hàng.",
-      image: "/assets/generated/process/process-packing.png",
+      image: "/assets/generated/process/process-packing.webp",
       time: "1-3 ngày",
     },
   ];
@@ -1299,28 +1299,28 @@ function PortfolioBento() {
     {
       title: "Tượng Phật A Di Đà",
       description: "FDM 60cm, sơn hiệu ứng đồng",
-      image: "/assets/generated/projects/tuong-phat/phat-05-display.png",
+      image: "/assets/generated/projects/tuong-phat/phat-05-display.webp",
       href: "/portfolio/tuong-phat-a-di-da/",
       span: "col-span-2 row-span-2",
     },
     {
       title: "Rồng trang trí 80cm",
       description: "9 đốt tháo rời, sơn nhũ vàng",
-      image: "/assets/generated/projects/rong-trang-tri/rong-05-display.png",
+      image: "/assets/generated/projects/rong-trang-tri/rong-05-display.webp",
       href: "/portfolio/rong-trang-tri-tet/",
       span: "col-span-1 row-span-1",
     },
     {
       title: "Tượng anime 70cm",
       description: "8 khối, phủ bóng 2K",
-      image: "/assets/generated/projects/tuong-anime-lon/goku-05-display.png",
+      image: "/assets/generated/projects/tuong-anime-lon/goku-05-display.webp",
       href: "/portfolio/tuong-anime-lon-70cm/",
       span: "col-span-1 row-span-1",
     },
     {
       title: "Linh vật thương hiệu",
       description: "30 bản, đồng đều màu",
-      image: "/assets/generated/projects/mascot-cua-hang/mascot-05-display.png",
+      image: "/assets/generated/projects/mascot-cua-hang/mascot-05-display.webp",
       href: "/portfolio/mascot-cua-hang/",
       span: "col-span-2 row-span-1",
     },

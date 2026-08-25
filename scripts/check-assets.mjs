@@ -11,8 +11,10 @@ const ROOTS = ["src", "content"];
 const PUBLIC_DIR = "public";
 const EXTS = /\.(tsx?|mdx?|css)$/;
 
-// Matches "/assets/..." and "/images/..." inside quotes or backticks.
-const REF = /["'`](\/(?:assets|images)\/[^"'`\s)]+)["'`]/g;
+// Matches "/assets/..." and "/images/..." inside quotes or backticks, and in
+// markdown image/link syntax. The quoted-only version missed five broken
+// `![alt](/assets/blog/...)` references in a published post.
+const REF = /(?:["'`]|\]\()(\/(?:assets|images)\/[^"'`\s)]+)(?:["'`]|\))/g;
 
 // Skip template literals like `/assets/.../${dir}/${file}.png` — those are
 // resolved at runtime and can't be checked statically.

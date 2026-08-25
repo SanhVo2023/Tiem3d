@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -31,12 +31,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Anime Figure", category: "Figure", image: "/assets/generated/products/product-figure-01.png" },
-  { title: "Chibi Character", category: "Figure", image: "/assets/generated/products/product-figure-02.png" },
-  { title: "Mecha Robot", category: "Figure", image: "/assets/generated/products/product-figure-03.png" },
-  { title: "D&D Miniature", category: "Miniature", image: "/assets/generated/products/product-mini-01.png" },
-  { title: "Miniature Set", category: "Miniature", image: "/assets/generated/products/product-mini-02.png" },
-  { title: "Dental Model", category: "Nha khoa", image: "/assets/generated/products/product-dental.png" },
+  { title: "Anime Figure", category: "Figure", image: "/assets/generated/products/product-figure-01.webp" },
+  { title: "Chibi Character", category: "Figure", image: "/assets/generated/products/product-figure-02.webp" },
+  { title: "Mecha Robot", category: "Figure", image: "/assets/generated/products/product-figure-03.webp" },
+  { title: "D&D Miniature", category: "Miniature", image: "/assets/generated/products/product-mini-01.webp" },
+  { title: "Miniature Set", category: "Miniature", image: "/assets/generated/products/product-mini-02.webp" },
+  { title: "Dental Model", category: "Nha khoa", image: "/assets/generated/products/product-dental.webp" },
 ];
 
 export default function ResinPageContent() {
@@ -49,8 +49,8 @@ export default function ResinPageContent() {
         <section className="relative py-24 px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Image
-              src="/assets/generated/services/service-resin-hero.png"
-              alt="Resin Printing"
+              src="/assets/generated/services/service-resin-hero.webp"
+              alt="In 3D Resin độ phân giải cao"
               fill
               className="object-cover opacity-20"
             />
@@ -127,8 +127,8 @@ export default function ResinPageContent() {
                 className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl"
               >
                 <Image
-                  src="/assets/generated/workspace/printer-resin-closeup.png"
-                  alt="Elegoo Saturn Printer"
+                  src="/assets/generated/workspace/printer-resin-closeup.webp"
+                  alt="Máy in 3D Resin Elegoo Saturn"
                   fill
                   className="object-cover"
                 />
@@ -148,8 +148,8 @@ export default function ResinPageContent() {
             <div className="grid md:grid-cols-2 gap-8">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
                 <Image
-                  src="/assets/generated/services/service-resin-detail.png"
-                  alt="Resin Detail"
+                  src="/assets/generated/services/service-resin-detail.webp"
+                  alt="Chi tiết sắc nét trên sản phẩm in Resin"
                   fill
                   className="object-cover"
                 />
@@ -201,8 +201,8 @@ export default function ResinPageContent() {
               </div>
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
                 <Image
-                  src="/assets/generated/services/service-resin-wash.png"
-                  alt="Wash and Cure Station"
+                  src="/assets/generated/services/service-resin-wash.webp"
+                  alt="Máy rửa và sấy UV cho sản phẩm in Resin"
                   fill
                   className="object-cover"
                 />

@@ -9,8 +9,10 @@ import {
   BUSINESS,
   PRIMARY_BRANCH,
   formatAddress,
+  mapsUrl,
   type Branch,
 } from "@/lib/business";
+import { SERVICES } from "@/lib/navigation";
 
 const ORG_ID = `${BUSINESS.url}/#organization`;
 const SITE_ID = `${BUSINESS.url}/#website`;
@@ -38,15 +40,28 @@ const AREA_SERVED = BUSINESS.serviceAreas.map((area) => ({
   name: area,
 }));
 
-const SERVICE_CATALOG = [
-  "Thiết kế 3D theo yêu cầu",
-  "Vẽ mẫu 3D kỹ thuật",
-  "In 3D Resin 8K/14K/16K siêu sắc nét",
-  "In 3D FDM chất liệu PLA, PETG",
-  "In 3D màu (Multicolor Printing)",
-  "Sơn hoàn thiện mô hình",
-  "Xử lý hậu kỳ sản phẩm in 3D",
-  "In 3D quà tặng và mô hình nhân vật",
+// Derived from navigation.ts rather than retyped. The hardcoded copy this
+// replaces had drifted: it advertised a "Multicolor Printing" service that does
+// not exist as a page, and omitted two that do.
+const SERVICE_CATALOG = SERVICES.map((service) => ({
+  name: service.name,
+  description: service.summary,
+  url: `${BUSINESS.url}${service.href}`,
+}));
+
+// What the business is an authority on. Answer engines lean on this to decide
+// whether a source is relevant to a question, and it costs nothing to state.
+const KNOWS_ABOUT = [
+  "In 3D",
+  "In 3D FDM",
+  "In 3D Resin",
+  "Thiết kế mô hình 3D",
+  "Dựng hình 3D từ ảnh",
+  "Vật liệu in 3D (PLA, PETG, ABS, ASA, TPU, Nylon)",
+  "Hoàn thiện và sơn mô hình in 3D",
+  "In mẫu prototype",
+  "Mô hình kiến trúc",
+  "Phụ kiện cosplay in 3D",
 ];
 
 function postalAddress(branch: Branch) {
@@ -61,7 +76,7 @@ function postalAddress(branch: Branch) {
 
 function localBusinessNode(branch: Branch) {
   return {
-    "@type": "LocalBusiness",
+    "@type": ["LocalBusiness", "ProfessionalService"],
     "@id": branchId(branch),
     name: `${BUSINESS.name} — ${branch.name}`,
     alternateName: BUSINESS.name,
@@ -76,8 +91,12 @@ function localBusinessNode(branch: Branch) {
       longitude: branch.geo.lng,
     },
     openingHoursSpecification: [OPENING_HOURS],
+    hasMap: mapsUrl(branch),
     priceRange: "$$",
-    image: `${BUSINESS.url}/assets/generated/hero/hero-main.png`,
+    currenciesAccepted: "VND",
+    paymentAccepted: "Tiền mặt, Chuyển khoản, Momo, ZaloPay",
+    knowsAbout: KNOWS_ABOUT,
+    image: `${BUSINESS.url}/assets/generated/hero/hero-main.webp`,
     areaServed: AREA_SERVED,
     sameAs: [BUSINESS.zalo],
   };
@@ -125,13 +144,20 @@ export function SiteJsonLd() {
           areaServed: "VN",
         },
         department: BUSINESS.branches.map((b) => ({ "@id": branchId(b) })),
+        areaServed: AREA_SERVED,
+        knowsAbout: KNOWS_ABOUT,
         sameAs: [BUSINESS.zalo],
         hasOfferCatalog: {
           "@type": "OfferCatalog",
           name: "Dịch vụ In 3D",
-          itemListElement: SERVICE_CATALOG.map((name) => ({
+          itemListElement: SERVICE_CATALOG.map((service) => ({
             "@type": "Offer",
-            itemOffered: { "@type": "Service", name },
+            itemOffered: {
+              "@type": "Service",
+              name: service.name,
+              description: service.description,
+              url: service.url,
+            },
           })),
         },
       },
@@ -228,6 +254,10 @@ interface ArticleJsonLdProps {
   datePublished: string;
   dateModified?: string;
   authorName?: string;
+  /** Post tags. Emitted as `keywords` and as `about` entities. */
+  keywords?: string[];
+  /** Body length, so length-based quality signals have something to read. */
+  wordCount?: number;
 }
 
 /**
@@ -242,6 +272,8 @@ export function ArticleJsonLd({
   datePublished,
   dateModified,
   authorName = BUSINESS.name,
+  keywords = [],
+  wordCount,
 }: ArticleJsonLdProps) {
   const absoluteImage = image
     ? image.startsWith("http")
@@ -261,6 +293,17 @@ export function ArticleJsonLd({
     dateModified: dateModified || datePublished,
     author: { "@type": "Organization", name: authorName, "@id": ORG_ID },
     publisher: { "@id": ORG_ID },
+    // Ties the article back into the site-wide graph emitted by SiteJsonLd,
+    // so a crawler reading one article page can still resolve the publisher,
+    // both branches and the service catalogue.
+    isPartOf: { "@id": SITE_ID },
+    ...(keywords.length
+      ? {
+          keywords: keywords.join(", "),
+          about: keywords.map((name) => ({ "@type": "Thing", name })),
+        }
+      : {}),
+    ...(wordCount ? { wordCount } : {}),
     inLanguage: "vi-VN",
   });
 }

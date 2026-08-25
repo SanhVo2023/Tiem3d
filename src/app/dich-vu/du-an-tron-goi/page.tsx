@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import FullServicePageContent from "./FullServicePageContent";
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "Dự Án Trọn Gói 3D - Từ Ý Tưởng Đến Sản Phẩm",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/dich-vu/du-an-tron-goi",
     images: [
       {
-        url: "/assets/generated/workspace/workspace-overview.png",
+        url: socialCard("/assets/generated/workspace/workspace-overview.webp"),
         width: 1200,
         height: 630,
         alt: "Dự Án Trọn Gói 3D",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Dự Án Trọn Gói 3D - Từ Ý Tưởng Đến Sản Phẩm | Tiệm 3D",
     description: "Chỉ cần ý tưởng - chúng tôi lo phần còn lại. Tư vấn, thiết kế, in ấn, hoàn thiện.",
-    images: ["/assets/generated/workspace/workspace-overview.png"],
+    images: [socialCard("/assets/generated/workspace/workspace-overview.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/dich-vu/du-an-tron-goi",
@@ -56,7 +57,7 @@ export default function FullServicePage() {
         name="Dự Án Trọn Gói 3D"
         description="Dịch vụ dự án in 3D trọn gói end-to-end. Chỉ cần ý tưởng - chúng tôi lo phần còn lại: tư vấn, thiết kế 3D, in ấn, hoàn thiện, sơn màu với 1 điểm liên hệ duy nhất."
         url="https://tiem3d.com/dich-vu/du-an-tron-goi"
-        image="https://tiem3d.com/assets/generated/workspace/workspace-overview.png"
+        image="https://tiem3d.com/assets/generated/workspace/workspace-overview.webp"
       />
       <BreadcrumbJsonLd
         items={[

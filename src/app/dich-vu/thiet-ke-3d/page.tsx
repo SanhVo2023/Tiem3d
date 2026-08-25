@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import DesignPageContent from "./DesignPageContent";
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "Thiết Kế 3D & Modeling - Từ Ý Tưởng Đến File In",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/dich-vu/thiet-ke-3d",
     images: [
       {
-        url: "/assets/generated/services/service-design-hero.png",
+        url: socialCard("/assets/generated/services/service-design-hero.webp"),
         width: 1200,
         height: 630,
         alt: "Thiết Kế 3D",
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Thiết Kế 3D & Modeling - Từ Ý Tưởng Đến File In | Tiệm 3D",
     description: "Không có file 3D? Chỉ cần mô tả ý tưởng - chúng tôi sẽ biến nó thành model 3D chuyên nghiệp.",
-    images: ["/assets/generated/services/service-design-hero.png"],
+    images: [socialCard("/assets/generated/services/service-design-hero.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/dich-vu/thiet-ke-3d",
@@ -57,7 +58,7 @@ export default function DesignPage() {
         name="Thiết Kế 3D & Modeling"
         description="Dịch vụ thiết kế 3D chuyên nghiệp. Không có file? Chỉ cần ý tưởng. Hỗ trợ CAD mechanical, sculpting organic, industrial design với chỉnh sửa không giới hạn."
         url="https://tiem3d.com/dich-vu/thiet-ke-3d"
-        image="https://tiem3d.com/assets/generated/services/service-design-hero.png"
+        image="https://tiem3d.com/assets/generated/services/service-design-hero.webp"
       />
       <BreadcrumbJsonLd
         items={[

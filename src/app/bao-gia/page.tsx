@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import QuotePageContent from "./QuotePageContent";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "Báo giá in 3D - Nhận báo giá trong 30 phút",
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/bao-gia",
     images: [
       {
-        url: "/assets/generated/hero/hero-main.png",
+        url: socialCard("/assets/generated/hero/hero-main.webp"),
         width: 1200,
         height: 630,
         alt: "Báo giá in 3D - Cái Tiệm In 3D",
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Báo giá in 3D - Nhận báo giá trong 30 phút",
     description: "Gửi file 3D và nhận báo giá chi tiết trong 30 phút.",
-    images: ["/assets/generated/hero/hero-main.png"],
+    images: [socialCard("/assets/generated/hero/hero-main.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/bao-gia",

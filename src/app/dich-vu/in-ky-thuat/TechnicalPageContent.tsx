@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -15,12 +15,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Mechanical Gears", category: "Cơ khí", image: "/assets/generated/products/product-gear.png" },
-  { title: "Enclosure", category: "Vỏ máy", image: "/assets/generated/products/product-enclosure.png" },
-  { title: "Bracket", category: "Giá đỡ", image: "/assets/generated/products/product-bracket.png" },
-  { title: "Assembly Parts", category: "Lắp ghép", image: "/assets/generated/projects/project3-02-cad.png" },
-  { title: "Precision Part", category: "Chính xác", image: "/assets/generated/products/product-dental.png" },
-  { title: "Prototype", category: "Prototype", image: "/assets/generated/projects/project1-02-cad.png" },
+  { title: "Mechanical Gears", category: "Cơ khí", image: "/assets/generated/products/product-gear.webp" },
+  { title: "Enclosure", category: "Vỏ máy", image: "/assets/generated/products/product-enclosure.webp" },
+  { title: "Bracket", category: "Giá đỡ", image: "/assets/generated/products/product-bracket.webp" },
+  { title: "Assembly Parts", category: "Lắp ghép", image: "/assets/generated/projects/project3-02-cad.webp" },
+  { title: "Precision Part", category: "Chính xác", image: "/assets/generated/products/product-dental.webp" },
+  { title: "Prototype", category: "Prototype", image: "/assets/generated/projects/project1-02-cad.webp" },
 ];
 
 export default function TechnicalPageContent() {
@@ -34,7 +34,7 @@ export default function TechnicalPageContent() {
         {/* Hero */}
         <section className="relative py-24 px-4 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image src="/assets/generated/products/product-gear.png" alt="Technical Printing" fill className="object-cover opacity-20" />
+            <Image src="/assets/generated/products/product-gear.webp" alt="In 3D chi tiết kỹ thuật" fill className="object-cover opacity-20" />
             <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white" />
           </div>
           <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -54,7 +54,7 @@ export default function TechnicalPageContent() {
               <Link href="/bao-gia" className="inline-flex items-center gap-2 px-8 py-4 bg-blue-500 text-white text-sm font-bold tracking-wide rounded-full hover:bg-blue-600 transition-colors">BÁO GIÁ NGAY →</Link>
             </div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-              <Image src="/assets/generated/products/product-gear.png" alt="Technical 3D Print" fill className="object-cover" />
+              <Image src="/assets/generated/products/product-gear.webp" alt="Chi tiết kỹ thuật in 3D chính xác" fill className="object-cover" />
             </motion.div>
           </div>
         </section>
@@ -68,7 +68,7 @@ export default function TechnicalPageContent() {
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
-                <Image src="/assets/generated/services/service-fdm-samples.png" alt="Technical Detail" fill className="object-cover" />
+                <Image src="/assets/generated/services/service-fdm-samples.webp" alt="Chi tiết cơ khí in 3D dung sai ±0.1mm" fill className="object-cover" />
               </div>
               <div className="flex flex-col justify-center space-y-6">
                 {[

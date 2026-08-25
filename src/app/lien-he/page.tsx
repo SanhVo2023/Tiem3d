@@ -5,6 +5,7 @@ import { BUSINESS, formatAddress, mapsUrl, type Branch } from "@/lib/business";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
 import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 const TITLE = "Liên hệ & địa chỉ";
 const DESCRIPTION = `Tiệm 3D có 2 chi nhánh tại TP.HCM: Thủ Đức (61 Đường Số 1, P. Linh Tây) và Sơn Kỳ (36 Bờ Bao Tân Thắng, cạnh Aeon Mall Tân Phú). Zalo/gọi ${BUSINESS.phoneDisplay}, mở cửa ${BUSINESS.hours.display} tất cả các ngày.`;
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
     locale: "vi_VN",
     images: [
       {
-        url: "/assets/generated/workspace/workspace-overview.png",
+        url: socialCard("/assets/generated/workspace/workspace-overview.webp"),
         width: 1200,
         height: 630,
         alt: "Xưởng in 3D Tiệm 3D",
@@ -55,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${TITLE} | Tiệm 3D`,
     description: DESCRIPTION,
-    images: ["/assets/generated/workspace/workspace-overview.png"],
+    images: [socialCard("/assets/generated/workspace/workspace-overview.webp")],
   },
 };
 

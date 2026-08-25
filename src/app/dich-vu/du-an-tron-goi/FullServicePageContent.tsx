@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -15,12 +15,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Phone Stand Project", category: "From Idea", image: "/assets/generated/projects/project1-01-sketch.png" },
-  { title: "CAD Design", category: "Design", image: "/assets/generated/projects/project1-02-cad.png" },
-  { title: "Printing", category: "Production", image: "/assets/generated/projects/project1-03-printing.png" },
-  { title: "Finished Product", category: "Result", image: "/assets/generated/projects/project1-04-finished.png" },
-  { title: "Cosplay Helmet", category: "Full Project", image: "/assets/generated/projects/project4-06-finished.png" },
-  { title: "Custom Figure", category: "End to End", image: "/assets/generated/projects/project2-05-finished.png" },
+  { title: "Phone Stand Project", category: "From Idea", image: "/assets/generated/projects/project1-01-sketch.webp" },
+  { title: "CAD Design", category: "Design", image: "/assets/generated/projects/project1-02-cad.webp" },
+  { title: "Printing", category: "Production", image: "/assets/generated/projects/project1-03-printing.webp" },
+  { title: "Finished Product", category: "Result", image: "/assets/generated/projects/project1-04-finished.webp" },
+  { title: "Cosplay Helmet", category: "Full Project", image: "/assets/generated/projects/project4-06-finished.webp" },
+  { title: "Custom Figure", category: "End to End", image: "/assets/generated/projects/project2-05-finished.webp" },
 ];
 
 export default function FullServicePageContent() {
@@ -34,7 +34,7 @@ export default function FullServicePageContent() {
         {/* Hero */}
         <section className="relative py-24 px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <Image src="/assets/generated/workspace/workspace-overview.png" alt="Workshop" fill className="object-cover opacity-20" />
+            <Image src="/assets/generated/workspace/workspace-overview.webp" alt="Xưởng in 3D Tiệm 3D" fill className="object-cover opacity-20" />
             <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white" />
           </div>
           <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -54,7 +54,7 @@ export default function FullServicePageContent() {
               <Link href="/bao-gia" className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 text-white text-sm font-bold tracking-wide rounded-full hover:bg-orange-600 transition-colors">BÁO GIÁ NGAY →</Link>
             </div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
-              <Image src="/assets/generated/hero/hero-main.png" alt="Full Service" fill className="object-cover" />
+              <Image src="/assets/generated/hero/hero-main.webp" alt="Dịch vụ in 3D trọn gói từ thiết kế đến thành phẩm" fill className="object-cover" />
             </motion.div>
           </div>
         </section>
@@ -68,10 +68,10 @@ export default function FullServicePageContent() {
             </div>
             <div className="grid grid-cols-4 gap-4">
               {[
-                { img: "/assets/generated/projects/project1-01-sketch.png", label: "Sketch" },
-                { img: "/assets/generated/projects/project1-02-cad.png", label: "Design" },
-                { img: "/assets/generated/projects/project1-03-printing.png", label: "Print" },
-                { img: "/assets/generated/projects/project1-04-finished.png", label: "Done" },
+                { img: "/assets/generated/projects/project1-01-sketch.webp", label: "Sketch" },
+                { img: "/assets/generated/projects/project1-02-cad.webp", label: "Design" },
+                { img: "/assets/generated/projects/project1-03-printing.webp", label: "Print" },
+                { img: "/assets/generated/projects/project1-04-finished.webp", label: "Done" },
               ].map((step, i) => (
                 <motion.div key={step.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="relative aspect-square rounded-xl overflow-hidden">
                   <Image src={step.img} alt={step.label} fill className="object-cover" />

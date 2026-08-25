@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { formatDate, slugifyTag, type BlogPostMeta } from "@/lib/blog";
 
 /**

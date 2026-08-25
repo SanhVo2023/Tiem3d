@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
@@ -11,6 +11,7 @@ import {
   coverImage,
   CATEGORY_LABELS,
 } from "@/lib/portfolio";
+import { socialCard } from "@/lib/social";
 import { SERVICES } from "@/lib/navigation";
 import { BUSINESS } from "@/lib/business";
 import { Header, Footer } from "@/components/landing";
@@ -31,7 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!study) return { title: "Không tìm thấy dự án" };
 
   const url = `${BUSINESS.url}/portfolio/${slug}/`;
-  const image = coverImage(study);
+  // The cover is WebP for the page; scrapers need the JPEG card.
+  const image = socialCard(coverImage(study));
 
   return {
     title: study.title,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
@@ -199,6 +199,8 @@ export default async function BlogPostPage({ params }: Props) {
         datePublished={post.date}
         dateModified={post.updated}
         authorName={post.author}
+        keywords={post.tags}
+        wordCount={post.content.trim().split(/\s+/).length}
       />
       <BreadcrumbJsonLd
         items={[

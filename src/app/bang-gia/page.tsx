@@ -13,6 +13,7 @@ import {
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
 import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 const TITLE = "Bảng giá in 3D";
 const DESCRIPTION =
@@ -67,7 +68,7 @@ export const metadata: Metadata = {
     locale: "vi_VN",
     images: [
       {
-        url: "/assets/generated/services/service-fdm-materials.png",
+        url: socialCard("/assets/generated/services/service-fdm-materials.webp"),
         width: 1200,
         height: 630,
         alt: TITLE,
@@ -78,7 +79,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${TITLE} | Tiệm 3D`,
     description: DESCRIPTION,
-    images: ["/assets/generated/services/service-fdm-materials.png"],
+    images: [socialCard("/assets/generated/services/service-fdm-materials.webp")],
   },
 };
 

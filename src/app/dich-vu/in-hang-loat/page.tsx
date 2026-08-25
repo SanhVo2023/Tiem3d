@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BatchPageContent from "./BatchPageContent";
 import { ServiceJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { socialCard } from "@/lib/social";
 
 export const metadata: Metadata = {
   title: "In 3D Hàng Loạt - Print-on-Demand - Giảm 40%",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     url: "https://tiem3d.com/dich-vu/in-hang-loat",
     images: [
       {
-        url: "/assets/generated/services/service-batch-hero.png",
+        url: socialCard("/assets/generated/services/service-batch-hero.webp"),
         width: 1200,
         height: 630,
         alt: "In 3D Hàng Loạt",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "In 3D Hàng Loạt - Print-on-Demand - Giảm 40% | Tiệm 3D",
     description: "20+ máy in chạy 24/7. Discount lên đến 40% cho batch lớn. Phù hợp sản xuất số lượng lớn.",
-    images: ["/assets/generated/services/service-batch-hero.png"],
+    images: [socialCard("/assets/generated/services/service-batch-hero.webp")],
   },
   alternates: {
     canonical: "https://tiem3d.com/dich-vu/in-hang-loat",
@@ -56,7 +57,7 @@ export default function BatchPage() {
         name="In 3D Hàng Loạt & Print-on-Demand"
         description="Dịch vụ in 3D hàng loạt với 20+ máy in chạy 24/7. Print-on-Demand giảm giá lên đến 40% cho batch lớn. Phù hợp cho sản xuất số lượng lớn, merchandise, reseller."
         url="https://tiem3d.com/dich-vu/in-hang-loat"
-        image="https://tiem3d.com/assets/generated/services/service-batch-hero.png"
+        image="https://tiem3d.com/assets/generated/services/service-batch-hero.webp"
       />
       <BreadcrumbJsonLd
         items={[

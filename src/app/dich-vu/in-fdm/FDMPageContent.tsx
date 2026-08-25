@@ -2,7 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import Link from "next/link";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
@@ -31,12 +31,12 @@ const processSteps = [
 ];
 
 const portfolioItems = [
-  { title: "Mechanical Gear Set", category: "Cơ khí", image: "/assets/generated/products/product-gear.png" },
-  { title: "Custom Enclosure", category: "Electronics", image: "/assets/generated/products/product-enclosure.png" },
-  { title: "Mounting Bracket", category: "Cơ khí", image: "/assets/generated/products/product-bracket.png" },
-  { title: "Drone Frame", category: "Hobby", image: "/assets/generated/portfolio/portfolio-02.png" },
-  { title: "Voronoi Lamp", category: "Decor", image: "/assets/generated/products/product-lamp.png" },
-  { title: "Spiral Vase", category: "Art", image: "/assets/generated/products/product-vase.png" },
+  { title: "Mechanical Gear Set", category: "Cơ khí", image: "/assets/generated/products/product-gear.webp" },
+  { title: "Custom Enclosure", category: "Electronics", image: "/assets/generated/products/product-enclosure.webp" },
+  { title: "Mounting Bracket", category: "Cơ khí", image: "/assets/generated/products/product-bracket.webp" },
+  { title: "Drone Frame", category: "Hobby", image: "/assets/generated/portfolio/portfolio-02.webp" },
+  { title: "Voronoi Lamp", category: "Decor", image: "/assets/generated/products/product-lamp.webp" },
+  { title: "Spiral Vase", category: "Art", image: "/assets/generated/products/product-vase.webp" },
 ];
 
 export default function FDMPageContent() {
@@ -49,8 +49,8 @@ export default function FDMPageContent() {
         <section className="relative py-24 px-6 md:px-12 overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Image
-              src="/assets/generated/services/service-fdm-hero.png"
-              alt="FDM Printing"
+              src="/assets/generated/services/service-fdm-hero.webp"
+              alt="In 3D FDM bằng nhựa sợi"
               fill
               className="object-cover opacity-20"
               priority
@@ -128,8 +128,8 @@ export default function FDMPageContent() {
                 className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl"
               >
                 <Image
-                  src="/assets/generated/workspace/printer-bambu-closeup.png"
-                  alt="Bambu Lab Printer"
+                  src="/assets/generated/workspace/printer-bambu-closeup.webp"
+                  alt="Máy in 3D FDM Bambu Lab đang chạy trong xưởng"
                   fill
                   className="object-cover"
                   priority
@@ -150,8 +150,8 @@ export default function FDMPageContent() {
             <div className="grid md:grid-cols-2 gap-8">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
                 <Image
-                  src="/assets/generated/services/service-fdm-materials.png"
-                  alt="FDM Materials"
+                  src="/assets/generated/services/service-fdm-materials.webp"
+                  alt="Các loại nhựa in 3D FDM: PLA, PETG, ABS và TPU"
                   fill
                   className="object-cover"
                 />

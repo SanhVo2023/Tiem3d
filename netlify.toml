@@ -12,7 +12,21 @@
 # unknown URLs returned 200 with the homepage instead of a 404, and out/404.html
 # was never reachable.
 
-# Cache static assets
+# ---------------------------------------------------------------------------
+# Caching
+#
+# Images also live on the R2 CDN; these rules cover the copy kept in the deploy
+# as a fallback, and everything the CDN does not serve.
+# ---------------------------------------------------------------------------
+
+# Next.js fingerprints everything under /_next/static, so it is safe to pin
+# forever. A bare "/*.js" rule does not match nested paths on Netlify, which is
+# why the build output needs its own entry.
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
 [[headers]]
   for = "/assets/*"
   [headers.values]
@@ -22,6 +36,13 @@
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Social cards are re-cut whenever their source image changes and are fetched by
+# scrapers rather than browsers, so they get a shorter, revalidating TTL.
+[[headers]]
+  for = "/assets/social/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
 
 [[headers]]
   for = "/*.js"
@@ -33,28 +54,54 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# ---------------------------------------------------------------------------
+# Content types
+# ---------------------------------------------------------------------------
+
 [[headers]]
   for = "/feed.xml"
   [headers.values]
     Content-Type = "application/rss+xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
 
-# Sitemap headers
 [[headers]]
   for = "/sitemap.xml"
   [headers.values]
-    Content-Type = "application/xml"
+    Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
 
-# Robots.txt headers
 [[headers]]
   for = "/robots.txt"
   [headers.values]
-    Content-Type = "text/plain"
+    Content-Type = "text/plain; charset=utf-8"
 
-# Security headers
+# The AI-crawler equivalents of a sitemap. Served as UTF-8 text so the
+# Vietnamese diacritics survive.
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/llms-full.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+# ---------------------------------------------------------------------------
+# Security
+# ---------------------------------------------------------------------------
+
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    # X-XSS-Protection is deliberately absent. The legacy auditor it enables is
+    # gone from every current browser and was itself a source of vulnerabilities;
+    # X-Content-Type-Options plus a modern CSP is what actually protects here.

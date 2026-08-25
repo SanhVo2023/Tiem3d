@@ -19,6 +19,7 @@ import { Menu, X, ChevronDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { SERVICES } from "@/lib/navigation";
 import { BUSINESS } from "@/lib/business";
 import LayerField from "@/components/home/LayerField";
+import PrintReveal from "@/components/home/PrintReveal";
 
 // ============================================
 // MAIN PAGE - SUPER PREMIUM
@@ -109,8 +110,6 @@ function FloatingHeader({ onDark }: { onDark: boolean }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
 
-  // The header is always present. It used to be hidden until 20% scroll, which
-  // left the homepage with no navigation at all in the first viewport.
   // The header is always present; onDark controls which palette it wears.
   const services = SERVICES;
 
@@ -395,15 +394,14 @@ function MobileNavLink({
 // ============================================
 // CINEMATIC HERO - Giant Typography + GSAP Parallax
 // ============================================
-// The three things every enquiry opens with — what can you print it in, how
-// fine, how fast — answered before anyone has to ask. Material names track
-// src/data/pricing.ts; no prices live here.
-const HERO_SPECS = [
-  { label: "Vật liệu", value: "PLA · PETG · ABS · TPU · Resin" },
-  { label: "Độ dày lớp", value: "0,03 – 0,30 mm" },
-  { label: "Khổ in", value: "Tới 500 mm+" },
-  { label: "Báo giá", value: "30 phút qua Zalo" },
-  { label: "Giao hàng", value: "COD toàn quốc" },
+// Four numbers a visitor is actually weighing, in the mono face the site keeps
+// for specs. This replaced a five-row spec panel: same job, a quarter of the
+// space, and it does not compete with the build animation beside it.
+const HERO_FACTS = [
+  { value: "30 phút", label: "Báo giá qua Zalo" },
+  { value: "0,03 mm", label: "Lớp in mịn nhất" },
+  { value: "500 mm+", label: "Khổ in tối đa" },
+  { value: "COD", label: "Giao toàn quốc" },
 ];
 
 function CinematicHero({
@@ -413,11 +411,10 @@ function CinematicHero({
 }) {
   const bgRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
 
-  // Parallax on scroll. The layer field drifts slower than the page so the hero
-  // has depth; the content lifts and fades as it leaves.
+  // Parallax on scroll: the build plate drifts slower than the page, and the
+  // content lifts away as it leaves.
   useEffect(() => {
     if (reduceMotion) return;
     let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
@@ -432,7 +429,7 @@ function CinematicHero({
       ctx = gsap.context(() => {
         if (bgRef.current) {
           gsap.to(bgRef.current, {
-            y: 120,
+            y: 100,
             ease: "none",
             scrollTrigger: {
               trigger: heroRef.current,
@@ -444,26 +441,14 @@ function CinematicHero({
         }
         if (contentRef.current) {
           gsap.to(contentRef.current, {
-            y: -60,
+            y: -50,
             opacity: 0,
             ease: "power2.out",
             scrollTrigger: {
               trigger: heroRef.current,
               start: "top top",
-              end: "55% top",
+              end: "60% top",
               scrub: 0.3,
-            },
-          });
-        }
-        if (scrollIndicatorRef.current) {
-          gsap.to(scrollIndicatorRef.current, {
-            opacity: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: heroRef.current,
-              start: "top top",
-              end: "25% top",
-              scrub: true,
             },
           });
         }
@@ -476,9 +461,7 @@ function CinematicHero({
     };
   }, [heroRef, reduceMotion]);
 
-  // One orchestrated entrance rather than scattered per-element delays. The
-  // whole sequence resolves inside 700ms, so the CTA is never what the visitor
-  // is waiting on.
+  // One entrance, resolved inside 700ms, so the CTA is never what anyone waits on.
   const rise = {
     hidden: { opacity: 0, y: reduceMotion ? 0 : 18 },
     show: {
@@ -494,61 +477,48 @@ function CinematicHero({
       data-surface="dark"
       className="relative flex min-h-[100svh] items-center overflow-hidden bg-zinc-950"
     >
-      {/* WebGL layer field — contours warming as a print head climbs past.
-          The print-bed grid sits underneath as a plain CSS layer, so the hero
-          still has a ground under reduced motion and on anything without a
-          WebGL context, where the canvas draws nothing at all. */}
+      {/* The build plate the whole hero sits on. */}
       <div ref={bgRef} className="absolute inset-0 z-0 will-change-transform">
-        <div aria-hidden className="absolute inset-0 grid-bg-orange opacity-60" />
+        <div aria-hidden className="absolute inset-0 grid-bg-orange opacity-70" />
         <LayerField />
       </div>
-
-      {/* Ground the type: darken the lower half and the left edge so every line
-          clears contrast regardless of what the shader is doing behind it. */}
       <div
         aria-hidden
-        className="absolute inset-0 z-[1] bg-gradient-to-b from-zinc-950/70 via-zinc-950/30 to-zinc-950"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 z-[1] bg-[radial-gradient(120%_90%_at_10%_50%,rgba(9,9,11,0.78)_0%,transparent_58%)]"
+        className="absolute inset-0 z-[1] bg-[radial-gradient(100%_80%_at_20%_50%,rgba(9,9,11,0.88)_0%,rgba(9,9,11,0.35)_55%,transparent_100%)]"
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-32 pb-24 md:px-8 md:pt-36 md:pb-28">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-24 pb-16 md:px-8 md:pt-32 md:pb-24">
         <motion.div
           ref={contentRef}
           initial="hidden"
           animate="show"
           variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-          className="grid gap-12 will-change-transform lg:grid-cols-12 lg:items-end lg:gap-10"
+          className="grid items-center gap-10 will-change-transform lg:grid-cols-12 lg:gap-14"
         >
-          {/* ---- Left: the offer ---- */}
+          {/* ---- Left: what you get, in one sentence ---- */}
           <div className="lg:col-span-7">
             <motion.h1 variants={rise} className="text-white">
-              <span className="text-mono-sm mb-5 block tracking-[0.32em] text-orange-400 md:mb-6">
-                In 3D FDM · Resin · Thiết kế
+              <span className="text-mono-sm mb-5 block tracking-[0.3em] text-orange-400 md:mb-6">
+                Xưởng in 3D · {BUSINESS.branches.map((b) => b.shortName).join(" & ")}
               </span>
               <span className="text-display-sentence block text-hero">
-                <span className="text-zinc-500">Từ bản vẽ đến</span>
+                Gửi ảnh,
                 <br />
-                sản phẩm thực
+                nhận sản phẩm in&nbsp;3D
               </span>
             </motion.h1>
 
             <motion.p
               variants={rise}
-              className="mt-7 max-w-xl text-lg leading-relaxed text-zinc-300 md:mt-8 md:text-xl"
+              className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300 md:mt-7 md:text-xl"
             >
-              Xưởng in 3D ở{" "}
-              {BUSINESS.branches.map((b) => b.shortName).join(" và ")}. Gửi ảnh
-              hoặc bản vẽ tay — chúng tôi dựng mẫu, in, sơn hoàn thiện và giao
-              tận nơi.{" "}
-              <span className="text-white">Chưa có file 3D vẫn in được.</span>
+              Không cần biết file 3D là gì. Gửi ảnh món đồ hoặc bản vẽ tay qua
+              Zalo — chúng tôi dựng mẫu, in, sơn hoàn thiện và giao tận nơi.
             </motion.p>
 
             <motion.div
               variants={rise}
-              className="mt-9 flex flex-col gap-3 sm:flex-row sm:gap-4 md:mt-10"
+              className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4"
             >
               <MagneticElement strength={0.15}>
                 <Link
@@ -561,55 +531,34 @@ function CinematicHero({
               </MagneticElement>
               <Link
                 href={BUSINESS.zalo}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 px-8 py-4 text-base font-bold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-zinc-900 sm:w-auto"
+                className="inline-flex w-full items-center justify-center rounded-full border border-white/25 px-8 py-4 text-base font-bold text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-zinc-900 sm:w-auto"
               >
                 Nhắn Zalo {BUSINESS.phoneDisplay}
               </Link>
             </motion.div>
-          </div>
 
-          {/* ---- Right: the spec plate ----
-              The shop's own machine language used as page furniture, in the
-              mono face the rest of the site reserves for numbers and specs. */}
-          <motion.div variants={rise} className="lg:col-span-5">
-            <dl className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm md:p-7">
-              <div className="mb-4 flex items-baseline justify-between gap-4 border-b border-white/10 pb-4">
-                <span className="text-mono-sm tracking-[0.28em] text-zinc-400">
-                  Thông số xưởng
-                </span>
-                <span className="text-mono-sm flex shrink-0 items-center gap-2 tracking-widest text-orange-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
-                  {BUSINESS.hours.display}
-                </span>
-              </div>
-              {HERO_SPECS.map((spec) => (
-                <div
-                  key={spec.label}
-                  className="flex items-baseline justify-between gap-4 border-b border-white/5 py-3 last:border-0 last:pb-0"
-                >
-                  <dt className="text-sm text-zinc-400">{spec.label}</dt>
-                  <dd className="text-mono-sm text-right text-sm text-zinc-100">
-                    {spec.value}
+            <motion.dl
+              variants={rise}
+              className="mt-9 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/10 pt-7 sm:grid-cols-4 md:mt-10"
+            >
+              {HERO_FACTS.map((fact) => (
+                <div key={fact.label}>
+                  <dt className="text-mono-lg font-semibold text-white">
+                    {fact.value}
+                  </dt>
+                  <dd className="mt-1 text-xs leading-snug text-zinc-400">
+                    {fact.label}
                   </dd>
                 </div>
               ))}
-            </dl>
+            </motion.dl>
+          </div>
+
+          {/* ---- Right: proof, building ---- */}
+          <motion.div variants={rise} className="lg:col-span-5 lg:col-start-8">
+            <PrintReveal />
           </motion.div>
         </motion.div>
-      </div>
-
-      {/* Scroll cue */}
-      <div
-        ref={scrollIndicatorRef}
-        aria-hidden
-        className="pointer-events-none absolute bottom-7 left-1/2 z-10 hidden -translate-x-1/2 md:block"
-      >
-        <div className="animate-bounce-slow flex flex-col items-center gap-2">
-          <span className="text-mono-sm tracking-[0.3em] text-zinc-500">
-            Cuộn xuống
-          </span>
-          <div className="h-8 w-px bg-gradient-to-b from-zinc-500 to-transparent" />
-        </div>
       </div>
     </section>
   );

@@ -66,7 +66,7 @@ void main() {
   vec2 gridFract = fract(gl_FragCoord.xy / gridSize);
   float lineThickness = 1.0 / gridSize;
   float gridLines = step(1.0 - lineThickness, gridFract.x) + step(1.0 - lineThickness, gridFract.y);
-  gridLines = clamp(gridLines, 0.0, 1.0) * 0.10;
+  gridLines = clamp(gridLines, 0.0, 1.0) * 0.16;
 
   // Contour bands. numBands is the layer count: more bands, finer layer lines.
   float noiseScale = 1.25;
@@ -95,7 +95,7 @@ void main() {
 
   vec3 color = vec3(0.0);
   color += vec3(1.0) * gridLines;
-  color += lineColor * topoLines * 0.85;
+  color += lineColor * topoLines * 0.40;
   color += hot * atHead * 0.05;         // faint bloom at the head itself
 
   // Vignette, so the type above always has a quiet ground to sit on.

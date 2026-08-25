@@ -39,9 +39,9 @@ const SHOWCASE = [
   .map((slug) => getCaseStudyBySlug(slug))
   .filter((study): study is CaseStudy => Boolean(study));
 
-const BUILD_MS = 2600;
-const HOLD_MS = 2600;
-const CLEAR_MS = 900;
+const BUILD_MS = 2200;
+const HOLD_MS = 3800;
+const CLEAR_MS = 700;
 
 // Layers snap into place in steps instead of the mask sliding smoothly, while
 // the nozzle keeps gliding — so the head runs slightly ahead and the material
@@ -106,6 +106,10 @@ export default function PrintReveal() {
 
     let stopped = false;
     const timers: number[] = [];
+    // Start from an empty plate. Arriving here from the clear phase this is
+    // already 0, but jumping straight to a job from the dots is not — without
+    // it, picking a job while one is on hold animates 1 -> 1 and nothing builds.
+    progress.set(0);
     let controls = animate(progress, 1, {
       duration: BUILD_MS / 1000,
       ease: [0.3, 0, 0.25, 1],
@@ -168,10 +172,26 @@ export default function PrintReveal() {
         <div aria-hidden className="absolute inset-0 grid-bg-orange opacity-40" />
         <div
           aria-hidden
-          className="absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_100%,rgba(249,115,22,0.16)_0%,transparent_70%)]"
+          className="absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_100%,rgba(249,115,22,0.10)_0%,transparent_70%)]"
         />
 
-        <motion.div className="absolute inset-0" style={{ clipPath }}>
+        {/* The part that has not been laid down yet, ghosted.
+            A slicer shows the unprinted portion greyed rather than absent, and
+            it matters here for a plainer reason: clipping to nothing meant the
+            product — the entire point of this panel — was invisible for more
+            than half of every cycle. Now it is always legible, and the build
+            reads as it coming up to full strength. */}
+        <Image
+          key={`${study.slug}-ghost`}
+          src={coverImage(study)}
+          alt=""
+          aria-hidden
+          fill
+          className="object-cover opacity-35 grayscale-[0.85]"
+          sizes="(max-width: 768px) 100vw, 768px"
+        />
+
+        <motion.div className="absolute inset-0 isolate" style={{ clipPath }}>
           <Image
             key={study.slug}
             src={coverImage(study)}
@@ -199,7 +219,7 @@ export default function PrintReveal() {
           className="pointer-events-none absolute inset-x-0"
           style={{ bottom: nozzleBottom, opacity: nozzleOpacity }}
         >
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-orange-500/25 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-orange-500/20 to-transparent" />
           <div className="h-px w-full bg-orange-300 shadow-[0_0_22px_5px_rgba(249,115,22,0.6)]" />
         </motion.div>
 

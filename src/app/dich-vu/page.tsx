@@ -11,7 +11,7 @@ import { socialCard } from "@/lib/social";
 
 const TITLE = "Dịch vụ in 3D & thiết kế";
 const DESCRIPTION =
-  "8 dịch vụ của Tiệm 3D: in FDM, in Resin 8K/14K/16K, in khổ lớn, in chi tiết kỹ thuật ±0.1mm, thiết kế 3D theo yêu cầu, sơn hoàn thiện, in hàng loạt và dự án trọn gói. Hai chi nhánh tại Thủ Đức và Sơn Kỳ, TP.HCM.";
+  "8 dịch vụ của Tiệm 3D: in FDM, in Resin 8K/14K/16K, in khổ lớn, in chi tiết kỹ thuật ±0.1mm, thiết kế 3D theo yêu cầu, sơn hoàn thiện, in hàng loạt và dự án trọn gói. Hai chi nhánh tại Thủ Đức và Tân Phú, TP.HCM.";
 
 // Hero images already on disk, matched to the right service.
 const SERVICE_IMAGES: Record<string, string> = {

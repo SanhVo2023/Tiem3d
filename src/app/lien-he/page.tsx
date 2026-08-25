@@ -8,7 +8,7 @@ import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
 import { socialCard } from "@/lib/social";
 
 const TITLE = "Liên hệ & địa chỉ";
-const DESCRIPTION = `Tiệm 3D có 2 chi nhánh tại TP.HCM: Thủ Đức (61 Đường Số 1, P. Linh Tây) và Sơn Kỳ (36 Bờ Bao Tân Thắng, cạnh Aeon Mall Tân Phú). Zalo/gọi ${BUSINESS.phoneDisplay}, mở cửa ${BUSINESS.hours.display} tất cả các ngày.`;
+const DESCRIPTION = `Tiệm 3D có 2 chi nhánh tại TP.HCM: Thủ Đức (61 Đường Số 1, P. Linh Tây) và Tân Phú (36 Bờ Bao Tân Thắng, cạnh Aeon Mall Tân Phú). Zalo/gọi ${BUSINESS.phoneDisplay}, mở cửa ${BUSINESS.hours.display} tất cả các ngày.`;
 
 const FAQS = [
   {
@@ -23,7 +23,7 @@ const FAQS = [
   {
     question: "Chi nhánh nào gần tôi hơn?",
     answer:
-      "Chi nhánh Thủ Đức thuận tiện cho khu vực phía Đông: Thủ Đức, Bình Thạnh, Quận 1. Chi nhánh Sơn Kỳ nằm cạnh Aeon Mall Tân Phú, thuận tiện cho Tân Phú, Tân Bình, Bình Tân, Gò Vấp và Quận 11.",
+      "Chi nhánh Thủ Đức thuận tiện cho khu vực phía Đông: Thủ Đức, Bình Thạnh, Quận 1. Chi nhánh Tân Phú nằm cạnh Aeon Mall Tân Phú, thuận tiện cho Tân Phú, Tân Bình, Bình Tân, Gò Vấp và Quận 11.",
   },
   {
     question: "Muốn ghé xem trực tiếp có cần hẹn trước không?",

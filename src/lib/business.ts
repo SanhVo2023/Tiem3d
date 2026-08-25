@@ -20,6 +20,18 @@ export interface Branch {
   region: string;
   /** A nearby landmark — how people in Vietnam actually navigate. */
   landmark?: string;
+  /**
+   * The district name people actually say and search for, which is not always
+   * the current administrative one. TP.HCM dissolved its quận on 1 July 2025
+   * (Nghị quyết 1685/NQ-UBTVQH15) and folded them into wards, but nobody asks
+   * for "phường Tây Thạnh" — they ask for Tân Phú.
+   */
+  district: string;
+  /**
+   * Other names for this location: the pre-2025 ward, the new ward(s), the
+   * landmark. Kept so a search for either the old or the new name finds us.
+   */
+  aliases: string[];
   geo: { lat: number; lng: number };
   /** The first branch is treated as the primary for single-value SEO fields. */
   primary?: boolean;
@@ -61,19 +73,43 @@ export const BUSINESS = {
       shortName: "Thủ Đức",
       street: "61 Đường Số 1, Khu Phố 2",
       ward: "Phường Linh Tây",
+      district: "Thủ Đức",
       locality: "Thủ Đức",
       region: "TP. Hồ Chí Minh",
+      aliases: [
+        "Thành phố Thủ Đức",
+        "Quận Thủ Đức",
+        "Phường Linh Tây",
+        "Linh Tây",
+      ],
       geo: { lat: 10.8589, lng: 106.7568 },
       primary: true,
     },
     {
-      id: "son-ky",
-      name: "Chi nhánh Sơn Kỳ",
-      shortName: "Sơn Kỳ",
+      // Named Tân Phú, not Sơn Kỳ. Sơn Kỳ is the ward on the paperwork; Tân
+      // Phú is the district everyone actually says, searches and navigates by.
+      id: "tan-phu",
+      name: "Chi nhánh Tân Phú",
+      shortName: "Tân Phú",
       street: "36 Bờ Bao Tân Thắng",
       ward: "Phường Sơn Kỳ",
+      district: "Tân Phú",
       locality: "TP. Hồ Chí Minh",
       region: "TP. Hồ Chí Minh",
+      // Quận Tân Phú was dissolved on 1 July 2025 and old phường Sơn Kỳ was
+      // split between Tây Thạnh, Tân Sơn Nhì and Phú Thọ Hòa. Which one No. 36
+      // now sits in is not something to guess at, so all three are carried as
+      // aliases rather than asserted as the address.
+      // TODO(owner): confirm the new ward on the shop's papers and promote it.
+      aliases: [
+        "Quận Tân Phú",
+        "Phường Sơn Kỳ",
+        "Phường Tây Thạnh",
+        "Phường Tân Sơn Nhì",
+        "Phường Phú Thọ Hòa",
+        "Aeon Mall Tân Phú",
+        "Celadon City",
+      ],
       landmark: "Cạnh Aeon Mall Tân Phú",
       // Anchored on the surveyed position of Aeon Mall Tân Phú Celadon, which
       // is No. 30 on this street, and stepped east along the same side to No.
@@ -83,7 +119,14 @@ export const BUSINESS = {
     },
   ] satisfies Branch[] as Branch[],
 
-  /** Districts the shop delivers to, used for local SEO and footer copy. */
+  /**
+   * Areas the shop delivers to, used for local SEO and footer copy.
+   *
+   * These are the pre-July-2025 quận names. TP.HCM dissolved its districts into
+   * wards on 1 July 2025 (Nghị quyết 1685/NQ-UBTVQH15), but customers still say
+   * and search the old names, and will for years — so the old names lead here
+   * and the new ward names ride along in each branch's `aliases`.
+   */
   serviceAreas: [
     "Thủ Đức",
     "Tân Phú",

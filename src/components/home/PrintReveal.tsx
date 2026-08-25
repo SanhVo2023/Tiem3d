@@ -10,21 +10,22 @@ import {
 } from "framer-motion";
 import Link from "next/link";
 import Image from "@/components/ui/Img";
+import { asset } from "@/lib/cdn";
 import { getCaseStudyBySlug, coverImage, type CaseStudy } from "@/lib/portfolio";
 
 /**
  * The hero's focal visual: a real job building up the way it did on the machine.
  *
- * The previous hero was an abstract contour field. It was legible only if you
- * already knew it was meant to be slicer output — and for a shop whose product
- * is physical and photogenic, showing no printed object at all was the bigger
- * miss. This shows four finished jobs, each revealed bottom-to-top behind a
- * nozzle line, which is the one image of this craft everybody recognises.
- *
  * The four are chosen to span the range a visitor might be wondering about:
  * fine detail, a cosplay prop, something large, and a functional part. Names,
  * specs and photos come from src/lib/portfolio.ts, so every frame is a real job
  * and links to its write-up.
+ *
+ * The loop is one continuous machine cycle rather than a crossfade — build up,
+ * hold, then the nozzle sweeps back down and takes the part with it, clearing
+ * the plate for the next job. Nothing fades in or out, because a printer does
+ * not do that. The part swaps while the plate is empty, so the change is
+ * invisible and the motion never stops to reset.
  */
 
 // Fine detail -> cosplay -> large format -> functional. Whatever you came to
@@ -38,8 +39,30 @@ const SHOWCASE = [
   .map((slug) => getCaseStudyBySlug(slug))
   .filter((study): study is CaseStudy => Boolean(study));
 
-const BUILD_MS = 2400;
-const HOLD_MS = 3400;
+const BUILD_MS = 2600;
+const HOLD_MS = 2600;
+const CLEAR_MS = 900;
+
+// Layers snap into place in steps instead of the mask sliding smoothly, while
+// the nozzle keeps gliding — so the head runs slightly ahead and the material
+// catches up to it, which is what watching a printer actually looks like.
+const VISIBLE_STEPS = 40;
+
+const SIZE_LABELS = ["Chiều cao", "Chiều dài", "Kích thước", "Đường kính", "Tỉ lệ"];
+
+/**
+ * A plausible layer count for this part, from its real dimension at a 0.2mm
+ * layer height — so the 60cm statue counts through thousands and the 38mm gear
+ * through a couple of hundred, instead of every job sharing one invented number.
+ */
+function layerCount(size: string | undefined): number {
+  if (!size) return 600;
+  const match = size.match(/(\d+(?:[.,]\d+)?)\s*(cm|mm)/i);
+  if (!match) return 600;
+  const value = parseFloat(match[1].replace(",", "."));
+  const mm = match[2].toLowerCase() === "cm" ? value * 10 : value;
+  return Math.min(3200, Math.max(180, Math.round(mm / 0.2)));
+}
 
 export default function PrintReveal() {
   const [index, setIndex] = useState(0);
@@ -48,37 +71,87 @@ export default function PrintReveal() {
 
   const study = SHOWCASE[index];
 
-  // Reveal from the build plate upward, then hold, then move to the next job.
+  /**
+   * Warm the other three covers once the browser is idle.
+   *
+   * This is what a loading screen would have been for, without the loading
+   * screen: a splash that holds the page back holds LCP back with it, and LCP
+   * is a ranking signal. Fetching after first paint costs the visitor nothing,
+   * and the images are decoded long before the carousel reaches them.
+   */
+  useEffect(() => {
+    if (SHOWCASE.length < 2) return;
+    const warm = () => {
+      SHOWCASE.slice(1).forEach((item) => {
+        const img = new window.Image();
+        img.decoding = "async";
+        img.src = asset(coverImage(item));
+      });
+    };
+    const idle = window.requestIdleCallback
+      ? window.requestIdleCallback(warm, { timeout: 3000 })
+      : window.setTimeout(warm, 1200);
+    return () => {
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idle as number);
+      else window.clearTimeout(idle as number);
+    };
+  }, []);
+
+  // build -> hold -> clear -> next part
   useEffect(() => {
     if (reduceMotion) {
       progress.set(1);
       return;
     }
-    progress.set(0);
-    const controls = animate(progress, 1, {
+
+    let stopped = false;
+    const timers: number[] = [];
+    let controls = animate(progress, 1, {
       duration: BUILD_MS / 1000,
-      ease: [0.33, 0, 0.2, 1],
+      ease: [0.3, 0, 0.25, 1],
     });
-    const next = window.setTimeout(
-      () => setIndex((i) => (i + 1) % SHOWCASE.length),
-      BUILD_MS + HOLD_MS
+
+    timers.push(
+      window.setTimeout(() => {
+        if (stopped) return;
+        // The nozzle runs back down and takes the part with it.
+        controls = animate(progress, 0, {
+          duration: CLEAR_MS / 1000,
+          ease: [0.5, 0, 0.5, 1],
+        });
+        timers.push(
+          window.setTimeout(() => {
+            if (stopped) return;
+            setIndex((i) => (i + 1) % SHOWCASE.length);
+          }, CLEAR_MS)
+        );
+      }, BUILD_MS + HOLD_MS)
     );
+
     return () => {
+      stopped = true;
       controls.stop();
-      window.clearTimeout(next);
+      timers.forEach((t) => window.clearTimeout(t));
     };
   }, [index, reduceMotion, progress]);
 
+  const size = study?.specs.find((s) => SIZE_LABELS.includes(s.label))?.value;
+  const total = layerCount(size);
+
   // Everything below is driven off the single progress value, so the mask, the
-  // nozzle line and the layer readout can never disagree with each other.
-  const clipPath = useTransform(progress, (v) => `inset(${(1 - v) * 100}% 0 0 0)`);
-  const nozzleBottom = useTransform(progress, (v) => `${v * 100}%`);
-  const nozzleOpacity = useTransform(progress, [0, 0.04, 0.93, 1], [0, 1, 1, 0]);
-  const captionOpacity = useTransform(progress, [0.72, 0.96], [0, 1]);
-  const layerLabel = useTransform(progress, (v) => {
-    const total = 380;
-    return `Lớp ${String(Math.round(v * total)).padStart(3, "0")} / ${total}`;
+  // nozzle and the readout can never disagree with each other.
+  const clipPath = useTransform(progress, (v) => {
+    const stepped = Math.round(v * VISIBLE_STEPS) / VISIBLE_STEPS;
+    return `inset(${(1 - stepped) * 100}% 0 0 0)`;
   });
+  const nozzleBottom = useTransform(progress, (v) => `${v * 100}%`);
+  // Lit whenever the head is moving; gone while the finished part is held.
+  const nozzleOpacity = useTransform(progress, [0, 0.02, 0.97, 1], [0, 1, 1, 0]);
+  const captionOpacity = useTransform(progress, [0.74, 0.97], [0, 1]);
+  const layerLabel = useTransform(
+    progress,
+    (v) => `Lớp ${Math.round(v * total)} / ${total}`
+  );
 
   if (!study) return null;
 
@@ -86,39 +159,30 @@ export default function PrintReveal() {
     study.specs.find((s) => s.label === "Vật liệu")?.value ??
     study.specs.find((s) => s.label === "Công nghệ")?.value ??
     "";
-  const size = study.specs.find((s) =>
-    ["Chiều cao", "Chiều dài", "Kích thước", "Đường kính", "Tỉ lệ"].includes(s.label)
-  )?.value;
 
   return (
     <div className="relative">
       {/* Build chamber */}
-      <div className="relative aspect-[5/4] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 lg:aspect-[4/5]">
-        {/* Empty build plate, visible before the part covers it */}
+      <div className="relative aspect-[5/4] overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 sm:aspect-[16/9]">
+        {/* Empty build plate, seen before the part covers it */}
         <div aria-hidden className="absolute inset-0 grid-bg-orange opacity-40" />
         <div
           aria-hidden
           className="absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_100%,rgba(249,115,22,0.16)_0%,transparent_70%)]"
         />
 
-        <motion.div
-          key={study.slug}
-          className="absolute inset-0"
-          style={{ clipPath }}
-          initial={reduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.35 }}
-        >
+        <motion.div className="absolute inset-0" style={{ clipPath }}>
           <Image
+            key={study.slug}
             src={coverImage(study)}
             alt={`${study.title} — sản phẩm in 3D hoàn thiện tại Tiệm 3D`}
             fill
             className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 40vw"
+            sizes="(max-width: 768px) 100vw, 768px"
             priority={index === 0}
           />
-          {/* Layer striping across the finished part, so the surface reads as
-              printed rather than moulded. */}
+          {/* Layer striping across the part, so the surface reads as printed
+              rather than moulded. */}
           <div
             aria-hidden
             className="absolute inset-0 opacity-[0.13] mix-blend-overlay"
@@ -129,13 +193,14 @@ export default function PrintReveal() {
           />
         </motion.div>
 
-        {/* The nozzle: a hot line at the build front. */}
+        {/* The nozzle: a hot line at the build front, with the heat it leaves. */}
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 h-px"
+          className="pointer-events-none absolute inset-x-0"
           style={{ bottom: nozzleBottom, opacity: nozzleOpacity }}
         >
-          <div className="h-px w-full bg-orange-400 shadow-[0_0_18px_4px_rgba(249,115,22,0.55)]" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-orange-500/25 to-transparent" />
+          <div className="h-px w-full bg-orange-300 shadow-[0_0_22px_5px_rgba(249,115,22,0.6)]" />
         </motion.div>
 
         {/* Live layer readout, in the mono face the site keeps for numbers. */}
@@ -150,11 +215,11 @@ export default function PrintReveal() {
 
         {/* Caption — arrives with the finished part. */}
         <motion.div
-          style={{ opacity: captionOpacity }}
+          style={{ opacity: reduceMotion ? 1 : captionOpacity }}
           className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-zinc-950 via-zinc-950/75 to-transparent p-4 pt-12 md:p-5 md:pt-14"
         >
           <Link href={`/portfolio/${study.slug}/`} className="group block">
-            <p className="text-base font-semibold text-white group-hover:text-orange-400 transition-colors md:text-lg">
+            <p className="text-base font-semibold text-white transition-colors group-hover:text-orange-400 md:text-lg">
               {study.shortTitle}
             </p>
             <p className="text-mono-sm mt-1 text-zinc-400">

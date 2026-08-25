@@ -27,9 +27,16 @@ import { getAllCaseStudies } from "@/lib/portfolio";
 const url = (p: string) => `${BUSINESS.url}${p}`;
 
 function branchLines(): string[] {
-  return BUSINESS.branches.map((b: Branch) => {
+  return BUSINESS.branches.flatMap((b: Branch) => {
     const landmark = b.landmark ? ` (${b.landmark})` : "";
-    return `- ${b.name}: ${formatAddress(b)}${landmark}`;
+    const lines = [`- ${b.name}: ${formatAddress(b)}${landmark}`];
+    // TP.HCM dissolved its quận into wards on 1 July 2025, and people still ask
+    // for the old names. Both generations are listed so an assistant answering
+    // "in 3D ở Tân Phú" and one answering "in 3D phường Tây Thạnh" both land here.
+    if (b.aliases.length) {
+      lines.push(`  Còn gọi là: ${b.aliases.join(", ")}`);
+    }
+    return lines;
   });
 }
 
@@ -44,6 +51,8 @@ function facts(): string {
     `- Giờ mở cửa: ${BUSINESS.hours.days}, ${BUSINESS.hours.display} (${BUSINESS.hours.note})`,
     ...branchLines(),
     `- Khu vực phục vụ: ${BUSINESS.serviceAreas.join(", ")}`,
+    "- Lưu ý tên hành chính: TP.HCM bỏ cấp quận từ 01/07/2025, tên quận cũ và",
+    "  tên phường mới đều chỉ cùng một địa điểm.",
     "",
   ].join("\n");
 }

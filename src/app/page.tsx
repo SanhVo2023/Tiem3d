@@ -418,6 +418,7 @@ function CinematicHero({
   useEffect(() => {
     if (reduceMotion) return;
     let ctx: ReturnType<typeof import("gsap").default.context> | null = null;
+    let mm: ReturnType<typeof import("gsap").default.matchMedia> | null = null;
 
     const initParallax = async () => {
       const gsapModule = await import("gsap");
@@ -425,6 +426,8 @@ function CinematicHero({
       const gsap = gsapModule.default;
       const ScrollTrigger = ScrollTriggerModule.default;
       gsap.registerPlugin(ScrollTrigger);
+
+      mm = gsap.matchMedia();
 
       ctx = gsap.context(() => {
         if (bgRef.current) {
@@ -439,7 +442,12 @@ function CinematicHero({
             },
           });
         }
-        if (contentRef.current) {
+        // Desktop only: the whole hero is visible at once there, so fading it
+        // out on the way past reads as depth. On a phone the hero is a tall
+        // stack and the visual is below the fold — fading it would mean the
+        // image is already disappearing the moment it comes into view.
+        mm!.add("(min-width: 1024px)", () => {
+          if (!contentRef.current) return;
           gsap.to(contentRef.current, {
             y: -50,
             opacity: 0,
@@ -451,13 +459,16 @@ function CinematicHero({
               scrub: 0.3,
             },
           });
-        }
+        });
       }, heroRef);
     };
 
     initParallax();
     return () => {
-      if (ctx) ctx.revert();
+      // matchMedia is created outside the context, so it needs reverting too —
+      // otherwise its desktop tween keeps its ScrollTrigger after unmount.
+      mm?.revert();
+      ctx?.revert();
     };
   }, [heroRef, reduceMotion]);
 
@@ -487,30 +498,28 @@ function CinematicHero({
         className="absolute inset-0 z-[1] bg-[radial-gradient(100%_80%_at_20%_50%,rgba(9,9,11,0.88)_0%,rgba(9,9,11,0.35)_55%,transparent_100%)]"
       />
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-24 pb-16 md:px-8 md:pt-32 md:pb-24">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pt-28 pb-14 md:px-8 md:pt-28 md:pb-16">
         <motion.div
           ref={contentRef}
           initial="hidden"
           animate="show"
           variants={{ show: { transition: { staggerChildren: 0.08 } } }}
-          className="grid items-center gap-10 will-change-transform lg:grid-cols-12 lg:gap-14"
+          className="will-change-transform"
         >
-          {/* ---- Left: what you get, in one sentence ---- */}
-          <div className="lg:col-span-7">
+          {/* ---- The offer, on the centre axis ---- */}
+          <div className="mx-auto max-w-3xl text-center">
             <motion.h1 variants={rise} className="text-white">
               <span className="text-mono-sm mb-5 block tracking-[0.3em] text-orange-400 md:mb-6">
                 Xưởng in 3D · {BUSINESS.branches.map((b) => b.shortName).join(" & ")}
               </span>
-              <span className="text-display-sentence block text-hero">
-                Gửi ảnh,
-                <br />
-                nhận sản phẩm in&nbsp;3D
+              <span className="text-display-sentence block text-hero text-balance">
+                Gửi ảnh, nhận sản phẩm in&nbsp;3D
               </span>
             </motion.h1>
 
             <motion.p
               variants={rise}
-              className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300 md:mt-7 md:text-xl"
+              className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-zinc-300 md:text-xl"
             >
               Không cần biết file 3D là gì. Gửi ảnh món đồ hoặc bản vẽ tay qua
               Zalo — chúng tôi dựng mẫu, in, sơn hoàn thiện và giao tận nơi.
@@ -518,7 +527,7 @@ function CinematicHero({
 
             <motion.div
               variants={rise}
-              className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4"
+              className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4"
             >
               <MagneticElement strength={0.15}>
                 <Link
@@ -539,7 +548,7 @@ function CinematicHero({
 
             <motion.dl
               variants={rise}
-              className="mt-9 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/10 pt-7 sm:grid-cols-4 md:mt-10"
+              className="mx-auto mt-7 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-4 border-t border-white/10 pt-5 sm:grid-cols-4"
             >
               {HERO_FACTS.map((fact) => (
                 <div key={fact.label}>
@@ -554,12 +563,13 @@ function CinematicHero({
             </motion.dl>
           </div>
 
-          {/* ---- Right: proof, building ---- */}
-          <motion.div variants={rise} className="lg:col-span-5 lg:col-start-8">
+          {/* ---- Proof, building, on the same axis ---- */}
+          <motion.div variants={rise} className="mx-auto mt-8 max-w-3xl md:mt-9">
             <PrintReveal />
           </motion.div>
         </motion.div>
       </div>
+
     </section>
   );
 }

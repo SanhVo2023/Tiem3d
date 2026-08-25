@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     default: "Tiệm 3D | Dịch Vụ In 3D & Thiết Kế TP.HCM",
     template: "%s | Tiệm 3D",
   },
-  description: `Tiệm 3D nhận in 3D và thiết kế mẫu tại TP.HCM — 2 chi nhánh Thủ Đức và Sơn Kỳ (Tân Phú). In FDM (PLA, PETG, ABS, TPU) và Resin 8K/14K/16K siêu sắc nét, thiết kế 3D theo yêu cầu, sơn hoàn thiện mô hình. Mở cửa ${BUSINESS.hours.display} cả Chủ nhật. Báo giá qua Zalo ${BUSINESS.phoneDisplay} trong 30 phút.`,
+  description: `Tiệm 3D nhận in 3D và thiết kế mẫu tại TP.HCM — 2 chi nhánh Thủ Đức và Tân Phú. In FDM (PLA, PETG, ABS, TPU) và Resin 8K/14K/16K siêu sắc nét, thiết kế 3D theo yêu cầu, sơn hoàn thiện mô hình. Mở cửa ${BUSINESS.hours.display} cả Chủ nhật. Báo giá qua Zalo ${BUSINESS.phoneDisplay} trong 30 phút.`,
   keywords: [
     // Primary keywords
     "in 3D Thủ Đức",
@@ -57,9 +57,20 @@ export const metadata: Metadata = {
     "sơn mô hình",
     "in 3D màu",
     "in 3D multicolor",
-    // Location keywords - both branches
+    // Location keywords - both branches.
+    // TP.HCM dissolved its quận on 1 July 2025 (NQ 1685/NQ-UBTVQH15) and folded
+    // them into wards, but people still search the old district names — and will
+    // for years. Both generations of name are carried so either query lands here.
     "in 3D Tân Phú",
+    "in 3D quận Tân Phú",
     "in 3D Sơn Kỳ",
+    "in 3D phường Sơn Kỳ",
+    "in 3D Tây Thạnh",
+    "in 3D Tân Sơn Nhì",
+    "in 3D Phú Thọ Hòa",
+    "in 3D Thủ Đức",
+    "in 3D Linh Tây",
+    "in 3D gần Aeon Tân Phú",
     "in 3D Tân Bình",
     "in 3D Bình Thạnh",
     "in 3D Gò Vấp",
@@ -98,7 +109,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Tiệm 3D | In 3D & Thiết Kế Chuyên Nghiệp TP.HCM",
     description:
-      `In 3D FDM, Resin 8K/14K/16K siêu sắc nét tại TP.HCM. 2 chi nhánh: Thủ Đức và Sơn Kỳ (Tân Phú). Thiết kế 3D theo yêu cầu, sơn hoàn thiện mô hình. Zalo ${BUSINESS.phoneDisplay}.`,
+      `In 3D FDM, Resin 8K/14K/16K siêu sắc nét tại TP.HCM. 2 chi nhánh: Thủ Đức và Tân Phú. Thiết kế 3D theo yêu cầu, sơn hoàn thiện mô hình. Zalo ${BUSINESS.phoneDisplay}.`,
     url: `${BUSINESS.url}/`,
     siteName: "Tiệm 3D",
     images: [

@@ -80,7 +80,8 @@ function PriceTableBlock({ table }: { table: PriceTable }) {
         <p className="mb-4 text-sm leading-relaxed text-zinc-600">{table.intro}</p>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-zinc-200">
+      <p className="mb-2 text-sm text-zinc-600 sm:hidden">Vuốt ngang để xem đủ bảng giá.</p>
+      <div tabIndex={0} role="region" aria-label={`Bảng giá ${table.title}`} className="overflow-x-auto rounded-xl border border-zinc-200">
         <table className="w-full min-w-[520px] border-collapse text-sm">
           <thead>
             <tr className="bg-zinc-50 text-left">
@@ -145,7 +146,7 @@ export function BangGia({ loai }: { loai: string }) {
 /* ------------------------------------------------------------------ */
 
 export function ZaloCTA({
-  title = "Gửi file hoặc ảnh, nhận báo giá trong 30 phút",
+  title = "Gửi file hoặc ảnh để nhận báo giá",
   children,
   message,
 }: {
@@ -161,13 +162,13 @@ export function ZaloCTA({
         <h3 className="text-xl font-bold leading-snug sm:text-2xl">{title}</h3>
 
         {children && (
-          <div className="mt-3 text-sm leading-relaxed text-zinc-300">
+          <div className="mt-3 text-sm leading-relaxed text-zinc-300 [&_p]:text-inherit [&_ul]:text-inherit [&_ol]:text-inherit [&_strong]:text-white [&_a]:text-orange-300 [&_a:hover]:text-orange-200">
             {children}
           </div>
         )}
 
         {message && (
-          <pre className="mt-5 overflow-x-auto whitespace-pre-wrap rounded-xl bg-zinc-800/80 p-4 font-mono text-[13px] leading-relaxed text-zinc-200">
+          <pre tabIndex={0} aria-label="Mẫu tin nhắn Zalo" className="mt-5 overflow-x-auto whitespace-pre-wrap rounded-xl bg-zinc-800/80 p-4 font-mono text-[13px] leading-relaxed text-zinc-200">
 {message}
           </pre>
         )}
@@ -189,7 +190,7 @@ export function ZaloCTA({
           </Link>
         </div>
 
-        <p className="mt-4 font-mono text-xs text-zinc-500">
+        <p className="mt-4 text-sm text-zinc-300">
           {BUSINESS.hours.display} · {BUSINESS.hours.note}
         </p>
       </div>
@@ -211,6 +212,7 @@ export function ThongTinLienHe() {
           <li key={branch.id}>
             <span className="font-medium text-zinc-900">{branch.name}:</span>{" "}
             {formatAddressShort(branch)}
+            <p className="mt-1 text-sm text-zinc-600">{branch.customerVisits ? "Liên hệ trước khi đến." : "Không đón khách; nhận đơn trực tuyến, giao qua đơn vị vận chuyển."}</p>
             {branch.landmark && (
               <span className="text-zinc-500"> · {branch.landmark}</span>
             )}

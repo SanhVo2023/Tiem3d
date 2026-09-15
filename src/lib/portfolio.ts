@@ -1,10 +1,8 @@
 /**
  * Portfolio case studies.
  *
- * Each study follows the shop's real workflow — a customer sends a photo over
- * Zalo, the model gets built, printed, finished and shipped. That sequence is
- * far more persuasive than a grid of product shots, and the images for it
- * already existed in public/assets/generated/projects/ referenced by nothing.
+ * Illustrative scenarios using generated images, not verified customer records.
+ * Keep that disclosure visible wherever these examples are presented.
  *
  * `imageDir` maps to that folder; `steps[].file` to a file inside it.
  */

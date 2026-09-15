@@ -1,670 +1,153 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { ArrowLeft, Upload, Check, FileText, X, AlertCircle, MessageCircle, Copy } from "lucide-react";
-import { LenisProvider, CustomCursor } from "@/components/effects";
-import { ZaloWidget, MagneticButton } from "@/components/ui";
+import { ArrowRight, Copy, MessageCircle, Paperclip, Phone } from "lucide-react";
+import { Header, Footer } from "@/components/landing";
+import { BUSINESS } from "@/lib/business";
+import { SERVICES } from "@/lib/navigation";
+import { buildQuoteMessage, validateQuote, type QuoteErrors, type QuoteRequest } from "@/lib/quote";
 
-// Vietnamese phone validation regex
-const PHONE_REGEX = /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-9]|9[0-9])[0-9]{7}$/;
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-
-interface FormErrors {
-  name?: string;
-  phone?: string;
-  email?: string;
-  files?: string;
-}
+const INITIAL_REQUEST: QuoteRequest = { name: "", phone: "", service: "Cần tư vấn", notes: "" };
 
 export default function QuotePageContent() {
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [zaloMessage, setZaloMessage] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    notes: "",
-  });
+  const [request, setRequest] = useState(INITIAL_REQUEST);
+  const [errors, setErrors] = useState<QuoteErrors>({});
+  const [message, setMessage] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const previewRef = useRef<HTMLElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
 
-  const validateField = (name: string, value: string): string | undefined => {
-    switch (name) {
-      case "name":
-        if (!value.trim()) return "Vui lòng nhập tên của bạn";
-        if (value.trim().length < 2) return "Tên phải có ít nhất 2 ký tự";
-        return undefined;
-      case "phone":
-        if (!value.trim()) return "Vui lòng nhập số điện thoại";
-        const cleanPhone = value.replace(/[\s-]/g, "");
-        if (!PHONE_REGEX.test(cleanPhone)) {
-          return "Số điện thoại không hợp lệ (VD: 0912345678)";
-        }
-        return undefined;
-      case "email":
-        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          return "Email không hợp lệ";
-        }
-        return undefined;
-      default:
-        return undefined;
-    }
-  };
+  useEffect(() => {
+    if (message) previewRef.current?.focus();
+  }, [message]);
 
-  const handleBlur = (name: string) => {
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    const error = validateField(name, formData[name as keyof typeof formData]);
-    setErrors((prev) => ({ ...prev, [name]: error }));
-  };
+  function update(field: keyof QuoteRequest, value: string) {
+    setRequest((previous) => ({ ...previous, [field]: value }));
+    setErrors((previous) => ({ ...previous, [field]: undefined }));
+    setMessage("");
+    setCopyStatus("");
+  }
 
-  const handleChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors((prev) => ({ ...prev, [name]: error }));
-    }
-  };
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
-
-  const validateFiles = (files: File[]): { valid: File[]; error?: string } => {
-    const validExtensions = [".stl", ".obj", ".step", ".3mf", ".stp"];
-    const validFiles: File[] = [];
-
-    for (const file of files) {
-      const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
-      if (!validExtensions.includes(ext)) {
-        continue;
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        return { valid: [], error: `File "${file.name}" vượt quá 10MB` };
-      }
-      validFiles.push(file);
-    }
-
-    const totalSize = [...uploadedFiles, ...validFiles].reduce((acc, f) => acc + f.size, 0);
-    if (totalSize > MAX_FILE_SIZE) {
-      return { valid: [], error: "Tổng dung lượng file vượt quá 10MB" };
-    }
-
-    return { valid: validFiles };
-  };
-
-  // Declared before the handlers that call it — it used to sit below them, so
-  // both handlers referenced it before initialisation.
-  const simulateUpload = (files: File[]) => {
-    setIsUploading(true);
-    setUploadProgress(0);
-
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsUploading(false);
-          setUploadedFiles((current) => [...current, ...files]);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 100);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
-    const files = Array.from(e.dataTransfer.files);
-    const { valid, error } = validateFiles(files);
-
-    if (error) {
-      setErrors((prev) => ({ ...prev, files: error }));
+  function prepareMessage(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextErrors = validateQuote(request);
+    setErrors(nextErrors);
+    const firstError = Object.keys(nextErrors)[0];
+    if (firstError) {
+      formRef.current?.querySelector<HTMLElement>('[name="' + firstError + '"]')?.focus();
       return;
     }
+    setCopyStatus("");
+    setMessage(buildQuoteMessage(request));
+  }
 
-    if (valid.length > 0) {
-      setErrors((prev) => ({ ...prev, files: undefined }));
-      simulateUpload(valid);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const { valid, error } = validateFiles(files);
-
-    if (error) {
-      setErrors((prev) => ({ ...prev, files: error }));
-      return;
-    }
-
-    if (valid.length > 0) {
-      setErrors((prev) => ({ ...prev, files: undefined }));
-      simulateUpload(valid);
-    }
-
-    e.target.value = "";
-  };
-
-  const removeFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
-    setErrors((prev) => ({ ...prev, files: undefined }));
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    newErrors.name = validateField("name", formData.name);
-    newErrors.phone = validateField("phone", formData.phone);
-    newErrors.email = validateField("email", formData.email);
-
-    setErrors(newErrors);
-    setTouched({ name: true, phone: true, email: true });
-
-    return !Object.values(newErrors).some(Boolean);
-  };
-
-  const generateZaloMessage = (): string => {
-    let message = `🖨️ YÊU CẦU BÁO GIÁ IN 3D\n\n`;
-    message += `👤 Tên: ${formData.name}\n`;
-    message += `📞 SĐT: ${formData.phone}\n`;
-    if (formData.email) {
-      message += `📧 Email: ${formData.email}\n`;
-    }
-    if (uploadedFiles.length > 0) {
-      message += `📁 File: ${uploadedFiles.map(f => f.name).join(", ")}\n`;
-      message += `(Sẽ gửi file qua Zalo)\n`;
-    }
-    if (formData.notes) {
-      message += `\n📝 Ghi chú:\n${formData.notes}\n`;
-    }
-    message += `\n---\nGửi từ tiem3d.com`;
-    return message;
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    // Generate message and show success
-    const message = generateZaloMessage();
-    setZaloMessage(message);
-    setIsSuccess(true);
-
-    // Open Zalo chat after a short delay
-    setTimeout(() => {
-      window.open("https://zalo.me/0384844730", "_blank");
-    }, 500);
-  };
-
-  const copyMessage = async () => {
+  async function copyMessage() {
     try {
-      await navigator.clipboard.writeText(zaloMessage);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(message);
+      setCopyStatus("Đã sao chép. Mở Zalo, dán nội dung và gửi cho Tiệm 3D.");
     } catch {
-      // Fallback for older browsers
-      const textArea = document.createElement("textarea");
-      textArea.value = zaloMessage;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      messageRef.current?.focus();
+      messageRef.current?.select();
+      setCopyStatus("Trình duyệt chưa cho phép sao chép. Nội dung đã được chọn; hãy dùng lệnh Sao chép rồi dán vào Zalo.");
     }
-  };
-
-  const handleReset = () => {
-    setIsSuccess(false);
-    setZaloMessage("");
-    setFormData({ name: "", phone: "", email: "", notes: "" });
-    setUploadedFiles([]);
-    setErrors({});
-    setTouched({});
-    setCopied(false);
-  };
+  }
 
   return (
-    <LenisProvider>
-      <CustomCursor />
+    <>
+      <Header />
+      <main id="noi-dung" className="min-h-screen bg-[#f4f6f7] pb-20 pt-28 sm:pt-32">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <nav aria-label="Đường dẫn" className="mb-8 text-sm text-zinc-600">
+            <Link href="/" className="hover:underline">Trang chủ</Link>
+            <span aria-hidden="true" className="mx-3">/</span>
+            <span aria-current="page">Báo giá in 3D</span>
+          </nav>
+          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+            <div>
+              <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-zinc-950 sm:text-5xl">
+                Báo giá in 3D.<br />Bắt đầu từ món đồ bạn cần.
+              </h1>
+              <p className="mt-6 max-w-lg text-lg leading-relaxed text-zinc-600">
+                Kể cho Tiệm 3D ý tưởng, số lượng và kích thước dự kiến.
+                Chúng tôi sẽ tư vấn cách làm, vật liệu và chi phí phù hợp.
+              </p>
+              <a href={BUSINESS.zalo} target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-[#0068d9] px-6 py-3 font-semibold text-white hover:bg-[#0055b3]">
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />Nhắn Zalo trực tiếp
+              </a>
+              <div className="mt-10 space-y-6 border-t border-zinc-300 pt-8">
+                <div className="flex gap-3">
+                  <Paperclip className="mt-1 h-5 w-5 shrink-0 text-zinc-600" aria-hidden="true" />
+                  <div>
+                    <h2 className="font-semibold text-zinc-950">Có ảnh hoặc file 3D?</h2>
+                    <p className="mt-1 text-sm leading-relaxed text-zinc-600">Đính kèm ảnh, bản vẽ, STL, OBJ, STEP hoặc 3MF trực tiếp trong cuộc trò chuyện Zalo. Chưa có file cũng có thể nhờ tư vấn.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Phone className="mt-1 h-5 w-5 shrink-0 text-zinc-600" aria-hidden="true" />
+                  <div>
+                    <h2 className="font-semibold text-zinc-950">Muốn trao đổi nhanh?</h2>
+                    <a href={BUSINESS.tel} className="mt-1 inline-block py-1 text-lg font-semibold text-[#a83e08] underline-offset-4 hover:underline">{BUSINESS.phoneDisplay}</a>
+                    <p className="text-sm text-zinc-600">{BUSINESS.hours.display}, {BUSINESS.hours.days.toLowerCase()}</p>
+                  </div>
+                </div>
+                <Link href="/bang-gia/" className="inline-flex min-h-11 items-center gap-2 font-semibold text-zinc-900 underline underline-offset-4">Xem giá tham khảo<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+              </div>
+            </div>
 
-      <div className="min-h-screen bg-void relative">
-        {/* 3D Grid Floor */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div
-            className="absolute inset-0"
-            style={{
-              perspective: "500px",
-              perspectiveOrigin: "50% 100%",
-            }}
-          >
-            <motion.div
-              className="absolute inset-0"
-              style={{
-                transformStyle: "preserve-3d",
-                transform: "rotateX(60deg) translateY(-50%)",
-                backgroundImage: `
-                  linear-gradient(rgba(249, 115, 22, ${isDragging ? 0.15 : 0.05}) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(249, 115, 22, ${isDragging ? 0.15 : 0.05}) 1px, transparent 1px)
-                `,
-                backgroundSize: "60px 60px",
-              }}
-              animate={{
-                backgroundSize: isDragging ? "80px 80px" : "60px 60px",
-              }}
-              transition={{ duration: 0.3 }}
-            />
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-8">
+              <h2 className="text-2xl font-semibold text-zinc-950">Chuẩn bị yêu cầu báo giá</h2>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600">Điền thông tin, xem lại rồi sao chép sang Zalo. Nội dung chỉ được gửi khi bạn bấm gửi trong Zalo.</p>
+              <form ref={formRef} onSubmit={prepareMessage} noValidate className="quote-request-form mt-7 space-y-5">
+                <div>
+                  <label htmlFor="quote-name" className="form-label">Tên của bạn <span className="font-normal text-zinc-600">(bắt buộc)</span></label>
+                  <input id="quote-name" name="name" autoComplete="name" required maxLength={100} value={request.name} onChange={(event) => update("name", event.target.value)} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "quote-name-error" : undefined} className="form-input" />
+                  {errors.name && <p id="quote-name-error" className="form-error">{errors.name}</p>}
+                </div>
+                <div>
+                  <label htmlFor="quote-phone" className="form-label">Số di động <span className="font-normal text-zinc-600">(không bắt buộc)</span></label>
+                  <input id="quote-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={24} value={request.phone} onChange={(event) => update("phone", event.target.value)} aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "quote-phone-error" : "quote-phone-help"} className="form-input" />
+                  {errors.phone ? <p id="quote-phone-error" className="form-error">{errors.phone}</p> : <p id="quote-phone-help" className="mt-2 text-sm text-zinc-600">Có thể để trống nếu bạn muốn trao đổi qua Zalo.</p>}
+                </div>
+                <div>
+                  <label htmlFor="quote-service" className="form-label">Bạn cần hỗ trợ gì?</label>
+                  <select id="quote-service" name="service" value={request.service} onChange={(event) => update("service", event.target.value)} className="form-input">
+                    <option>Cần tư vấn</option>
+                    {SERVICES.map((service) => <option key={service.href}>{service.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="quote-notes" className="form-label">Mô tả yêu cầu <span className="font-normal text-zinc-600">(bắt buộc)</span></label>
+                  <textarea id="quote-notes" name="notes" required rows={5} maxLength={3000} value={request.notes} onChange={(event) => update("notes", event.target.value)} aria-invalid={Boolean(errors.notes)} aria-describedby={errors.notes ? "quote-notes-error" : "quote-notes-help"} className="form-input resize-y" placeholder="Ví dụ: Mình cần in 2 bánh răng thay thế, đường kính khoảng 38 mm. Có ảnh và mẫu cũ, cần dùng trong tuần tới." />
+                  {errors.notes ? <p id="quote-notes-error" className="form-error">{errors.notes}</p> : <p id="quote-notes-help" className="mt-2 text-sm text-zinc-600">Mục đích sử dụng, kích thước, số lượng và thời gian bạn cần.</p>}
+                </div>
+                <button type="submit" className="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-xl bg-zinc-950 px-5 py-3 font-semibold text-white hover:bg-zinc-800">Xem nội dung gửi Zalo<ArrowRight className="h-5 w-5" aria-hidden="true" /></button>
+                <p className="text-xs leading-relaxed text-zinc-600">Thông tin trong biểu mẫu được xử lý trên thiết bị của bạn. Tiệm 3D chưa nhận được nội dung cho tới khi bạn gửi qua Zalo.</p>
+              </form>
+
+              {message && (
+                <section ref={previewRef} tabIndex={-1} aria-labelledby="quote-preview-title" className="mt-8 scroll-mt-24 rounded-xl border border-orange-200 bg-orange-50 p-4 sm:p-5">
+                  <h2 id="quote-preview-title" className="text-lg font-semibold text-zinc-950">Nội dung đã sẵn sàng</h2>
+                  <p className="mt-1 text-sm text-zinc-600">Chưa được gửi. Sao chép nội dung, mở Zalo rồi dán và gửi.</p>
+                  <label htmlFor="quote-message" className="sr-only">Nội dung để sao chép sang Zalo</label>
+                  <textarea ref={messageRef} id="quote-message" readOnly value={message} rows={9} className="form-input mt-4 resize-y text-sm" />
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <button type="button" onClick={copyMessage} className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-3 font-semibold text-zinc-950 hover:bg-zinc-50"><Copy className="h-4 w-4" aria-hidden="true" />1. Sao chép nội dung</button>
+                    <a href={BUSINESS.zalo} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-[#0068d9] px-4 py-3 font-semibold text-white hover:bg-[#0055b3]"><MessageCircle className="h-4 w-4" aria-hidden="true" />2. Mở Zalo để gửi</a>
+                  </div>
+                  <p role="status" aria-live="polite" className="mt-3 text-sm leading-relaxed text-zinc-700">{copyStatus}</p>
+                </section>
+              )}
+              <noscript>
+                <style>{".quote-request-form { display: none; }"}</style>
+                <p className="mt-5 rounded-lg bg-orange-50 p-4 text-sm text-zinc-800">Biểu mẫu cần JavaScript. Bạn vẫn có thể dùng nút Nhắn Zalo trực tiếp hoặc gọi điện để gửi yêu cầu.</p>
+              </noscript>
+            </div>
           </div>
         </div>
-
-        {/* Back Button */}
-        <motion.div
-          className="fixed top-8 left-8 z-50"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-noise hover:text-signal transition-colors group"
-            data-cursor="BACK"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-mono text-xs">TRANG CHỦ</span>
-          </Link>
-        </motion.div>
-
-        {/* Main Content */}
-        <div className="relative z-10 min-h-screen flex items-center justify-center px-8 py-24">
-          <motion.div
-            className="w-full max-w-4xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <AnimatePresence mode="wait">
-              {isSuccess ? (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-8 max-w-lg mx-auto"
-                >
-                  {/* Success Icon */}
-                  <div className="text-center mb-6">
-                    <motion.div
-                      className="w-20 h-20 mx-auto bg-green-500 rounded-full flex items-center justify-center mb-4"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", delay: 0.2 }}
-                    >
-                      <Check className="w-10 h-10 text-white" />
-                    </motion.div>
-                    <h2 className="text-display text-2xl text-signal mb-2">
-                      GẦN XONG RỒI!
-                    </h2>
-                    <p className="text-mono text-sm text-noise">
-                      Zalo đã được mở. Copy tin nhắn bên dưới và gửi cho chúng tôi.
-                    </p>
-                  </div>
-
-                  {/* Message to copy */}
-                  <div className="bg-zinc-800 rounded-lg p-4 mb-4">
-                    <pre className="text-mono text-xs text-zinc-300 whitespace-pre-wrap break-words">
-                      {zaloMessage}
-                    </pre>
-                  </div>
-
-                  {/* Copy button */}
-                  <button
-                    onClick={copyMessage}
-                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all ${
-                      copied
-                        ? "bg-green-500 text-white"
-                        : "bg-orange-500 hover:bg-orange-600 text-white"
-                    }`}
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        ĐÃ COPY!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        COPY TIN NHẮN
-                      </>
-                    )}
-                  </button>
-
-                  {/* Open Zalo again */}
-                  <a
-                    href="https://zalo.me/0384844730"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-3 mt-3 rounded-lg border border-zinc-700 text-signal hover:bg-zinc-800 transition-colors"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    MỞ LẠI ZALO
-                  </a>
-
-                  {/* File reminder */}
-                  {uploadedFiles.length > 0 && (
-                    <p className="text-mono text-xs text-orange-500 text-center mt-4">
-                      💡 Nhớ gửi {uploadedFiles.length} file qua Zalo nhé!
-                    </p>
-                  )}
-
-                  {/* Reset */}
-                  <button
-                    onClick={handleReset}
-                    className="w-full text-mono text-xs text-zinc-500 hover:text-signal mt-6 transition-colors"
-                  >
-                    ← Gửi yêu cầu khác
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="form"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {/* Header */}
-                  <div className="text-center mb-12">
-                    <p className="text-mono text-xs text-noise tracking-widest mb-4">BÁO GIÁ</p>
-                    <h1 className="text-display text-4xl md:text-5xl lg:text-6xl text-signal">
-                      GỬI FILE CỦA BẠN
-                    </h1>
-                    <p className="text-mono text-sm text-noise mt-4 max-w-md mx-auto">
-                      Nhận báo giá chi tiết trong vòng 30 phút qua Zalo
-                    </p>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Upload Zone */}
-                    <motion.div
-                      className={`
-                        relative p-8 border-2 border-dashed rounded-lg transition-colors duration-300
-                        ${isDragging ? "border-orange-500 bg-orange-500/10" : "border-zinc-700 bg-zinc-900/50"}
-                        ${errors.files ? "border-red-500" : ""}
-                      `}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      whileHover={{ scale: 1.01 }}
-                    >
-                      <input
-                        type="file"
-                        multiple
-                        accept=".stl,.obj,.step,.3mf,.stp"
-                        onChange={handleFileSelect}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      />
-
-                      <div className="text-center">
-                        <AnimatePresence mode="wait">
-                          {isUploading ? (
-                            <motion.div
-                              key="uploading"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              className="mb-6"
-                            >
-                              <div className="relative w-32 h-32 mx-auto">
-                                <svg className="w-full h-full -rotate-90">
-                                  <circle
-                                    cx="64"
-                                    cy="64"
-                                    r="56"
-                                    fill="none"
-                                    stroke="rgba(113, 113, 122, 0.3)"
-                                    strokeWidth="8"
-                                  />
-                                  <motion.circle
-                                    cx="64"
-                                    cy="64"
-                                    r="56"
-                                    fill="none"
-                                    stroke="#f97316"
-                                    strokeWidth="8"
-                                    strokeLinecap="round"
-                                    strokeDasharray={`${2 * Math.PI * 56}`}
-                                    initial={{ strokeDashoffset: 2 * Math.PI * 56 }}
-                                    animate={{
-                                      strokeDashoffset:
-                                        2 * Math.PI * 56 * (1 - uploadProgress / 100),
-                                    }}
-                                  />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                  <span className="text-display text-2xl text-orange-500">
-                                    {Math.round(uploadProgress * 2)}°C
-                                  </span>
-                                  <span className="text-mono text-xs text-noise">HEATING</span>
-                                </div>
-                              </div>
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              key="idle"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              className="mb-6"
-                            >
-                              <motion.div
-                                className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${
-                                  isDragging ? "bg-orange-500" : "bg-zinc-800"
-                                }`}
-                                animate={{
-                                  scale: isDragging ? 1.1 : 1,
-                                }}
-                              >
-                                <Upload
-                                  className={`w-8 h-8 ${
-                                    isDragging ? "text-void" : "text-orange-500"
-                                  }`}
-                                />
-                              </motion.div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        <h3 className="text-display text-xl text-signal mb-2">
-                          {isDragging ? "THẢ FILE TẠI ĐÂY" : "KÉO THẢ FILE"}
-                        </h3>
-                        <p className="text-mono text-xs text-noise mb-4">
-                          hoặc click để chọn file
-                        </p>
-                        <p className="text-mono text-xs text-zinc-600">
-                          Hỗ trợ: STL, OBJ, STEP, 3MF
-                        </p>
-                      </div>
-
-                      {errors.files && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="flex items-center gap-2 text-red-500 text-mono text-xs mt-4 justify-center"
-                        >
-                          <AlertCircle className="w-4 h-4" />
-                          {errors.files}
-                        </motion.p>
-                      )}
-
-                      {uploadedFiles.length > 0 && (
-                        <div className="mt-6 space-y-2">
-                          {uploadedFiles.map((file, index) => (
-                            <motion.div
-                              key={index}
-                              className="flex items-center justify-between bg-zinc-800 px-4 py-2 rounded"
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                            >
-                              <div className="flex items-center gap-3">
-                                <FileText className="w-4 h-4 text-orange-500" />
-                                <span className="text-mono text-xs text-signal truncate max-w-[150px]">
-                                  {file.name}
-                                </span>
-                                <span className="text-mono text-xs text-zinc-500">
-                                  ({(file.size / 1024 / 1024).toFixed(2)}MB)
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => removeFile(index)}
-                                className="text-noise hover:text-red-500 transition-colors"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </motion.div>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
-
-                    {/* Contact Form */}
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div>
-                        <label className="text-mono text-xs text-noise mb-2 block">
-                          TÊN CỦA BẠN *
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          required
-                          value={formData.name}
-                          onChange={(e) => handleChange("name", e.target.value)}
-                          onBlur={() => handleBlur("name")}
-                          className={`w-full bg-zinc-900 border px-4 py-3 text-signal text-mono focus:border-orange-500 focus:outline-none transition-colors ${
-                            errors.name && touched.name ? "border-red-500" : "border-zinc-800"
-                          }`}
-                          placeholder="Nguyễn Văn A"
-                        />
-                        {errors.name && touched.name && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="flex items-center gap-1 text-red-500 text-mono text-xs mt-2"
-                          >
-                            <AlertCircle className="w-3 h-3" />
-                            {errors.name}
-                          </motion.p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="text-mono text-xs text-noise mb-2 block">
-                          SỐ ĐIỆN THOẠI / ZALO *
-                        </label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          required
-                          value={formData.phone}
-                          onChange={(e) => handleChange("phone", e.target.value)}
-                          onBlur={() => handleBlur("phone")}
-                          className={`w-full bg-zinc-900 border px-4 py-3 text-signal text-mono focus:border-orange-500 focus:outline-none transition-colors ${
-                            errors.phone && touched.phone ? "border-red-500" : "border-zinc-800"
-                          }`}
-                          placeholder="0912 345 678"
-                        />
-                        {errors.phone && touched.phone && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="flex items-center gap-1 text-red-500 text-mono text-xs mt-2"
-                          >
-                            <AlertCircle className="w-3 h-3" />
-                            {errors.phone}
-                          </motion.p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="text-mono text-xs text-noise mb-2 block">
-                          EMAIL (tùy chọn)
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={(e) => handleChange("email", e.target.value)}
-                          onBlur={() => handleBlur("email")}
-                          className={`w-full bg-zinc-900 border px-4 py-3 text-signal text-mono focus:border-orange-500 focus:outline-none transition-colors ${
-                            errors.email && touched.email ? "border-red-500" : "border-zinc-800"
-                          }`}
-                          placeholder="email@example.com"
-                        />
-                        {errors.email && touched.email && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="flex items-center gap-1 text-red-500 text-mono text-xs mt-2"
-                          >
-                            <AlertCircle className="w-3 h-3" />
-                            {errors.email}
-                          </motion.p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="text-mono text-xs text-noise mb-2 block">
-                          GHI CHÚ
-                        </label>
-                        <textarea
-                          name="notes"
-                          rows={4}
-                          value={formData.notes}
-                          onChange={(e) => handleChange("notes", e.target.value)}
-                          className="w-full bg-zinc-900 border border-zinc-800 px-4 py-3 text-signal text-mono focus:border-orange-500 focus:outline-none transition-colors resize-none"
-                          placeholder="Số lượng, vật liệu mong muốn, deadline..."
-                        />
-                      </div>
-
-                      <MagneticButton
-                        variant="solid"
-                        className="w-full justify-center"
-                        cursorText="GỬI"
-                        type="submit"
-                      >
-                        <span className="flex items-center gap-2">
-                          <MessageCircle className="w-4 h-4" />
-                          GỬI QUA ZALO
-                        </span>
-                      </MagneticButton>
-
-                      <p className="text-mono text-xs text-zinc-600 text-center">
-                        Sẽ mở Zalo để bạn gửi thông tin trực tiếp
-                      </p>
-                    </form>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </div>
-
-        <ZaloWidget />
-      </div>
-    </LenisProvider>
+      </main>
+      <Footer />
+    </>
   );
 }

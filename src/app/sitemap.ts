@@ -88,6 +88,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticPages,
+    ...BUSINESS.branches.map(branch => ({ url: url(`/khu-vuc/${branch.id}/`), changeFrequency: "monthly" as const, priority: 0.7 })),
     ...servicePages,
     ...caseStudyPages,
     ...blogPages,

@@ -8,7 +8,9 @@ export const metadata: Metadata = {
   title: "Không tìm thấy trang",
   description: "Trang bạn tìm không tồn tại hoặc đã được chuyển sang địa chỉ khác.",
   robots: { index: false, follow: true },
-  alternates: {},
+  alternates: { canonical: null },
+  openGraph: null,
+  twitter: null,
 };
 
 export default function NotFound() {

@@ -64,7 +64,7 @@ export function BlogIndex({
         <div className="container mx-auto max-w-3xl px-6 text-center">
           <h2 className="text-display text-3xl md:text-4xl">Cần tư vấn về in 3D?</h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-            Gửi file hoặc ảnh mẫu qua Zalo, Tiệm 3D báo giá trong 30 phút. Mở cửa{" "}
+            Gửi file hoặc ảnh mẫu qua Zalo để tiệm kiểm tra và báo giá. Giờ tư vấn:{" "}
             {BUSINESS.hours.display} tất cả các ngày.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">

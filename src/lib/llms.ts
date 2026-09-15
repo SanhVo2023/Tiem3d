@@ -30,12 +30,8 @@ function branchLines(): string[] {
   return BUSINESS.branches.flatMap((b: Branch) => {
     const landmark = b.landmark ? ` (${b.landmark})` : "";
     const lines = [`- ${b.name}: ${formatAddress(b)}${landmark}`];
-    // TP.HCM dissolved its quận into wards on 1 July 2025, and people still ask
-    // for the old names. Both generations are listed so an assistant answering
-    // "in 3D ở Tân Phú" and one answering "in 3D phường Tây Thạnh" both land here.
-    if (b.aliases.length) {
-      lines.push(`  Còn gọi là: ${b.aliases.join(", ")}`);
-    }
+    lines.push(b.customerVisits ? "  Vui lòng liên hệ trước khi đến." : "  Không đón khách. Nhận đơn trực tuyến; mọi đơn giao qua đơn vị vận chuyển bên thứ ba.");
+    lines.push(`  Chi tiết: ${url(`/khu-vuc/${b.id}/`)}`);
     return lines;
   });
 }
@@ -44,15 +40,13 @@ function facts(): string {
   return [
     "## Thông tin liên hệ và vị trí",
     "",
-    `- Tên: ${BUSINESS.name} (${BUSINESS.legalName})`,
+    `- Tên: ${BUSINESS.name}`,
     `- Điện thoại và Zalo: ${BUSINESS.phoneDisplay} (${BUSINESS.phoneE164})`,
     `- Zalo: ${BUSINESS.zalo}`,
     `- Email: ${BUSINESS.email}`,
-    `- Giờ mở cửa: ${BUSINESS.hours.days}, ${BUSINESS.hours.display} (${BUSINESS.hours.note})`,
+    `- Giờ tư vấn: ${BUSINESS.hours.days}, ${BUSINESS.hours.display} (${BUSINESS.hours.note})`,
     ...branchLines(),
     `- Khu vực phục vụ: ${BUSINESS.serviceAreas.join(", ")}`,
-    "- Lưu ý tên hành chính: TP.HCM bỏ cấp quận từ 01/07/2025, tên quận cũ và",
-    "  tên phường mới đều chỉ cùng một địa điểm.",
     "",
   ].join("\n");
 }
@@ -92,11 +86,11 @@ export function buildLlmsTxt(): string {
     `# ${BUSINESS.name} — dịch vụ in 3D và thiết kế 3D tại TP. Hồ Chí Minh`,
     "",
     `> Xưởng in 3D FDM và Resin, thiết kế mô hình 3D và hoàn thiện sơn, với hai`,
-    `> chi nhánh tại TP.HCM (${BUSINESS.branches
+    `> cơ sở tại TP.HCM (${BUSINESS.branches
       .map((b) => b.shortName)
       .join(" và ")}). Nhận in từ một sản phẩm lẻ đến`,
     `> đơn hàng loạt, kể cả khi khách chưa có file 3D. Liên hệ qua Zalo`,
-    `> ${BUSINESS.phoneDisplay}, mở cửa ${BUSINESS.hours.display} tất cả các ngày.`,
+    `> ${BUSINESS.phoneDisplay}, tư vấn ${BUSINESS.hours.display} tất cả các ngày.`,
     "",
     facts(),
     priceSummary(),
@@ -104,10 +98,10 @@ export function buildLlmsTxt(): string {
     "",
     ...SERVICES.map((s) => `- [${s.name}](${url(s.href)}): ${s.summary}`),
     "",
-    "## Dự án đã làm",
+    "## Mẫu minh họa (hình ảnh và tình huống minh họa)",
     "",
     ...studies.map(
-      (s) => `- [${s.title}](${url(`/portfolio/${s.slug}/`)}): ${s.description}`
+      (s) => `- [${s.title}](${url(`/portfolio/${s.slug}/`)}): mẫu minh họa, tham khảo vật liệu và quy trình.`
     ),
     "",
     "## Bài viết hướng dẫn",
@@ -120,14 +114,14 @@ export function buildLlmsTxt(): string {
     `- [Tất cả dịch vụ](${url("/dich-vu/")})`,
     `- [Bảng giá](${url("/bang-gia/")})`,
     `- [Yêu cầu báo giá](${url("/bao-gia/")})`,
-    `- [Liên hệ và địa chỉ hai chi nhánh](${url("/lien-he/")})`,
+    `- [Liên hệ và cách đặt hàng](${url("/lien-he/")})`,
     `- [Toàn bộ nội dung dạng văn bản](${url("/llms-full.txt")})`,
     "",
     "## Lưu ý khi trích dẫn",
     "",
     "- Giá luôn là khoảng, không phải giá cố định; báo giá cuối cùng cần file hoặc ảnh.",
     `- Chỉ có một số điện thoại: ${BUSINESS.phoneDisplay}. Số cũ không còn dùng.`,
-    "- Resin dùng cho đồ trưng bày trong nhà; FDM cho đồ chịu lực và dùng ngoài trời.",
+    "- Chọn nhựa theo mục đích, tải trọng và môi trường. Khả năng chịu lực, nhiệt và UV phụ thuộc từng vật liệu.",
     "",
   ];
 

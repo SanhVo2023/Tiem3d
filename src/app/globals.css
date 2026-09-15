@@ -40,7 +40,7 @@
   --color-orange-50: #fff7ed;
   --color-orange-100: #ffedd5;
   --color-orange-500: #f97316;
-  --color-orange-600: #ea580c;
+  --color-orange-600: #a83e08;
 
   /* Cyan is NOT a second brand accent. It marks Resin surfaces only, so colour
      carries meaning (FDM = orange, Resin = cyan) instead of decorating.
@@ -94,12 +94,161 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom selection */
+/* Shared navigation and quote form */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  border-bottom: 1px solid #e4e4e7;
+  background: #fff;
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100%, 1280px);
+  min-height: 76px;
+  margin-inline: auto;
+  padding: 0.75rem clamp(1rem, 3vw, 2rem);
+}
+
+.site-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: #151719;
+}
+
+.brand-mark {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.4rem;
+  background: #f97316;
+  color: #151719;
+}
+
+.nav-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3f3f46;
+}
+
+.nav-link:hover, .nav-link[aria-current="page"] {
+  background: #f4f4f5;
+  color: #a83e08;
+}
+
+.nav-services { position: relative; }
+.nav-services summary::-webkit-details-marker { display: none; }
+.nav-services[open] summary svg { transform: rotate(180deg); }
+.nav-service-panel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  left: 0;
+  width: 300px;
+  padding: 0.5rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 15px 40px #15171918;
+}
+
+.header-quote {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 100px;
+  padding: 0.65rem 1.1rem;
+  background: #151719;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.header-quote:hover { background: #a83e08; }
+
+.mobile-navigation {
+  inset: 0 0 0 auto;
+  width: min(100%, 420px);
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: #fff;
+  color: #18181b;
+}
+.mobile-navigation::backdrop { background: #15171999; }
+.mobile-navigation[open] { display: flex; flex-direction: column; }
+.mobile-navigation-content {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  min-height: 0;
+  padding: 0.75rem 1.25rem max(1.5rem, env(safe-area-inset-bottom));
+}
+
+.mobile-navigation-content [aria-current="page"] { color: #a83e08; background: #fff7ed; }
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #27272a;
+}
+
+.form-input {
+  display: block;
+  width: 100%;
+  min-height: 3rem;
+  border: 1px solid #a1a1aa;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #18181b;
+  padding: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.form-input[aria-invalid="true"] {
+  border-color: #b91c1c;
+}
+
+.form-error {
+  margin-top: 0.5rem;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 3px solid #a83e08;
+  outline-offset: 4px;
+}
+
 ::selection {
   background: var(--color-primary);
   color: white;
@@ -159,8 +308,8 @@ body {
   letter-spacing: -0.02em;
   /* Vietnamese stacks diacritics above the cap height, so display type needs
      more line height than a Latin-only face would. 0.95 clipped them. */
-  line-height: 1.05;
-  text-transform: uppercase;
+  line-height: 1.18;
+  text-transform: none;
 }
 
 .text-display-thin {
@@ -765,8 +914,8 @@ html.lenis body {
    Focus visibility
    ======================================== */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: 3px solid #a83e08;
+  outline-offset: 4px;
   border-radius: 2px;
 }
 
@@ -785,4 +934,11 @@ html.lenis body {
 
 .skip-link:focus {
   top: 0;
+}
+
+/* Leave fixed navigation clear of anchor destinations and focused content. */
+[id] { scroll-margin-top: 100px; }
+h1, h2, h3 { font-family: var(--font-display), var(--font-sans), sans-serif; }
+@media (prefers-reduced-motion: reduce) {
+  .group:hover img { transform: none !important; }
 }

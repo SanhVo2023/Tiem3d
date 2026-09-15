@@ -31,12 +31,12 @@ export function PostCard({
           </div>
         )}
         {post.featured && (
-          <span className="absolute left-3 top-3 rounded-full bg-orange-500 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-white">
+          <span className="absolute left-3 top-3 rounded-full bg-orange-500 px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-zinc-950">
             Nổi bật
           </span>
         )}
         {post.draft && (
-          <span className="absolute right-3 top-3 rounded-full bg-yellow-400 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-yellow-950">
+          <span className="absolute right-3 top-3 rounded-full bg-yellow-400 px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-yellow-950">
             Nháp
           </span>
         )}

@@ -1,114 +1,47 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MapPin, Phone, Clock, MessageCircle, Mail, Navigation } from "lucide-react";
+import { MapPin, Phone, Clock, MessageCircle, Mail, Navigation, ArrowUpRight } from "lucide-react";
 import { BUSINESS, formatAddress, mapsUrl, type Branch } from "@/lib/business";
 import { Header, Footer } from "@/components/landing";
-import { ZaloWidget } from "@/components/ui";
 import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
-import { socialCard } from "@/lib/social";
 
-const TITLE = "Liên hệ & địa chỉ";
-const DESCRIPTION = `Tiệm 3D có 2 chi nhánh tại TP.HCM: Thủ Đức (61 Đường Số 1, P. Linh Tây) và Tân Phú (36 Bờ Bao Tân Thắng, cạnh Aeon Mall Tân Phú). Zalo/gọi ${BUSINESS.phoneDisplay}, mở cửa ${BUSINESS.hours.display} tất cả các ngày.`;
-
+const TITLE = "Liên hệ Tiệm 3D tại TP.HCM";
+const DESCRIPTION = "Đặt in 3D qua Zalo 0384 844 730. Tư vấn 8:00–22:00 mỗi ngày. Xưởng Tân Phú nhận đơn trực tuyến và giao qua đơn vị vận chuyển, không đón khách.";
 const FAQS = [
-  {
-    question: "Tiệm 3D mở cửa mấy giờ?",
-    answer: `Cả hai chi nhánh mở cửa ${BUSINESS.hours.display}, ${BUSINESS.hours.days} — kể cả Chủ nhật. Bạn nhắn Zalo ${BUSINESS.phoneDisplay} bất cứ lúc nào, chúng tôi trả lời trong giờ mở cửa.`,
-  },
-  {
-    question: "Tôi có cần đến tận nơi không?",
-    answer:
-      "Không bắt buộc. Phần lớn khách gửi file hoặc ảnh qua Zalo, chốt mẫu rồi nhận hàng qua ship COD toàn quốc. Ghé trực tiếp phù hợp khi bạn muốn xem mẫu vật liệu thật hoặc mang món đồ cần đo đạc.",
-  },
-  {
-    question: "Chi nhánh nào gần tôi hơn?",
-    answer:
-      "Chi nhánh Thủ Đức thuận tiện cho khu vực phía Đông: Thủ Đức, Bình Thạnh, Quận 1. Chi nhánh Tân Phú nằm cạnh Aeon Mall Tân Phú, thuận tiện cho Tân Phú, Tân Bình, Bình Tân, Gò Vấp và Quận 11.",
-  },
-  {
-    question: "Muốn ghé xem trực tiếp có cần hẹn trước không?",
-    answer:
-      "Nên nhắn Zalo trước một chút để chúng tôi chuẩn bị mẫu vật liệu và sắp xếp người tư vấn, nhất là khi bạn muốn xem một loại nhựa hoặc độ hoàn thiện cụ thể.",
-  },
+  { question: "Tôi có thể liên hệ lúc nào?", answer: `Tiệm tư vấn từ ${BUSINESS.hours.display} mỗi ngày, kể cả Chủ nhật. Bạn có thể để lại tin nhắn Zalo ngoài giờ; tiệm sẽ phản hồi trong giờ làm việc.` },
+  { question: "Tôi có thể ghé xưởng Tân Phú không?", answer: "Xưởng Tân Phú không đón khách hoặc giao hàng trực tiếp tại địa chỉ. Vui lòng gửi yêu cầu qua Zalo hoặc điện thoại; mọi đơn hàng được giao qua đơn vị vận chuyển bên thứ ba." },
+  { question: "Nếu cần xem mẫu hoặc mang chi tiết đến đo thì sao?", answer: "Hãy gọi hoặc nhắn Zalo để trao đổi trước với cơ sở Thủ Đức. Tiệm sẽ xác nhận lịch và khả năng tiếp nhận mẫu trước khi bạn di chuyển." },
+  { question: "Cần gửi gì để được báo giá?", answer: "Gửi file 3D hoặc ảnh tham khảo, kích thước, số lượng, mục đích sử dụng và ngày cần nhận hàng. Nếu chưa có file, tiệm sẽ trao đổi thêm về phần thiết kế. Phí giao hàng và thời gian dự kiến được xác nhận khi chốt đơn." },
 ];
 
 export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
+  title: TITLE, description: DESCRIPTION,
   alternates: { canonical: `${BUSINESS.url}/lien-he/` },
-  openGraph: {
-    type: "website",
-    title: `${TITLE} | Tiệm 3D`,
-    description: DESCRIPTION,
-    url: `${BUSINESS.url}/lien-he/`,
-    siteName: BUSINESS.name,
-    locale: "vi_VN",
-    images: [
-      {
-        url: socialCard("/assets/generated/workspace/workspace-overview.webp"),
-        width: 1200,
-        height: 630,
-        alt: "Xưởng in 3D Tiệm 3D",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${TITLE} | Tiệm 3D`,
-    description: DESCRIPTION,
-    images: [socialCard("/assets/generated/workspace/workspace-overview.webp")],
-  },
+  openGraph: { type: "website", title: TITLE, description: DESCRIPTION, url: `${BUSINESS.url}/lien-he/`, images: ["/og-image.jpg"] },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: ["/og-image.jpg"] },
 };
 
 function BranchCard({ branch }: { branch: Branch }) {
   return (
-    <article className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-7">
-      <div className="flex items-start justify-between gap-4">
-        <h2 className="text-xl font-bold text-zinc-900">{branch.name}</h2>
-        {branch.primary && (
-          <span className="rounded-full bg-orange-100 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-orange-700">
-            Cơ sở chính
-          </span>
-        )}
-      </div>
-
-      <ul className="mt-5 flex-1 space-y-4 text-sm">
-        <li className="flex items-start gap-3">
-          <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-500" />
-          <div>
-            <p className="text-zinc-900">{formatAddress(branch)}</p>
-            {branch.landmark && (
-              <p className="mt-1 text-zinc-500">{branch.landmark}</p>
-            )}
-          </div>
-        </li>
-        <li className="flex items-start gap-3">
-          <Clock className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-500" />
-          <div>
-            <p className="font-mono text-zinc-900">{BUSINESS.hours.display}</p>
-            <p className="text-zinc-500">{BUSINESS.hours.days}</p>
-          </div>
-        </li>
-        <li className="flex items-start gap-3">
-          <Phone className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-500" />
-          <a
-            href={BUSINESS.tel}
-            className="font-mono text-zinc-900 transition-colors hover:text-orange-600"
-          >
-            {BUSINESS.phoneDisplay}
-          </a>
-        </li>
-      </ul>
-
-      <a
-        href={mapsUrl(branch)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 inline-flex items-center justify-center gap-2 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:border-zinc-900"
-      >
-        <Navigation className="h-4 w-4" />
-        Chỉ đường trên Google Maps
-      </a>
+    <article className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8">
+      <p className="text-sm font-semibold text-[#a83e08]">{branch.customerVisits ? "Trao đổi trước khi đến" : "Đặt hàng trực tuyến"}</p>
+      <h2 className="mt-2 text-2xl font-bold text-zinc-900">{branch.name}</h2>
+      <p className="mt-4 flex items-start gap-3 text-base leading-relaxed text-zinc-600">
+        <MapPin aria-hidden="true" className="mt-1 h-5 w-5 shrink-0" />{formatAddress(branch)}
+      </p>
+      <p className="mt-5 flex-1 text-base leading-relaxed text-zinc-700">
+        {branch.customerVisits
+          ? "Muốn xem vật liệu hoặc mang mẫu đến đo? Liên hệ trước để tiệm xác nhận lịch và chuẩn bị mẫu phù hợp."
+          : "Xưởng không đón khách và không có điểm nhận hàng trực tiếp. Mọi đơn được giao qua đơn vị vận chuyển bên thứ ba."}
+      </p>
+      <Link href={`/khu-vuc/${branch.id}/`} className="mt-5 inline-flex min-h-11 items-center gap-2 font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4">
+        Cách đặt hàng tại {branch.shortName}<ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+      </Link>
+      {branch.customerVisits && (
+        <a href={mapsUrl(branch)} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-zinc-300 px-5 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-50">
+          <Navigation aria-hidden="true" className="h-4 w-4" />Tìm địa chỉ Thủ Đức trên Maps
+        </a>
+      )}
     </article>
   );
 }
@@ -116,130 +49,40 @@ function BranchCard({ branch }: { branch: Branch }) {
 export default function ContactPage() {
   return (
     <>
-      <BreadcrumbJsonLd
-        items={[
-          { name: "Trang chủ", url: `${BUSINESS.url}/` },
-          { name: "Liên hệ", url: `${BUSINESS.url}/lien-he/` },
-        ]}
-      />
+      <BreadcrumbJsonLd items={[{ name: "Trang chủ", url: `${BUSINESS.url}/` }, { name: "Liên hệ", url: `${BUSINESS.url}/lien-he/` }]} />
       <FAQJsonLd faqs={FAQS} />
-
       <Header />
-
-      <main className="min-h-screen bg-white pt-16">
-        <section className="border-b border-zinc-200 bg-zinc-50">
-          <div className="container mx-auto max-w-6xl px-6 py-16 md:py-20">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-orange-600">
-              Liên hệ
-            </p>
-            <h1 className="mt-4 text-display text-4xl text-zinc-900 md:text-6xl">
-              Hai chi nhánh tại TP.HCM
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-600">
-              Cách nhanh nhất là nhắn Zalo kèm ảnh hoặc file — chúng tôi báo giá
-              trong 30 phút. Muốn xem mẫu vật liệu thật thì ghé chi nhánh gần bạn.
-            </p>
-
+      <main id="noi-dung" className="min-h-screen bg-[#f4f6f7] pt-[76px]">
+        <section className="border-b border-zinc-200 bg-white">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <p className="font-semibold text-[#a83e08]">Liên hệ Tiệm 3D</p>
+            <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-tight tracking-tight text-zinc-900 md:text-5xl">Cùng trao đổi về mẫu bạn muốn in.</h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-600">Gửi file hoặc ảnh qua Zalo, kèm kích thước và số lượng. Tiệm sẽ tư vấn vật liệu, cách hoàn thiện và báo giá theo yêu cầu của bạn.</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={BUSINESS.zalo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0068ff] px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-[#0057d4]"
-              >
-                <MessageCircle className="h-4 w-4" />
-                Chat Zalo {BUSINESS.phoneDisplay}
-              </a>
-              <a
-                href={BUSINESS.tel}
-                className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-7 py-3 text-sm font-bold text-zinc-900 transition-colors hover:border-zinc-900"
-              >
-                <Phone className="h-4 w-4" />
-                Gọi ngay
-              </a>
+              <a href={BUSINESS.zalo} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#0068ff] px-6 py-3 font-semibold text-white hover:bg-[#0057d4]"><MessageCircle aria-hidden="true" className="h-5 w-5" />Nhắn Zalo cho tiệm</a>
+              <a href={BUSINESS.tel} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-zinc-300 px-6 py-3 font-semibold text-zinc-900 hover:bg-zinc-50"><Phone aria-hidden="true" className="h-5 w-5" />{BUSINESS.phoneDisplay}</a>
             </div>
+            <p className="mt-6 flex items-center gap-2 text-sm text-zinc-600"><Clock aria-hidden="true" className="h-4 w-4" />Giờ tư vấn: {BUSINESS.hours.display}, mỗi ngày</p>
           </div>
         </section>
-
-        <section className="container mx-auto max-w-6xl px-6 py-16">
-          <div className="grid gap-6 md:grid-cols-2">
-            {BUSINESS.branches.map((branch) => (
-              <BranchCard key={branch.id} branch={branch} />
-            ))}
-          </div>
-
-          <div className="mt-10 rounded-2xl border border-zinc-200 bg-zinc-50 p-7">
-            <h2 className="text-lg font-bold text-zinc-900">Khu vực phục vụ</h2>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-              Nhận đơn toàn quốc qua ship COD, giao tận nơi trong nội thành TP.HCM.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {BUSINESS.serviceAreas.map((area) => (
-                <span
-                  key={area}
-                  className="rounded-full bg-white px-3 py-1 text-sm text-zinc-600 ring-1 ring-zinc-200"
-                >
-                  {area}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-10 flex flex-wrap items-center gap-6 rounded-2xl border border-zinc-200 p-7">
-            <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-orange-500" />
-              <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-zinc-500">
-                  Email
-                </p>
-                <a
-                  href={`mailto:${BUSINESS.email}`}
-                  className="text-zinc-900 transition-colors hover:text-orange-600"
-                >
-                  {BUSINESS.email}
-                </a>
-              </div>
-            </div>
-            <p className="max-w-md text-sm text-zinc-500">
-              Email phù hợp cho đơn doanh nghiệp cần báo giá bằng văn bản. Đơn lẻ
-              nên nhắn Zalo cho nhanh.
-            </p>
+        <section aria-label="Thông tin cơ sở" className="mx-auto max-w-6xl px-6 py-14">
+          <div className="grid gap-6 md:grid-cols-2">{BUSINESS.branches.map(branch => <BranchCard key={branch.id} branch={branch} />)}</div>
+          <div className="mt-8 flex flex-col gap-5 rounded-2xl bg-white p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+            <div><h2 className="text-xl font-bold text-zinc-900">Gửi yêu cầu qua email</h2><p className="mt-2 max-w-xl leading-relaxed text-zinc-600">Phù hợp khi cần trao đổi bản vẽ và yêu cầu chi tiết. Tiệm xác nhận phí và thời gian vận chuyển trước khi chốt đơn.</p></div>
+            <a href={`mailto:${BUSINESS.email}`} className="inline-flex min-h-12 items-center gap-2 break-all font-semibold text-zinc-900 underline underline-offset-4"><Mail aria-hidden="true" className="h-5 w-5 shrink-0" />{BUSINESS.email}</a>
           </div>
         </section>
-
-        <section className="border-t border-zinc-200 py-16">
-          <div className="container mx-auto max-w-3xl px-6">
-            <h2 className="text-2xl font-bold text-zinc-900 md:text-3xl">
-              Câu hỏi thường gặp
-            </h2>
+        <section className="bg-white py-14">
+          <div className="mx-auto max-w-3xl px-6">
+            <h2 className="text-2xl font-bold text-zinc-900 md:text-3xl">Trước khi liên hệ</h2>
             <div className="mt-6 divide-y divide-zinc-200 border-y border-zinc-200">
-              {FAQS.map((faq) => (
-                <details key={faq.question} className="group py-4">
-                  <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-medium text-zinc-900 marker:content-none">
-                    {faq.question}
-                    <span className="mt-1 text-orange-500 transition-transform group-open:rotate-45">
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-3 leading-relaxed text-zinc-600">{faq.answer}</p>
-                </details>
-              ))}
+              {FAQS.map(faq => <details key={faq.question} className="py-5"><summary className="cursor-pointer text-base font-semibold text-zinc-900">{faq.question}</summary><p className="mt-3 leading-relaxed text-zinc-600">{faq.answer}</p></details>)}
             </div>
-
-            <div className="mt-10 text-center">
-              <Link
-                href="/bao-gia/"
-                className="inline-flex rounded-full bg-zinc-900 px-8 py-3.5 text-sm font-bold text-white transition-colors hover:bg-zinc-800"
-              >
-                Gửi yêu cầu báo giá
-              </Link>
-            </div>
+            <Link href="/bao-gia/" className="mt-8 inline-flex min-h-12 items-center rounded-full bg-zinc-900 px-7 py-3 font-semibold text-white hover:bg-zinc-700">Soạn yêu cầu báo giá</Link>
           </div>
         </section>
       </main>
-
       <Footer />
-      <ZaloWidget />
     </>
   );
 }

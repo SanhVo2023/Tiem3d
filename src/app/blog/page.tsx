@@ -47,7 +47,7 @@ export default function BlogPage() {
         ]}
       />
       <Header />
-      <main className="min-h-screen bg-white pt-16">
+      <main id="noi-dung" className="min-h-screen bg-white pt-[76px]">
         <BlogIndex
           title={TITLE}
           description={DESCRIPTION}

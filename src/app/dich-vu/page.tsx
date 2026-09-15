@@ -73,7 +73,7 @@ export default function ServicesHubPage() {
 
       <Header />
 
-      <main className="min-h-screen bg-white pt-16">
+      <main id="noi-dung" className="min-h-screen bg-white pt-[76px]">
         <section className="border-b border-zinc-200 bg-zinc-50">
           <div className="container mx-auto max-w-6xl px-6 py-16 md:py-24">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-orange-600">

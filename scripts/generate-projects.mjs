@@ -12,26 +12,6 @@ import { VN_PROJECTS, MISSING_SINGLES } from "./data/projects-vn.mjs";
 const OUTPUT_DIR = path.join(process.cwd(), "public", "assets", "generated");
 
 // ============================================
-// CLEAN PRODUCT PHOTOGRAPHY STYLE
-// ============================================
-const CLEAN_STYLE = `
-Clean product photography. Soft natural daylight from window.
-Simple wooden desk or table surface. Light wood tone.
-Minimal background - white wall, blurred green plant.
-Bright and airy. Shallow depth of field.
-Professional but approachable. Modern minimalist aesthetic.
-NO harsh shadows. NO cluttered background. NO dramatic lighting.
-`;
-
-const WORK_STYLE = `
-Clean workspace photography. Soft natural lighting.
-Wooden desk surface. Minimal tools visible - only what's needed.
-White/light background. Small plant in corner blurred.
-Focused on the subject. Professional product photo style.
-Bright, clean, modern aesthetic.
-`;
-
-// ============================================
 // VIETNAM-SPECIFIC FDM PROJECTS
 // Large decoration pieces, multi-part assembly
 // ============================================

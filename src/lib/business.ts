@@ -16,6 +16,8 @@ export interface Branch {
   /** Street line, without the city. */
   street: string;
   ward: string;
+  /** False keeps an unconfirmed current ward out of the public address. */
+  currentWardConfirmed?: boolean;
   locality: string;
   region: string;
   /** A nearby landmark — how people in Vietnam actually navigate. */
@@ -27,12 +29,11 @@ export interface Branch {
    * for "phường Tây Thạnh" — they ask for Tân Phú.
    */
   district: string;
-  /**
-   * Other names for this location: the pre-2025 ward, the new ward(s), the
-   * landmark. Kept so a search for either the old or the new name finds us.
-   */
+  /** Familiar area names; these do not establish the current legal ward. */
   aliases: string[];
-  geo: { lat: number; lng: number };
+  geo?: { lat: number; lng: number };
+  /** Whether visitors can receive service at this address. */
+  customerVisits: boolean;
   /** The first branch is treated as the primary for single-value SEO fields. */
   primary?: boolean;
 }
@@ -63,7 +64,7 @@ export const BUSINESS = {
     closes: "22:00",
     display: "8:00 – 22:00",
     days: "Thứ 2 – Chủ nhật",
-    note: "Mở cửa cả Chủ nhật",
+    note: "Tư vấn cả Chủ nhật",
   },
 
   branches: [
@@ -83,39 +84,30 @@ export const BUSINESS = {
         "Linh Tây",
       ],
       geo: { lat: 10.8589, lng: 106.7568 },
+      customerVisits: true,
       primary: true,
     },
     {
-      // Named Tân Phú, not Sơn Kỳ. Sơn Kỳ is the ward on the paperwork; Tân
-      // Phú is the district everyone actually says, searches and navigates by.
+      // Keep the supplied street and ward until an exact updated ward is confirmed.
       id: "tan-phu",
-      name: "Chi nhánh Tân Phú",
+      name: "Xưởng Tân Phú",
       shortName: "Tân Phú",
       street: "36 Bờ Bao Tân Thắng",
       ward: "Phường Sơn Kỳ",
+      currentWardConfirmed: false,
       district: "Tân Phú",
       locality: "TP. Hồ Chí Minh",
       region: "TP. Hồ Chí Minh",
-      // Quận Tân Phú was dissolved on 1 July 2025 and old phường Sơn Kỳ was
-      // split between Tây Thạnh, Tân Sơn Nhì and Phú Thọ Hòa. Which one No. 36
-      // now sits in is not something to guess at, so all three are carried as
-      // aliases rather than asserted as the address.
-      // TODO(owner): confirm the new ward on the shop's papers and promote it.
       aliases: [
         "Quận Tân Phú",
         "Phường Sơn Kỳ",
-        "Phường Tây Thạnh",
-        "Phường Tân Sơn Nhì",
-        "Phường Phú Thọ Hòa",
         "Aeon Mall Tân Phú",
         "Celadon City",
       ],
       landmark: "Cạnh Aeon Mall Tân Phú",
-      // Anchored on the surveyed position of Aeon Mall Tân Phú Celadon, which
-      // is No. 30 on this street, and stepped east along the same side to No.
-      // 36. Accurate to roughly a shopfront; swap in the exact Google Maps pin
-      // if the branch is ever verified on Google Business Profile.
-      geo: { lat: 10.80141, lng: 106.61782 },
+      // Owner confirmed: no customer visits; all deliveries use third-party couriers.
+      // Do not present this workshop as a walk-in shop or publish an estimated pin.
+      customerVisits: false,
     },
   ] satisfies Branch[] as Branch[],
 
@@ -123,9 +115,7 @@ export const BUSINESS = {
    * Areas the shop delivers to, used for local SEO and footer copy.
    *
    * These are the pre-July-2025 quận names. TP.HCM dissolved its districts into
-   * wards on 1 July 2025 (Nghị quyết 1685/NQ-UBTVQH15), but customers still say
-   * and search the old names, and will for years — so the old names lead here
-   * and the new ward names ride along in each branch's `aliases`.
+   * wards on 1 July 2025, but familiar area names remain useful for delivery.
    */
   serviceAreas: [
     "Thủ Đức",
@@ -138,20 +128,22 @@ export const BUSINESS = {
   ],
 } as const;
 
-/** The branch used wherever only one location can be expressed (geo meta tags). */
+/** The primary branch for contact components that show a single location. */
 export const PRIMARY_BRANCH: Branch =
   BUSINESS.branches.find((b) => b.primary) ?? BUSINESS.branches[0];
 
 /** "61 Đường Số 1, Khu Phố 2, Phường Linh Tây, Thủ Đức, TP. Hồ Chí Minh" */
 export function formatAddress(branch: Branch): string {
-  return [branch.street, branch.ward, branch.locality, branch.region]
+  const area = branch.currentWardConfirmed === false ? `khu vực ${branch.district}` : branch.ward;
+  return [branch.street, area, branch.locality, branch.region]
     .filter((part, i, arr) => part && arr.indexOf(part) === i)
     .join(", ");
 }
 
 /** Short form for tight spaces: "61 Đường Số 1, P. Linh Tây" */
 export function formatAddressShort(branch: Branch): string {
-  return `${branch.street}, ${branch.ward.replace(/^Phường /, "P. ")}`;
+  const area = branch.currentWardConfirmed === false ? `khu vực ${branch.district}` : branch.ward.replace(/^Phường /, "P. ");
+  return `${branch.street}, ${area}`;
 }
 
 /** Opens the branch on Google Maps by address search. */

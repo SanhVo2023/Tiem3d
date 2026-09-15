@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "@/components/ui/Img";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import {
   CASE_STUDIES,
@@ -50,32 +49,31 @@ export default function PortfolioPageContent() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-white pt-16">
+      <main id="noi-dung" className="min-h-screen bg-white pt-[76px]">
         <section className="border-b border-zinc-200 bg-zinc-50">
           <div className="container mx-auto max-w-6xl px-6 py-16 md:py-20">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-orange-600">
               Portfolio
             </p>
             <h1 className="mt-4 max-w-3xl text-display text-4xl text-zinc-900 md:text-6xl">
-              Những đơn hàng đã đi qua xưởng
+              Bộ mẫu in 3D để bạn tham khảo
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-600">
-              Mỗi dự án dưới đây kể lại đầy đủ quá trình: từ tin nhắn Zalo đầu
-              tiên, dựng mẫu, in, sơn, tới lúc đóng gói giao đi.
+              Hình ảnh và tình huống minh họa cho cách chọn vật liệu, thiết kế, in và hoàn thiện. Dùng bộ mẫu để trao đổi kiểu dáng và bề mặt bạn muốn.
             </p>
           </div>
         </section>
 
         {/* Filters */}
-        <div className="sticky top-16 z-30 border-b border-zinc-200 bg-white/90 backdrop-blur">
+        <div className="sticky top-[76px] z-30 border-b border-zinc-200 bg-white/90 backdrop-blur">
           <div className="container mx-auto max-w-6xl overflow-x-auto px-6 py-4">
-            <div className="flex gap-2">
+            <div className="flex gap-2" role="group" aria-label="Lọc mẫu theo ứng dụng">
               {available.map((filter) => (
                 <button
                   key={filter.id}
                   onClick={() => setActive(filter.id)}
                   aria-pressed={active === filter.id}
-                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm transition-colors ${
+                  className={`min-h-11 whitespace-nowrap rounded-full px-4 py-2 text-sm transition-colors ${
                     active === filter.id
                       ? "bg-zinc-900 text-white"
                       : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
@@ -90,14 +88,11 @@ export default function PortfolioPageContent() {
 
         {/* Grid */}
         <section className="container mx-auto max-w-6xl px-6 py-16">
+          <p className="mb-6 text-sm text-zinc-600" role="status">{visible.length} mẫu minh họa</p>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((study, index) => (
-              <motion.article
+              <article
                 key={study.slug}
-                layout
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.24) }}
                 className="group overflow-hidden rounded-2xl border border-zinc-200 transition-shadow hover:shadow-lg"
               >
                 <Link href={`/portfolio/${study.slug}/`} className="block">
@@ -111,7 +106,7 @@ export default function PortfolioPageContent() {
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     {study.featured && (
-                      <span className="absolute left-3 top-3 rounded-full bg-orange-500 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-white">
+                      <span className="absolute left-3 top-3 rounded-full bg-orange-500 px-2.5 py-1 font-mono text-xs font-bold tracking-wide text-zinc-950">
                         Nổi bật
                       </span>
                     )}
@@ -142,7 +137,7 @@ export default function PortfolioPageContent() {
                     </span>
                   </div>
                 </Link>
-              </motion.article>
+              </article>
             ))}
           </div>
         </section>

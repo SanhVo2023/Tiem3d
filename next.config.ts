@@ -15,6 +15,8 @@ const cdnUrl = (process.env.NEXT_PUBLIC_CDN_URL || "").replace(/\/+$/, "");
 const cdnHost = cdnUrl ? new URL(cdnUrl).hostname : null;
 
 const nextConfig: NextConfig = {
+  // Preserve the existing contributor guide; never append generated agent rules.
+  agentRules: false,
   // Static export for Netlify
   output: "export",
   trailingSlash: true,

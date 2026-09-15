@@ -16,7 +16,7 @@ import { SERVICES } from "@/lib/navigation";
 import { BUSINESS } from "@/lib/business";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
-import { BreadcrumbJsonLd, ArticleJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, CreativeWorkJsonLd } from "@/components/seo/JsonLd";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -37,12 +37,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: study.title,
-    description: study.description,
+    description: `Mẫu minh họa ${study.shortTitle.toLowerCase()}: tham khảo vật liệu, thông số và quy trình thiết kế, in, hoàn thiện.`,
     alternates: { canonical: url },
     openGraph: {
       type: "article",
       title: `${study.title} | Tiệm 3D`,
-      description: study.description,
+      description: `Mẫu minh họa ${study.shortTitle.toLowerCase()}: tham khảo vật liệu, thông số và quy trình thiết kế, in, hoàn thiện.`,
       url,
       siteName: BUSINESS.name,
       locale: "vi_VN",
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: `${study.title} | Tiệm 3D`,
-      description: study.description,
+      description: `Mẫu minh họa ${study.shortTitle.toLowerCase()}: tham khảo vật liệu, thông số và quy trình thiết kế, in, hoàn thiện.`,
       images: [image],
     },
   };
@@ -77,17 +77,16 @@ export default async function CaseStudyPage({ params }: Props) {
           { name: study.shortTitle, url },
         ]}
       />
-      <ArticleJsonLd
+      <CreativeWorkJsonLd
         headline={study.title}
         description={study.description}
         url={url}
         image={coverImage(study)}
-        datePublished="2026-01-01"
       />
 
       <Header />
 
-      <main className="min-h-screen bg-white pt-16">
+      <main id="noi-dung" className="min-h-screen bg-white pt-[76px]">
         {/* Hero */}
         <section className="border-b border-zinc-200 bg-zinc-50">
           <div className="container mx-auto max-w-5xl px-6 py-14 md:py-20">
@@ -96,7 +95,7 @@ export default async function CaseStudyPage({ params }: Props) {
               className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-900"
             >
               <ArrowLeft className="h-4 w-4" />
-              Tất cả dự án
+              Tất cả mẫu minh họa
             </Link>
 
             <p className="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-orange-600">
@@ -106,8 +105,9 @@ export default async function CaseStudyPage({ params }: Props) {
               {study.title}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-600">
-              {study.description}
+              Mẫu minh họa {study.shortTitle.toLowerCase()}, kèm phương án thiết kế, in và hoàn thiện để bạn trao đổi với tiệm.
             </p>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-600">Hình ảnh, tình huống và thông số dưới đây là nội dung minh họa. Kích thước, vật liệu và thời gian thực hiện sẽ được xác nhận theo yêu cầu của bạn.</p>
 
             {/* Spec strip — the shop's real vernacular is measurements */}
             <dl className="mt-10 grid grid-cols-2 gap-6 border-t border-zinc-200 pt-8 md:grid-cols-4">
@@ -130,7 +130,7 @@ export default async function CaseStudyPage({ params }: Props) {
           <div className="space-y-10">
             <div>
               <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500">
-                Khách cần gì
+                Tình huống minh họa
               </h2>
               <p className="mt-3 text-lg leading-relaxed text-zinc-800">
                 {study.brief}
@@ -158,8 +158,7 @@ export default async function CaseStudyPage({ params }: Props) {
               Từng bước một
             </h2>
             <p className="mt-3 max-w-xl text-zinc-600">
-              Đây là quy trình thật của một đơn hàng tại Tiệm 3D, từ tin nhắn Zalo
-              đầu tiên đến lúc đóng gói.
+              Minh họa các công đoạn từ trao đổi mẫu đến đóng gói. Quy trình thực tế được chọn theo từng yêu cầu.
             </p>
 
             <ol className="mt-12 space-y-14">
@@ -184,7 +183,7 @@ export default async function CaseStudyPage({ params }: Props) {
                   </div>
 
                   <div className={index % 2 === 1 ? "md:order-1" : ""}>
-                    <span className="font-mono text-sm font-bold text-orange-500">
+                    <span className="font-mono text-sm font-bold text-orange-600">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <h3 className="mt-2 text-xl font-bold text-zinc-900 md:text-2xl">
@@ -204,7 +203,7 @@ export default async function CaseStudyPage({ params }: Props) {
         {usedServices.length > 0 && (
           <section className="container mx-auto max-w-5xl px-6 py-16">
             <h2 className="text-2xl font-bold text-zinc-900 md:text-3xl">
-              Dịch vụ đã dùng trong dự án này
+              Dịch vụ phù hợp với mẫu
             </h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {usedServices.map((service) => (
@@ -232,7 +231,7 @@ export default async function CaseStudyPage({ params }: Props) {
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-zinc-400">
               Gửi ảnh hoặc bản vẽ tay qua Zalo — kể cả khi chưa có file 3D. Chúng
-              tôi báo giá trong 30 phút.
+              tôi kiểm tra mẫu và báo giá trong giờ tư vấn.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <a
@@ -257,7 +256,7 @@ export default async function CaseStudyPage({ params }: Props) {
         {related.length > 0 && (
           <section className="container mx-auto max-w-5xl px-6 py-16">
             <h2 className="text-2xl font-bold text-zinc-900 md:text-3xl">
-              Dự án khác
+              Mẫu minh họa khác
             </h2>
             <div className="mt-6 grid gap-6 sm:grid-cols-3">
               {related.map((item) => (

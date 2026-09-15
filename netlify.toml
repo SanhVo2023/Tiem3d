@@ -3,7 +3,7 @@
   publish = "out"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 
 # NOTE: no catch-all redirect.
 # This is a static export (next.config.ts sets output: "export"), so Netlify

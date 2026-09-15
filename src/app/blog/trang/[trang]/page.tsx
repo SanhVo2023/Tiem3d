@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPostsForPage, getTotalPages } from "@/lib/blog";
 import { BUSINESS } from "@/lib/business";
+import { pageMetadata } from "@/lib/metadata";
 import { Header, Footer } from "@/components/landing";
 import { BlogIndex } from "@/components/blog/BlogIndex";
 import { ZaloWidget } from "@/components/ui";
@@ -22,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { trang } = await params;
 
   return {
+    ...pageMetadata(`Blog in 3D — Trang ${trang}`, "Kiến thức về in 3D: công nghệ, vật liệu, chuẩn bị file và bảng giá tham khảo.", `/blog/trang/${trang}/`),
     title: `Blog in 3D — Trang ${trang}`,
     description:
       "Kiến thức thực tế về in 3D từ Tiệm 3D: công nghệ, vật liệu, chuẩn bị file và bảng giá.",
@@ -44,7 +46,7 @@ export default async function BlogPaginatedPage({ params }: Props) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white pt-16">
+      <main id="noi-dung" className="min-h-screen bg-white pt-[76px]">
         <BlogIndex
           title={`Blog in 3D — Trang ${pageNumber}`}
           description="Kiến thức thực tế về in 3D: chọn công nghệ và vật liệu, chuẩn bị file, cách tính giá."

@@ -31,7 +31,7 @@ export function Pagination({
           ← Trước
         </Link>
       ) : (
-        <span className={`${cell} border border-zinc-100 text-zinc-300`}>← Trước</span>
+        <span aria-disabled="true" className={`${cell} border border-zinc-200 bg-zinc-50 text-zinc-600`}>← Trước</span>
       )}
 
       {pages.map((page) =>
@@ -63,7 +63,7 @@ export function Pagination({
           Sau →
         </Link>
       ) : (
-        <span className={`${cell} border border-zinc-100 text-zinc-300`}>Sau →</span>
+        <span aria-disabled="true" className={`${cell} border border-zinc-200 bg-zinc-50 text-zinc-600`}>Sau →</span>
       )}
     </nav>
   );

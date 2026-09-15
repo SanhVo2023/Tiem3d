@@ -6,6 +6,7 @@ import {
   getPostsByTagSlug,
 } from "@/lib/blog";
 import { BUSINESS } from "@/lib/business";
+import { pageMetadata } from "@/lib/metadata";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import { BlogIndex } from "@/components/blog/BlogIndex";
@@ -29,19 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = `${tag.count} bài viết về ${tag.name.toLowerCase()} từ Tiệm 3D — kinh nghiệm thực tế từ xưởng in 3D tại TP.HCM.`;
 
   return {
-    title,
-    description,
-    alternates: { canonical: `${BUSINESS.url}/blog/tag/${tagSlug}/` },
+    ...pageMetadata(title, description, `/blog/tag/${tagSlug}/`),
     // One post behind a tag makes the tag page a thin duplicate of it.
     ...(tag.count < 2 ? { robots: { index: false, follow: true } } : {}),
-    openGraph: {
-      type: "website",
-      title,
-      description,
-      url: `${BUSINESS.url}/blog/tag/${tagSlug}/`,
-      siteName: BUSINESS.name,
-      locale: "vi_VN",
-    },
   };
 }
 
@@ -62,7 +53,7 @@ export default async function BlogTagPage({ params }: Props) {
         ]}
       />
       <Header />
-      <main className="min-h-screen bg-white pt-16">
+      <main id="noi-dung" className="min-h-screen bg-white pt-[76px]">
         <BlogIndex
           title={tag.name}
           description={`${tag.count} bài viết về ${tag.name.toLowerCase()}.`}

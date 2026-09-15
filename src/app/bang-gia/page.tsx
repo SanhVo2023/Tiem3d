@@ -96,7 +96,7 @@ export default function PricingPage() {
 
       <Header />
 
-      <main className="min-h-screen bg-white pt-16">
+      <main id="noi-dung" className="min-h-screen bg-white pt-[76px]">
         {/* Hero — answer first, with a number */}
         <section className="border-b border-zinc-200 bg-zinc-50">
           <div className="container mx-auto max-w-4xl px-6 py-16 md:py-20">
@@ -122,7 +122,7 @@ export default function PricingPage() {
                 rel="noopener noreferrer"
                 className="rounded-full bg-[#0068ff] px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-[#0057d4]"
               >
-                Gửi file, nhận giá trong 30 phút
+                Gửi mẫu để nhận báo giá
               </a>
               <Link
                 href="/bao-gia/"
@@ -146,11 +146,8 @@ export default function PricingPage() {
               <span className="text-orange-400">+</span> thời gian máy chạy
               <br />
               <span className="text-orange-400">+</span> công hoàn thiện
-              <br />
-              <span className="text-zinc-500">
-                ────────────────────────
-              </span>
-              <br />= giá thành phẩm
+              <hr className="my-3 border-zinc-600" />
+              = giá thành phẩm
             </div>
             <p className="mt-4 text-sm leading-relaxed text-zinc-600">
               Bảng dưới đây là <strong>giá thành phẩm</strong> — tức là giá bạn trả
@@ -174,7 +171,8 @@ export default function PricingPage() {
                 </p>
               )}
 
-              <div className="overflow-x-auto rounded-xl border border-zinc-200">
+              <p className="mb-2 text-sm text-zinc-600 sm:hidden">Vuốt ngang để xem đủ bảng giá.</p>
+              <div tabIndex={0} role="region" aria-label={`Bảng giá ${table.title}`} className="overflow-x-auto rounded-xl border border-zinc-200">
                 <table className="w-full min-w-[560px] border-collapse text-sm">
                   <thead>
                     <tr className="bg-zinc-50 text-left">
@@ -234,9 +232,9 @@ export default function PricingPage() {
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-zinc-300">
               Copy đoạn dưới, dán vào Zalo kèm ảnh hoặc file — chúng tôi báo giá
-              trong 30 phút.
+              sau khi kiểm tra yêu cầu của bạn.
             </p>
-            <pre className="mt-5 overflow-x-auto whitespace-pre-wrap rounded-xl bg-zinc-800/80 p-4 font-mono text-[13px] leading-relaxed text-zinc-200">
+            <pre tabIndex={0} aria-label="Mẫu tin nhắn Zalo" className="mt-5 overflow-x-auto whitespace-pre-wrap rounded-xl bg-zinc-800/80 p-4 font-mono text-[13px] leading-relaxed text-zinc-200">
 {`Chào Tiệm 3D, em cần in 3D [tên món]
 Kích thước mong muốn: ___ cm
 Số lượng: ___
@@ -248,7 +246,7 @@ Cần trước ngày: ___`}
               rel="noopener noreferrer"
               className="mt-6 inline-flex rounded-full bg-[#0068ff] px-7 py-3 text-sm font-bold transition-colors hover:bg-[#0057d4]"
             >
-              Chat Zalo {BUSINESS.phoneDisplay}
+              Nhắn Zalo cho tiệm
             </a>
           </aside>
 
@@ -257,7 +255,7 @@ Cần trước ngày: ___`}
             <h2 className="text-2xl font-bold text-zinc-900 md:text-3xl">
               Điều gì làm giá đội lên
             </h2>
-            <div className="mt-5 overflow-x-auto rounded-xl border border-zinc-200">
+            <div tabIndex={0} role="region" aria-label="Yếu tố ảnh hưởng đến giá" className="mt-5 overflow-x-auto rounded-xl border border-zinc-200">
               <table className="w-full min-w-[480px] border-collapse text-sm">
                 <tbody>
                   {PRICE_MODIFIERS.map((row) => (
@@ -284,7 +282,7 @@ Cần trước ngày: ___`}
             <ol className="mt-5 space-y-4">
               {PRICE_SAVING_TIPS.map((tip, index) => (
                 <li key={tip.title} className="flex gap-4">
-                  <span className="font-mono text-sm font-bold text-orange-500">
+                  <span className="font-mono text-sm font-bold text-orange-600">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div>
@@ -301,9 +299,9 @@ Cần trước ngày: ___`}
           {/* Worked examples */}
           <section className="mt-14">
             <h2 className="text-2xl font-bold text-zinc-900 md:text-3xl">
-              Ví dụ thực tế
+              Ví dụ chi phí tham khảo
             </h2>
-            <div className="mt-5 overflow-x-auto rounded-xl border border-zinc-200">
+            <div tabIndex={0} role="region" aria-label="Ví dụ chi phí tham khảo" className="mt-5 overflow-x-auto rounded-xl border border-zinc-200">
               <table className="w-full min-w-[520px] border-collapse text-sm">
                 <thead>
                   <tr className="bg-zinc-50 text-left">
@@ -346,7 +344,7 @@ Cần trước ngày: ___`}
               href="/portfolio/"
               className="mt-3 inline-flex text-sm font-medium text-orange-600 hover:text-orange-700"
             >
-              Xem các dự án đã làm →
+              Xem bộ mẫu minh họa →
             </Link>
           </section>
 
@@ -360,7 +358,7 @@ Cần trước ngày: ___`}
                 <details key={faq.question} className="group py-4">
                   <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-medium text-zinc-900 marker:content-none">
                     {faq.question}
-                    <span className="mt-1 text-orange-500 transition-transform group-open:rotate-45">
+                    <span aria-hidden="true" className="mt-1 text-orange-500 transition-transform group-open:rotate-45">
                       +
                     </span>
                   </summary>
@@ -375,11 +373,11 @@ Cần trước ngày: ___`}
         <section className="bg-zinc-900 py-16 text-white md:py-20">
           <div className="container mx-auto max-w-3xl px-6 text-center">
             <h2 className="text-display text-3xl md:text-4xl">
-              Gửi file, nhận giá trong 30 phút
+              Gửi mẫu để nhận báo giá
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-zinc-400">
               Chưa có file cũng không sao — một tấm ảnh chụp vội là đủ để bắt đầu.
-              Mở cửa {BUSINESS.hours.display}, {BUSINESS.hours.note.toLowerCase()}.
+              Giờ tư vấn {BUSINESS.hours.display}, {BUSINESS.hours.note.toLowerCase()}.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <a

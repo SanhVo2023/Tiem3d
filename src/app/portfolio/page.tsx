@@ -5,9 +5,9 @@ import { BUSINESS } from "@/lib/business";
 import { getAllCaseStudies, coverImage } from "@/lib/portfolio";
 import { socialCard } from "@/lib/social";
 
-const TITLE = "Portfolio — dự án in 3D đã thực hiện";
+const TITLE = "Portfolio — bộ mẫu in 3D minh họa";
 const DESCRIPTION =
-  "Các dự án in 3D Tiệm 3D đã làm tại TP.HCM: tượng trang trí, figure Resin 8K, mũ cosplay, chi tiết cơ khí và linh vật thương hiệu. Mỗi dự án kể lại đầy đủ quy trình từ Zalo tới lúc giao hàng.";
+  "Tham khảo mẫu in 3D, figure Resin, props cosplay và chi tiết cơ khí. Hình ảnh và tình huống minh họa giúp bạn chọn vật liệu và cách hoàn thiện.";
 // Scrapers cannot render WebP; socialCard() resolves to the JPEG cut of the
 // same image that scripts/generate-social-cards.mjs writes.
 const OG_IMAGE = socialCard("/assets/generated/portfolio/portfolio-01.webp");
@@ -54,7 +54,7 @@ export default function PortfolioPage() {
         ]}
       />
       <ItemListJsonLd
-        name="Dự án in 3D đã thực hiện"
+        name="Bộ mẫu in 3D minh họa"
         items={studies.map((study) => ({
           name: study.shortTitle,
           url: `${BUSINESS.url}/portfolio/${study.slug}/`,

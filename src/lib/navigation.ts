@@ -39,8 +39,8 @@ export const SERVICES: ServiceLink[] = [
   {
     name: "In chi tiết kỹ thuật",
     href: "/dich-vu/in-ky-thuat/",
-    tag: "±0.1mm",
-    summary: "Dung sai ±0.1mm cho chi tiết cơ khí, lắp ghép chính xác, kèm báo cáo QC.",
+    tag: "CAD",
+    summary: "Chi tiết cơ khí và mẫu lắp ghép, kiểm tra kích thước theo yêu cầu.",
   },
   {
     name: "Thiết kế 3D",
@@ -51,14 +51,14 @@ export const SERVICES: ServiceLink[] = [
   {
     name: "Hoàn thiện & sơn",
     href: "/dich-vu/hoan-thien/",
-    tag: "Sơn · Mạ",
-    summary: "Chà nhám, sơn airbrush, mạ chrome/vàng/đồng và hiệu ứng weathering.",
+    tag: "Sơn",
+    summary: "Chà nhám, sơn màu và tạo hiệu ứng bề mặt theo mẫu tham khảo.",
   },
   {
     name: "In hàng loạt",
     href: "/dich-vu/in-hang-loat/",
-    tag: "−40%",
-    summary: "Print-on-Demand với dàn máy chạy liên tục, giảm tới 40% cho đơn lớn.",
+    tag: "Theo lô",
+    summary: "Duyệt mẫu trước khi nhân bản; báo giá theo số lượng và mức hoàn thiện.",
   },
   {
     name: "Dự án trọn gói",

@@ -36,7 +36,7 @@ const OPENING_HOURS = {
 };
 
 const AREA_SERVED = BUSINESS.serviceAreas.map((area) => ({
-  "@type": "City",
+  "@type": "Place",
   name: area,
 }));
 
@@ -78,25 +78,23 @@ function localBusinessNode(branch: Branch) {
   return {
     "@type": ["LocalBusiness", "ProfessionalService"],
     "@id": branchId(branch),
-    name: `${BUSINESS.name} — ${branch.name}`,
+    name: BUSINESS.name,
     alternateName: BUSINESS.name,
     parentOrganization: { "@id": ORG_ID },
-    url: `${BUSINESS.url}/lien-he/`,
+    url: `${BUSINESS.url}/khu-vuc/${branch.id}/`,
     telephone: BUSINESS.phoneE164,
     email: BUSINESS.email,
     address: postalAddress(branch),
-    geo: {
+    ...(branch.geo ? { geo: {
       "@type": "GeoCoordinates",
       latitude: branch.geo.lat,
       longitude: branch.geo.lng,
-    },
+    } } : {}),
     openingHoursSpecification: [OPENING_HOURS],
     hasMap: mapsUrl(branch),
     priceRange: "$$",
     currenciesAccepted: "VND",
-    paymentAccepted: "Tiền mặt, Chuyển khoản, Momo, ZaloPay",
     knowsAbout: KNOWS_ABOUT,
-    image: `${BUSINESS.url}/assets/generated/hero/hero-main.webp`,
     areaServed: AREA_SERVED,
     sameAs: [BUSINESS.zalo],
   };
@@ -106,7 +104,7 @@ function jsonLdScript(data: unknown) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
     />
   );
 }
@@ -127,7 +125,6 @@ export function SiteJsonLd() {
         "@type": "Organization",
         "@id": ORG_ID,
         name: BUSINESS.name,
-        legalName: BUSINESS.legalName,
         url: BUSINESS.url,
         logo: {
           "@type": "ImageObject",
@@ -143,7 +140,7 @@ export function SiteJsonLd() {
           availableLanguage: "Vietnamese",
           areaServed: "VN",
         },
-        department: BUSINESS.branches.map((b) => ({ "@id": branchId(b) })),
+        department: BUSINESS.branches.filter((branch) => branch.customerVisits).map((b) => ({ "@id": branchId(b) })),
         areaServed: AREA_SERVED,
         knowsAbout: KNOWS_ABOUT,
         sameAs: [BUSINESS.zalo],
@@ -169,7 +166,7 @@ export function SiteJsonLd() {
         publisher: { "@id": ORG_ID },
         inLanguage: "vi-VN",
       },
-      ...BUSINESS.branches.map(localBusinessNode),
+      ...BUSINESS.branches.filter((branch) => branch.customerVisits).map(localBusinessNode),
     ],
   });
 }
@@ -363,3 +360,8 @@ export function ProductJsonLd({
 
 /** The primary branch's full address — handy for page copy. */
 export const PRIMARY_ADDRESS = formatAddress(PRIMARY_BRANCH);
+
+/** Illustrative portfolio content does not claim publication dates or customer reviews. */
+export function CreativeWorkJsonLd({ headline, description, url, image }: { headline: string; description: string; url: string; image: string }) {
+  return jsonLdScript({ "@context": "https://schema.org", "@type": "CreativeWork", name: headline, description: `Nội dung minh họa. ${description}`, url, image: `${BUSINESS.url}${image}`, creator: { "@id": ORG_ID }, inLanguage: "vi-VN" });
+}

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import remarkGfm from "remark-gfm";
 import {
   getAllSlugs,
   getPostBySlug,
@@ -127,8 +128,8 @@ const mdxComponents = {
     <a className="text-orange-600 underline hover:text-orange-700" {...props} />
   ),
   table: (props: React.HTMLAttributes<HTMLTableElement>) => (
-    <div className="mb-6 overflow-x-auto rounded-lg border border-zinc-200">
-      <table className="min-w-full border-collapse text-sm" {...props} />
+    <div tabIndex={0} role="region" aria-label="Bảng thông tin, cuộn ngang để xem" className="mb-6 overflow-x-auto rounded-lg border border-zinc-200">
+      <table className="w-full min-w-[480px] border-collapse text-sm" {...props} />
     </div>
   ),
   thead: (props: React.HTMLAttributes<HTMLTableSectionElement>) => (
@@ -160,7 +161,9 @@ const mdxComponents = {
   ),
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
-      className="mb-6 overflow-x-auto rounded-lg bg-zinc-900 p-4 text-zinc-100"
+      tabIndex={0}
+      aria-label="Nội dung định dạng sẵn, cuộn ngang để xem"
+      className="mb-6 overflow-x-auto rounded-lg bg-zinc-900 p-4 text-zinc-100 [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-inherit"
       {...props}
     />
   ),
@@ -171,6 +174,7 @@ const mdxComponents = {
 // into the dormant contentlayer config, so no post had heading IDs.
 const mdxOptions = {
   mdxOptions: {
+    remarkPlugins: [[remarkGfm, { singleTilde: false }]] as never,
     rehypePlugins: [
       rehypeSlug,
       [rehypeAutolinkHeadings, { behavior: "wrap" }],
@@ -213,7 +217,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       <Header />
 
-      <main className="min-h-screen bg-white pt-24">
+      <main id="noi-dung" className="min-h-screen bg-white pt-24">
         <article className="container mx-auto max-w-3xl px-6 py-12">
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="mb-8">

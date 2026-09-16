@@ -7,7 +7,7 @@ import { Menu, X, ChevronDown, ArrowRight } from "lucide-react";
 import { SERVICES, NAV_ITEMS } from "@/lib/navigation";
 import { BUSINESS } from "@/lib/business";
 
-export function Header() {
+export function Header({ variant = "default" }: { variant?: "default" | "studio" }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -47,7 +47,7 @@ export function Header() {
   const active = (href: string) => pathname === href || (href !== "/" && pathname.startsWith(href.replace(/\/$/, "")));
 
   return (
-    <header className="site-header">
+    <header className={"site-header" + (variant === "studio" ? " site-header-studio" : "")}>
       <a href="#noi-dung" className="skip-link">Tới nội dung chính</a>
       <div className="site-header-inner">
         <Link href="/" aria-label="Tiệm 3D — Trang chủ" className="site-wordmark">
@@ -76,7 +76,7 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link href="/bao-gia/" className="header-quote">Nhận báo giá<ArrowRight className="hidden h-4 w-4 sm:block" aria-hidden="true" /></Link>
-          <button type="button" aria-label="Mở menu" aria-expanded={menuOpen} aria-controls="mobile-navigation" className="flex h-11 w-11 items-center justify-center rounded-lg text-zinc-950 hover:bg-zinc-100 lg:hidden" onClick={() => { dialogRef.current?.showModal(); setMenuOpen(true); }}>
+          <button type="button" aria-label="Mở menu" aria-expanded={menuOpen} aria-controls="mobile-navigation" className="header-menu-toggle flex h-11 w-11 items-center justify-center rounded-lg text-zinc-950 hover:bg-zinc-100 lg:hidden" onClick={() => { dialogRef.current?.showModal(); setMenuOpen(true); }}>
             <Menu className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>

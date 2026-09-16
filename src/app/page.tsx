@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import "./home.css";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Check, MapPin } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Check, MapPin } from "lucide-react";
 import Image from "@/components/ui/Img";
 import { Header, Footer } from "@/components/landing";
 import { ZaloWidget } from "@/components/ui";
 import { PrintShowcase } from "@/components/home/PrintShowcase";
+import { HomeExperience } from "@/components/home/HomeExperience";
 import { FAQSection } from "@/components/home/FAQSection";
 import { BUSINESS } from "@/lib/business";
 import { SERVICES } from "@/lib/navigation";
@@ -34,14 +35,15 @@ const process = [
 export default function Home() {
   const posts = getAllPosts().slice(0, 3);
   return (
-    <>
-      <Header />
-      <main id="noi-dung">
+    <HomeExperience>
+      <Header variant="studio" />
+      <main id="noi-dung" className="studio-home">
         <section className="home-hero">
+          <div className="hero-build-grid" aria-hidden="true" />
           <div className="site-container hero-layout">
             <div className="hero-intro">
-              <p className="hero-location">In 3D & thiết kế theo yêu cầu tại TP.HCM</p>
-              <h1>Ý tưởng của bạn.<br />Thành hình với in 3D.</h1>
+              <p className="hero-location"><span aria-hidden="true" />In 3D & thiết kế theo yêu cầu tại TP.HCM</p>
+              <h1>Ý tưởng của bạn.<br />Thành hình với <span className="hero-keep">in 3D.</span></h1>
             </div>
             <PrintShowcase samples={samples} />
             <div className="hero-copy">
@@ -59,31 +61,36 @@ export default function Home() {
                 <Link href="/khu-vuc/tan-phu/">Tân Phú</Link>
                 <span aria-hidden="true">/</span>
                 <Link href="/khu-vuc/thu-duc/">Thủ Đức</Link>
-                <span className="text-zinc-600">Giao hàng toàn quốc</span>
+                <span>Giao hàng toàn quốc</span>
               </p>
             </div>
           </div>
+          <div className="site-container hero-footer"><span>Từ ảnh tham khảo đến sản phẩm của riêng bạn.</span><a href="#services-heading">Khám phá cách Tiệm làm<ArrowDown aria-hidden="true" /></a></div>
         </section>
 
-        <section className="home-section bg-white" aria-labelledby="services-heading">
+        <div className="studio-ribbon" data-scroll="ribbon" aria-hidden="true"><div data-scroll-art><span>Thiết kế.</span><span>In 3D.</span><span>Hoàn thiện.</span><span>Thành hình.</span></div></div>
+
+        <section className="home-section services-section" aria-labelledby="services-heading">
           <div className="site-container">
             <div className="section-intro">
               <div><h2 id="services-heading">Chọn cách in.<br />Đúng với món đồ bạn cần.</h2></div>
               <p>Độ bền, độ mịn hay chi phí? Mỗi công nghệ có một thế mạnh. Chúng tôi tư vấn dựa trên cách bạn sẽ sử dụng sản phẩm.</p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="service-feature-grid">
               {[
                 { title: "FDM", description: "Cho chi tiết sử dụng hằng ngày, đồ gá, prototype và mô hình lớn. Nhiều lựa chọn từ PLA, PETG đến nhựa kỹ thuật.", image: "/assets/generated/services/service-fdm-hero.webp", href: "/dich-vu/in-fdm/", detail: "Nhựa sợi · Đa dụng" },
                 { title: "Resin", description: "Cho figure, mô hình trưng bày và các chi tiết cần bề mặt mịn. Phù hợp khi hình dáng nhỏ và đường nét là ưu tiên.", image: "/assets/generated/services/service-resin-hero.webp", href: "/dich-vu/in-resin/", detail: "Nhựa quang hóa · Chi tiết" },
               ].map((service) => (
-                <Link key={service.href} href={service.href} className="service-feature group">
-                  <div className="relative aspect-[16/9] overflow-hidden bg-zinc-100">
-                    <Image src={service.image} alt={"Minh họa công nghệ in " + service.title} fill sizes="(max-width: 767px) 100vw, 600px" className="object-cover transition-transform duration-300 group-hover:scale-[1.025]" />
+                <Link key={service.href} href={service.href} className={"service-feature service-" + service.title.toLowerCase()}>
+                  <div className="service-art" data-reveal>
+                    <Image src={service.image} alt={"Minh họa công nghệ in " + service.title} fill sizes="(max-width: 767px) 100vw, 600px" className="object-cover" />
+                    <span className="service-art-name" aria-hidden="true">{service.title}</span>
+                    <span className="service-art-arrow"><ArrowUpRight aria-hidden="true" /></span>
                   </div>
-                  <div className="p-5 sm:p-7">
-                    <p className="text-sm text-zinc-600">{service.detail}</p>
-                    <h3 className="mt-2 flex items-center justify-between font-display text-3xl font-bold text-zinc-950">In {service.title}<ArrowUpRight className="h-6 w-6" aria-hidden="true" /></h3>
-                    <p className="mt-3 max-w-lg leading-relaxed text-zinc-600">{service.description}</p>
+                  <div className="service-feature-copy">
+                    <p className="service-detail">{service.detail}</p>
+                    <h3>In {service.title}</h3>
+                    <p>{service.description}</p>
                   </div>
                 </Link>
               ))}
@@ -94,28 +101,28 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="home-section bg-[#f4f6f7]" aria-labelledby="examples-heading">
+        <section className="home-section examples-section" aria-labelledby="examples-heading">
           <div className="site-container">
             <div className="section-intro">
               <h2 id="examples-heading">Một vài cách<br />biến ý tưởng thành hình.</h2>
               <div><p>Mẫu minh họa giúp bạn hình dung công nghệ, vật liệu và mức hoàn thiện phù hợp trước khi đặt làm.</p><Link href="/portfolio/" className="section-text-link">Khám phá mẫu & quy trình<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></div>
             </div>
-            <div className="grid gap-7 sm:grid-cols-3">
-              {samples.map((sample) => <Link key={sample.href} href={sample.href} className="group block">
-                <div className="relative aspect-square overflow-hidden rounded-xl bg-zinc-200"><Image src={sample.image} alt={sample.title + " — mẫu minh họa"} fill sizes="(max-width: 639px) 100vw, 400px" className="object-cover transition-transform duration-300 group-hover:scale-[1.025]" /></div>
-                <p className="mt-4 text-sm text-zinc-600">{sample.label}</p>
-                <h3 className="mt-1 flex items-center justify-between gap-2 text-lg font-semibold text-zinc-950">{sample.title}<ArrowUpRight className="h-5 w-5 shrink-0" aria-hidden="true" /></h3>
+            <div className="sample-gallery">
+              {samples.map((sample, index) => <Link key={sample.href} href={sample.href} className={"sample-card sample-card-" + index}>
+                <div className="sample-art" data-reveal><Image src={sample.image} alt={sample.title + " — mẫu minh họa"} fill sizes="(max-width: 767px) 100vw, 600px" className="object-cover" /><span className="sample-view">Xem cách làm<ArrowUpRight aria-hidden="true" /></span></div>
+                <div className="sample-caption"><div><p>{sample.label}</p><h3>{sample.title}</h3></div><ArrowUpRight className="h-6 w-6 shrink-0" aria-hidden="true" /></div>
               </Link>)}
             </div>
           </div>
         </section>
 
-        <section className="home-section bg-[#151719] text-white" aria-labelledby="process-heading">
+        <section className="home-section process-section" aria-labelledby="process-heading" data-scroll="process">
           <div className="site-container">
             <div className="section-intro">
               <h2 id="process-heading">Bạn nói điều mình cần.<br />Tiệm lo phần còn lại.</h2>
               <p className="!text-zinc-300">Không cần biết thuật ngữ kỹ thuật. Chỉ cần bắt đầu từ món đồ, ảnh tham khảo hoặc vấn đề bạn muốn giải quyết.</p>
             </div>
+            <div className="process-track" aria-hidden="true"><span data-scroll-art /></div>
             <ol className="process-grid">
               {process.map((step, index) => <li key={step.title}>
                 <span className="process-number" aria-hidden="true">0{index + 1}</span>
@@ -130,7 +137,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="home-section bg-white" aria-labelledby="locations-heading">
+        <section className="home-section locations-section" aria-labelledby="locations-heading">
           <div className="site-container">
             <div className="section-intro">
               <h2 id="locations-heading">Ở TP.HCM.<br />Nhận yêu cầu từ mọi nơi.</h2>
@@ -146,11 +153,11 @@ export default function Home() {
 
         <FAQSection />
 
-        <section className="home-section bg-white" aria-labelledby="guides-heading">
+        <section className="home-section guides-section" aria-labelledby="guides-heading">
           <div className="site-container">
             <div className="section-intro"><h2 id="guides-heading">Tìm hiểu trước khi in.</h2><Link href="/blog/" className="section-text-link">Tất cả bài hướng dẫn<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></div>
             <div className="grid gap-8 md:grid-cols-3">
-              {posts.map((post) => <article key={post.slug}>
+              {posts.map((post) => <article key={post.slug} className="guide-card">
                 <Link href={post.url} className="group">
                   {post.image && <div className="relative mb-4 aspect-[16/10] overflow-hidden rounded-lg bg-zinc-100"><Image src={post.image} alt="" fill sizes="(max-width: 767px) 100vw, 400px" className="object-cover" /></div>}
                   <h3 className="text-lg font-semibold leading-relaxed text-zinc-950 group-hover:text-[#a83e08]">{post.title}</h3>
@@ -160,9 +167,16 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <section className="studio-invitation" aria-labelledby="invitation-heading" data-scroll="layers">
+          <div className="site-container invitation-layout">
+            <div className="invitation-copy"><h2 id="invitation-heading">Bạn đang muốn<br />in món gì?</h2><p>Một mô hình bạn thích. Một chi tiết khó tìm. Hay một ý tưởng chưa ai làm. Kể cho Tiệm nghe.</p><Link href="/bao-gia/" className="action-dark">Gửi ý tưởng cho Tiệm<ArrowUpRight aria-hidden="true" /></Link></div>
+            <div className="invitation-sculpture" aria-hidden="true"><svg viewBox="0 0 480 480" fill="none" data-scroll-art>{Array.from({ length: 26 }, (_, index) => <ellipse key={index} cx={240 + Math.sin(index * 0.14) * 40} cy={95 + index * 10.5} rx={95 + Math.cos(index * 0.22) * 48} ry={38 + Math.cos(index * 0.22) * 18} stroke="currentColor" strokeWidth="1.5" />)}</svg></div>
+          </div>
+        </section>
       </main>
       <Footer />
       <ZaloWidget />
-    </>
+    </HomeExperience>
   );
 }
